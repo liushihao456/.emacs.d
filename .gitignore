@@ -1,0 +1,15 @@
+*.el~
+.DS_Store
+recentf
+recentf~
+*.local
+*.local~
+projectile.cache
+projectile-bookmarks.eld
+eshell/
+.python-environments/
+workspace/
+auto-save-list/
+eclipse.jdt.ls/
+irony/
+.mc-lists.el
