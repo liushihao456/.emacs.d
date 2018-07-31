@@ -15,3 +15,4 @@ irony/
 .mc-lists.el
 .last-package-update-day
 elpa/
+srecode-map.el

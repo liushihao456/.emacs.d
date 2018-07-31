@@ -1,4 +1,8 @@
 
+
+
+
+
 ;;; Commentary:
 ;;init.el --- Emacs configuration
 
@@ -19,6 +23,8 @@
 (eval-when-compile
   (add-to-list 'load-path "~/.emacs.d/packages/use-package")
   (require 'use-package))
+
+;; (setq use-package-compute-statistics t)
 
 (use-package auto-package-update
   :ensure t
@@ -43,7 +49,7 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-    (dashboard auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony company-jedi jedi-core dumb-jump helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme use-package auto-package-update)))
+    (matlab-mode matlab helm-swoop dashboard auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony company-jedi jedi-core dumb-jump helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme use-package auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(truncate-lines t))
@@ -295,6 +301,10 @@ _d_: dir"
 				("s g" helm-projectile-grep))
   )
 
+(use-package helm-swoop
+  :ensure t
+  :commands (helm-swoop helm-swoop-back-to-last-point))
+
 (use-package helm
   :ensure t
   :custom
@@ -478,6 +488,11 @@ _d_: dir"
   :hook (LaTeX-mode . auctex-latexmk-setup)
   :custom (TeX-command-default "LatexMk")
   )
+
+;; Matlab mode
+(use-package matlab-mode
+  :ensure t
+  :defer t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                Smartparens                                ;;
