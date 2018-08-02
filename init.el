@@ -1,8 +1,3 @@
-
-
-
-
-
 ;;; Commentary:
 ;;init.el --- Emacs configuration
 
@@ -24,7 +19,7 @@
   (add-to-list 'load-path "~/.emacs.d/packages/use-package")
   (require 'use-package))
 
-;; (setq use-package-compute-statistics t)
+(setq use-package-compute-statistics t)
 
 (use-package auto-package-update
   :ensure t
@@ -49,9 +44,18 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-    (matlab-mode matlab helm-swoop dashboard auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony company-jedi jedi-core dumb-jump helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme use-package auto-package-update)))
+    (company-rtags helm-rtags rtags treemacs-projectile treemacs anaconda company-anaconda jedi py-autopep8 ein matlab-mode matlab helm-swoop dashboard auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony company-jedi jedi-core dumb-jump helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme use-package auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
+ '(treemacs-collapse-dirs 3 t nil "Customized with use-package treemacs")
+ '(treemacs-filewatch-mode t)
+ '(treemacs-follow-after-init t t nil "Customized with use-package treemacs")
+ '(treemacs-follow-mode t)
+ '(treemacs-fringe-indicator-mode nil)
+ '(treemacs-git-mode (quote deferred))
+ '(treemacs-goto-tag-strategy (quote refetch-index) t nil "Customized with use-package treemacs")
+ '(treemacs-indentation 2 t nil "Customized with use-package treemacs")
+ '(treemacs-is-never-other-window nil t nil "Customized with use-package treemacs")
  '(truncate-lines t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,13 +78,19 @@
       mac-command-key-is-meta t
       mac-command-modifier 'meta
       mac-option-modifier 'none)
-(set-frame-font "Monaco-13") ; set font to Monaco
+(set-frame-font "Monaco-12") ; set font to Monaco
 
 (use-package zerodark-theme
   :ensure t
   :config
   (load-theme 'zerodark t)
   )
+
+;; (use-package dracula-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'dracula t)
+;;   )
 
 (use-package powerline
   :ensure t
@@ -106,7 +116,8 @@
 (use-package which-key
   :ensure t
   :hook ((prog-mode . which-key-mode)
-	 (text-mode . which-key-mode))
+	 (text-mode . which-key-mode)
+	 (ein:notebook-multilang-mode . which-key-mode))
   :config
   (which-key-setup-side-window-right)
   )
@@ -123,7 +134,8 @@
   :ensure t
   :ensure yasnippet-snippets
   :hook ((prog-mode . yas-minor-mode)
-	 (LaTeX-mode . yas-minor-mode))
+	 (LaTeX-mode . yas-minor-mode)
+	 (ein:notebook-multilang-mode . yas-minor-mode))
   :config
   (add-hook 'python-mode-hook (lambda ()
 				(setq-local yas-indent-line 'fixed)))
@@ -131,18 +143,21 @@
 
 (use-package company
   :ensure t
-  :hook (prog-mode . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode ein:notebook-multilang-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
 		      (company-abbrev company-dabbrev)))
   :config
   (setq company-idle-delay 0)
+  (setq company-transformers '(company-sort-by-occurrence))
+  (setq company-selection-wrap-around t)
   )
 
 (use-package flycheck
   :ensure t
-  :hook (prog-mode . flycheck-mode)
+  :hook ((prog-mode . flycheck-mode)
+	 (ein:notebook-multilang-mode . flycheck-mode))
   :config
   (add-hook 'python-mode-hook (lambda ()
 				(setq-local flycheck-python-flake8-executable "/usr/local/bin/flake8")))
@@ -166,7 +181,9 @@
   :hook ((emacs-lisp-mode . hungry-delete-mode)
 	 (c-mode . hungry-delete-mode)
 	 (c++-mode . hungry-delete-mode)
-	 (matlab-mode . hungry-delete-mode))
+	 (python-mode . hungry-delete-mode)
+	 (matlab-mode . hungry-delete-mode)
+	 (ein:notebook-multilang-mode . hungry-delete-mode))
   )
 
 (use-package expand-region
@@ -225,6 +242,14 @@ narrowed."
 	 (c++-mode . aggressive-indent-mode)
 	 (LaTeX-mode . aggressive-indent-mode))
   :config
+  (setq-local electric-indent-mode nil)
+  (defun turn-off-electric-indent-mode ()
+    "Turn off electric indent mode in current buffer."
+    (setq-local electric-indent-mode nil))
+  (add-hook 'emacs-lisp-mode 'turn-off-electric-indent-mode)
+  (add-hook 'c-mode 'turn-off-electric-indent-mode)
+  (add-hook 'c++-mode 'turn-off-electric-indent-mode)
+  (add-hook 'LaTeX-mode 'turn-off-electric-indent-mode)
   )
 
 (use-package use-package-hydra
@@ -233,8 +258,8 @@ narrowed."
 
 (use-package smartparens
   :ensure t
-  :hook ((prog-mode . show-smartparens-mode)
-	 (prog-mode . turn-on-smartparens-mode))
+  :hook (((prog-mode ein:notebook-multilang-mode) . show-smartparens-mode)
+	 ((prog-mode ein:notebook-multilang-mode) . turn-on-smartparens-mode))
   :bind (:map smartparens-mode-map
 	      ("C-c s" . hydra-smartparens/body)
 	      ("C-k" . sp-kill-hybrid-sexp)
@@ -339,7 +364,8 @@ _d_: dir"
 		     ("t" helm-bibtex "bibtex"))
   :config
   (helm-mode t)
-  (require 'helm-config)
+  ;; (require 'helm-config)
+  (global-set-key (kbd "C-x c") 'hydra-helm/body)
   )
 
 (use-package dumb-jump
@@ -361,25 +387,126 @@ _d_: dir"
 			  ("x" dumb-jump-go-prefer-external-other-window "Go external other window"))
   )
 
-;; Python
-(use-package jedi-core
+(use-package treemacs
   :ensure t
-  :ensure company-jedi
-  :hook (python-mode . jedi:setup)
-  :config
-  (message "Jedi loaded.")
-
-  (make-local-variable 'company-backends)
-  (setq company-backends nil)
-  (add-to-list 'company-backends '(company-jedi company-yasnippet company-files))
-
-  (defun my/jedi-setup ()
-    "Add company-jedi to company-backends in python mode."
-    (make-local-variable 'company-backends)
-    (setq company-backends nil)
-    (add-to-list 'company-backends '(company-jedi company-yasnippet company-files))
+  :init
+  (defun treemacs-projectile/helm (p)
+    "Load helm before calling treemancs-projectile."
+    (interactive "P")
+    (unless (featurep 'helm)
+      (require 'helm))
+    (treemacs-projectile)
     )
-  (add-hook 'python-mode-hook 'my/jedi-setup)
+  :custom
+  (treemacs-follow-after-init t)
+  (treemacs-width 25)
+  (treemacs-indentation 2)
+  (treemacs-git-integration t)
+  (treemacs-collapse-dirs 3)
+  (treemacs-silent-refresh nil)
+  (treemacs-change-root-without-asking nil)
+  (treemacs-sorting 'alphabetic-desc)
+  (treemacs-show-hidden-files t)
+  (treemacs-never-persist nil)
+  (treemacs-is-never-other-window nil)
+  (treemacs-goto-tag-strategy 'refetch-index)
+  :config
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-resize-icons 44)
+  :bind (("C-x a" . hydra-treemacs/body)
+	 ("C-c a" . treemacs-helpful-hydra))
+  :hydra (hydra-treemacs (:color blue :hint nil)
+			 "
+^Toggle^                            ^Windows^                          ^Find^
+^ ^
+^^^^^^^^-------------------------------------------------------------------------------
+^ ^
+_a_: Treemacs                       _s_: Select treemacs window        _f_: Find files
+^ ^
+_p_: Treemacs projectile            _d_: Delete other windows          _b_: Find bookmark"
+                         ("a" treemacs)
+			 ("s" treemacs-select-window)
+			 ("f" treemacs-find-file)
+			 ("p" treemacs-projectile/helm)
+			 ("d" treemacs-delete-other-windows)
+			 ("b" treemacs-bookmark))
+  
+  )
+
+(use-package treemacs-projectile
+  :ensure t
+  :commands treemacs-projectile
+  :custom
+  (treemacs-header-function #'treemacs-projectile-create-header)
+  )
+
+;; Python
+;; (use-package anaconda-mode
+;;   :ensure t
+;;   :ensure company-anaconda
+;;   :hook ((python-mode . anaconda-mode)
+;; 	 (python-mode . anaconda-eldoc-mode))
+;;   :config
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends nil)
+;;   (add-to-list 'company-backends '(company-anaconda company-files))
+;;   ;; make sure the company backends are set again when opening another python file.
+;;   (defun my/anaconda-setup ()
+;;     "Add company-anaconda to company-backends in python mode."
+;;     (make-local-variable 'company-backends)
+;;     (setq company-backends nil)
+;;     (add-to-list 'company-backends '(company-anaconda company-files))
+;;     )
+;;   (add-hook 'python-mode-hook 'my/anaconda-setup)
+;;   )
+
+(use-package jedi
+  :ensure t
+  :custom (jedi:complete-on-dot t)
+  :hook (python-mode . jedi:ac-setup)
+  )
+
+;; (use-package company-jedi
+;;   :ensure t
+;;   :init
+;;   (defun my/python-mode-hook ()
+;;     (add-to-list 'company-backends 'company-jedi))
+;;   (add-hook 'python-mode-hook 'my/python-mode-hook)
+;;   )
+
+;; (use-package jedi-core
+;;   :ensure t
+;;   :ensure company-jedi
+;;   :hook (python-mode . jedi:setup)
+;;   :config
+;;   (message "Jedi loaded.")
+;;   (setq jedi:complete-on-dot t)
+;;   (setq jedi:use-shortcuts t)
+
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends nil)
+;;   (add-to-list 'company-backends 'company-jedi)
+
+;;   ;; make sure the company backends are set again when opening another python file.
+;;   (defun my/jedi-setup ()
+;;     "Add company-jedi to company-backends in python mode."
+;;     (make-local-variable 'company-backends)
+;;     (setq company-backends nil)
+;;     (add-to-list 'company-backends '(company-jedi company-yasnippet company-files))
+;;     )
+;;   (add-hook 'python-mode-hook 'my/jedi-setup)
+;;   )
+
+(use-package py-autopep8
+  :ensure t
+  :hook (python-mode . py-autopep8-enable-on-save))
+
+;; Emacs Ipython Notebook
+(use-package ein
+  :ensure t
+  :commands ein:jupyter-server-start
+  :custom (ein:completion-backend 'ein:use-company-backend)
   )
 
 ;; C++
@@ -391,7 +518,6 @@ _d_: dir"
 	 (irony-mode . irony-cdb-autosetup-compile-options))
   :config
   (message "Irony loaded.")
-
   (make-local-variable 'company-backends)
   (setq company-backends nil)
   (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
@@ -404,7 +530,18 @@ _d_: dir"
     )
   (add-hook 'c-mode-hook 'my/irony-mode)
   (add-hook 'c++-mode-hook 'my/irony-mode)
+
   )
+
+;; (use-package rtags
+;;   :ensure t
+;;   :ensure helm-rtags
+;;   :hook (((c-mode c++-mode) . rtags-start-process-unless-running)
+;; 	 ((c-mode c++-mode) . rtags-diagnostics))
+;;   :custom
+;;   (rtags-completions-enabled t)
+;;   (rtags-display-result-backend 'helm)
+;;   )
 
 ;; Java
 (use-package lsp-mode
@@ -492,6 +629,7 @@ _d_: dir"
 ;; Matlab mode
 (use-package matlab-mode
   :ensure t
+  :commands matlab-shell
   :defer t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -634,6 +772,10 @@ _d_: dir"
 ;; 			      (setf (car company-backends)
 ;; 			      	    (append '(company-jedi) (car company-backends)))
 ;; 			      ))
+;; (require 'jedi-core)
+;; (setq python-environment-virtualenv
+;;       (append python-environment-virtualenv
+;;               '("--python" "/usr/local/bin/python3")))
 ;; (add-hook 'python-mode-hook 'jedi:setup)
 
 ;; Aggressive indent doesn't work for python mode, therefore

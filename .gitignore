@@ -16,3 +16,7 @@ irony/
 .last-package-update-day
 elpa/
 srecode-map.el
+.cache/
+request/
+.cask/
+ac-comphist.dat
