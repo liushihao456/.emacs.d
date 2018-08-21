@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: table
+# key: table
+# --
+\begin{table}[$1]
+  \caption{$2}
+  \begin{center}
+    {\renewcommand{\arraystretch}{0.8}
+      $4
+    }
+    \label{tab:$3}
+  \end{center}
+  \begin{small}
+    
+  \end{small}
+\end{table}

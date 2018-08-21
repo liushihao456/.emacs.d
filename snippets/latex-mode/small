@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: small
+# key: small
+# --
+\begin{small}
+$0
+\end{small}

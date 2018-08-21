@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: tabular*
+# key: tabular
+# --
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}$1}
+  \toprule
+  $0
+  \\\
+  \midrule
+
+  \\\
+  \bottomrule
+\end{tabular*}

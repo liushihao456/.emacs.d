@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: cmidrule
+# key: cmid
+# --
+\cmidrule(lr){$1-$2} & $0

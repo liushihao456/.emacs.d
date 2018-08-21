@@ -1,0 +1,34 @@
+# -*- mode: snippet -*-
+# name: RA_report
+# key: ra
+# --
+\documentclass[11pt]{article}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+\textwidth=6.6in
+\textheight=8.9in
+\headheight=0.0in
+\oddsidemargin=0.0in
+\headsep=0.0in
+\topmargin=0.0in
+\def\baselinestretch{1.3}
+\begin{document}
+
+\author{Shihao Liu}
+\title{$1}
+\date{\today}
+\maketitle
+
+\begin{abstract}
+$0
+\end{abstract}
+
+\section{Introduction}
+
+\bibliographystyle{../elsevier}
+\bibliography{../mybib}
+\end{document}
