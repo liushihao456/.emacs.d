@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: lstlisting
+# key: ls
+# --
+\begin{lstlisting}[language={${1:Python}},title={$2}]
+$0
+\end{lstlisting}

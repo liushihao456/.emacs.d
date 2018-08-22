@@ -131,10 +131,15 @@
 (use-package yasnippet
   :ensure t
   :ensure yasnippet-snippets
+  ;; :custom
+  ;; (yas/root-directory "~/.emacs.d/snippets")
   :hook ((prog-mode . yas-minor-mode)
 	 (LaTeX-mode . yas-minor-mode)
-	 (ein:notebook-multilang-mode . yas-minor-mode))
+	 (ein:notebook-multilang-mode . yas-minor-mode)
+	 (org-mode . yas-minor-mode))
   :config
+  (setq yas/root-directory "~/.emacs.d/snippets")
+  (yas-load-directory yas/root-directory)
   (add-hook 'python-mode-hook (lambda ()
 				(setq-local yas-indent-line 'fixed)))
   )
@@ -237,7 +242,8 @@ narrowed."
 						    text-mode yaml-mode java-mode))
   :hook ((emacs-lisp-mode . aggressive-indent-mode)
 	 (c-mode . aggressive-indent-mode)
-	 (c++-mode . aggressive-indent-mode))
+	 (c++-mode . aggressive-indent-mode)
+	 (org-mode . aggressive-indent-mode))
   :config
   (setq-local electric-indent-mode nil)
   (defun turn-off-electric-indent-mode ()
