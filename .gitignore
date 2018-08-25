@@ -20,3 +20,5 @@ srecode-map.el
 request/
 .cask/
 ac-comphist.dat
+/abbrev_defs
+/bookmarks

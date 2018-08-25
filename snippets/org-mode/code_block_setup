@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: code_block_setup
+# key: lst
+# --
+#+LATEX_HEADER: \usepackage{xeCJK}
+#+LATEX_HEADER: \setCJKmainfont{Songti SC}
+#+LATEX_HEADER: \setlength\parindent{0pt}
+#+LATEX_HEADER: \usepackage{xcolor}
+#+LATEX_HEADER: \lstset{numbers=left,
+#+LATEX_HEADER:   basicstyle=\linespread{1.0}\small\ttfamily,
+#+LATEX_HEADER:   numberstyle=\tiny, 
+#+LATEX_HEADER:   keywordstyle= \color{blue!70},commentstyle=\color{red!50!green!50!blue!50}, 
+#+LATEX_HEADER:   frame=shadowbox, 
+#+LATEX_HEADER:   rulesepcolor= \color{red!20!green!20!blue!20},
+#+LATEX_HEADER:   breaklines=true,
+#+LATEX_HEADER:   backgroundcolor=\color[rgb]{0.91,0.91,0.91},
+#+LATEX_HEADER:   framextopmargin=2pt,
+#+LATEX_HEADER:   framexbottommargin=2pt,
+#+LATEX_HEADER:   abovecaptionskip=-3pt,
+#+LATEX_HEADER:   belowcaptionskip=3pt,
+#+LATEX_HEADER:   xleftmargin=0em,
+#+LATEX_HEADER:   xrightmargin=0em
+#+LATEX_HEADER: }

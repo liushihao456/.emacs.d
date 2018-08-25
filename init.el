@@ -1,5 +1,5 @@
 ;;; Commentary:
-;;init.el --- Emacs configuration
+;; init.el --- Emacs configuration
 
 ;; INSTALL PACKAGES;;; init -- init Emacs
 ;;
@@ -22,12 +22,12 @@
 
 (setq use-package-compute-statistics t)
 
-;; (use-package auto-package-update
-;;   :ensure t
-;;   :config
-;;   (setq auto-package-update-delete-old-versions t)
-;;   (setq auto-package-update-hide-results t)
-;;   (auto-package-update-maybe))
+(use-package auto-package-update
+  :ensure t
+  :config
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe))
 
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
@@ -45,7 +45,7 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-    (helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony ein py-autopep8 jedi treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
+    (ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 jedi treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(truncate-lines t))
@@ -70,7 +70,19 @@
       mac-command-key-is-meta t
       mac-command-modifier 'meta
       mac-option-modifier 'none)
-(set-frame-font "Monaco-12") ; set font to Monaco
+;; change all prompts to y or n
+(fset 'yes-or-no-p 'y-or-n-p)
+;; English Font
+(set-face-attribute
+ 'default nil :font "Monaco 12")
+;; Chinese Font
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font (frame-parameter nil 'font)
+		    charset
+		    ;; (font-spec :family "Microsoft Yahei" :size 14)))
+		    (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)))
+
+;; (set-frame-font "monaco-12") ; set font to Monaco
 
 ;; (use-package zenburn-theme
 ;;   :ensure t
@@ -114,8 +126,7 @@
 (use-package which-key
   :ensure t
   :hook ((prog-mode . which-key-mode)
-	 (text-mode . which-key-mode)
-	 (ein:notebook-multilang-mode . which-key-mode))
+	 (text-mode . which-key-mode))
   :config
   (which-key-setup-side-window-right)
   )
@@ -135,8 +146,7 @@
   ;; (yas/root-directory "~/.emacs.d/snippets")
   :hook ((prog-mode . yas-minor-mode)
 	 (LaTeX-mode . yas-minor-mode)
-	 (ein:notebook-multilang-mode . yas-minor-mode)
-	 (org-mode . yas-minor-mode))
+         (org-mode . yas-minor-mode))
   :config
   (setq yas/root-directory "~/.emacs.d/snippets")
   (yas-load-directory yas/root-directory)
@@ -146,7 +156,7 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode ein:notebook-multilang-mode) . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
@@ -159,8 +169,7 @@
 
 (use-package flycheck
   :ensure t
-  :hook ((prog-mode . flycheck-mode)
-	 (ein:notebook-multilang-mode . flycheck-mode))
+  :hook (prog-mode . flycheck-mode)
   :config
   (add-hook 'python-mode-hook (lambda ()
 				(setq-local flycheck-python-flake8-executable "/usr/local/bin/flake8")))
@@ -177,7 +186,9 @@
 (use-package undo-tree
   :ensure t
   :config
-  (global-undo-tree-mode))
+  (global-undo-tree-mode)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t))
 
 (use-package hungry-delete
   :ensure t
@@ -185,8 +196,7 @@
 	 (c-mode . hungry-delete-mode)
 	 (c++-mode . hungry-delete-mode)
 	 (python-mode . hungry-delete-mode)
-	 (matlab-mode . hungry-delete-mode)
-	 (ein:notebook-multilang-mode . hungry-delete-mode))
+	 (matlab-mode . hungry-delete-mode))
   )
 
 (use-package expand-region
@@ -242,17 +252,15 @@ narrowed."
 						    text-mode yaml-mode java-mode))
   :hook ((emacs-lisp-mode . aggressive-indent-mode)
 	 (c-mode . aggressive-indent-mode)
-	 (c++-mode . aggressive-indent-mode)
-	 (org-mode . aggressive-indent-mode))
+	 (c++-mode . aggressive-indent-mode))
   :config
-  (setq-local electric-indent-mode nil)
+  (electric-indent-local-mode -1)
   (defun turn-off-electric-indent-mode ()
     "Turn off electric indent mode in current buffer."
-    (setq-local electric-indent-mode nil))
+    (electric-indent-local-mode -1))
   (add-hook 'emacs-lisp-mode 'turn-off-electric-indent-mode)
   (add-hook 'c-mode 'turn-off-electric-indent-mode)
   (add-hook 'c++-mode 'turn-off-electric-indent-mode)
-  (add-hook 'LaTeX-mode 'turn-off-electric-indent-mode)
   )
 
 (use-package use-package-hydra
@@ -261,8 +269,8 @@ narrowed."
 
 (use-package smartparens
   :ensure t
-  :hook (((prog-mode ein:notebook-multilang-mode) . show-smartparens-mode)
-	 ((prog-mode ein:notebook-multilang-mode) . turn-on-smartparens-mode))
+  :hook ((prog-mode . show-smartparens-mode)
+	 (prog-mode . turn-on-smartparens-mode))
   :bind (:map smartparens-mode-map
 	      ("C-c s" . hydra-smartparens/body)
 	      ("C-k" . sp-kill-hybrid-sexp)
@@ -307,13 +315,21 @@ _k_: kill                         _q_: quit
   :hydra (hydra-helm-projectile (:color blue
 					:hint nil)
 				"
-^Find^                            ^List^                          ^Grep^
-^^^^^^^^-------------------------------------------------------------------------------
-_f_: files                        _e_: recent files               _s s_: ag
+
+^Find^                            ^List^                          ^Grep^                          ^Compile^
+
+^^^^^^^^-----------------------------------------------------------------------------------------------------------------
+
+_f_: files                        _e_: recent files               _s s_: ag                       _c_: compile peoject
+
 _a_: other files                  _p_: proj                       _s g_: grep
+
 _F_: files all prj                _b_: buff curr proj
+
 _g_: files at point               _h_: helm interface
-_d_: dir"
+
+_d_: dir
+"
 				("f" helm-projectile-find-file)
 				("a" helm-projectile-find-other-file)
 				("F" helm-projectile-find-file-in-known-projects)
@@ -326,7 +342,9 @@ _d_: dir"
 				("h" helm-projectile)
 
 				("s s" helm-projectile-ag)
-				("s g" helm-projectile-grep))
+				("s g" helm-projectile-grep)
+
+				("c" projectile-compile-project))
   )
 
 (use-package helm-swoop
@@ -367,7 +385,6 @@ _d_: dir"
 		     ("t" helm-bibtex "bibtex"))
   :config
   (helm-mode t)
-  ;; (require 'helm-config)
   (global-set-key (kbd "C-x c") 'hydra-helm/body)
   )
 
@@ -375,7 +392,7 @@ _d_: dir"
   :ensure t
   :init
   (defun dumb-jump-go/helm (p)
-    "Load helm before calling treemancs-projectile."
+    "Load helm before calling 'dumb-jump-go', P."
     (interactive "P")
     (unless (featurep 'helm)
       (require 'helm))
@@ -402,7 +419,7 @@ _d_: dir"
   :ensure t
   :init
   (defun treemacs-projectile/helm (p)
-    "Load helm before calling treemancs-projectile."
+    "Load helm before calling 'treemancs-projectile', P."
     (interactive "P")
     (unless (featurep 'helm)
       (require 'helm))
@@ -513,13 +530,6 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :ensure t
   :hook (python-mode . py-autopep8-enable-on-save))
 
-;; Emacs Ipython Notebook
-(use-package ein
-  :ensure t
-  :commands ein:jupyter-server-start
-  :custom (ein:completion-backend 'ein:use-company-backend)
-  )
-
 ;; C++
 (use-package irony
   :ensure t
@@ -607,15 +617,24 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :defer t
   :ensure auctex
   :ensure helm-bibtex
+  :init
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode) ; Enable spell check in latex mode
+  (add-hook 'LaTeX-mode-hook 'auto-fill-mode) ; Enable auto-fill in latex mode
+  (add-hook 'LaTeX-mode-hook 'reftex-mode)    ; Enable reftex mode in latex mode
   :config
   (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (add-hook 'LaTeX-mode-hook (lambda ()
+			       (setq TeX-engine 'xetex)
+			       (setq TeX-command-extra-options "-shell-escape")))
   (reftex-mode t)
-  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-  (add-hook 'LaTeX-mode-hook (lambda () (setq TeX-engine 'xetex)))
-  (setq TeX-view-program-selection
-	'((output-dvi "open")
-	  (output-pdf "Preview.app")
-	  (output-html "open")))
+  ;; (setq TeX-source-correlate-mode t)
+
+  ;; (setq TeX-view-program-selection
+  ;; 	'((output-dvi "open")
+  ;; 	  (output-pdf "open")
+  ;; 	  (output-html "open")))
+  
   (setq TeX-show-compilation t)
   (setq reftex-plug-into-AUCTeX t)
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
@@ -625,12 +644,11 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   (require 'helm-bibtex)
   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
-  (add-hook 'LaTeX-mode-hook 'reftex-mode)
   )
 
 (use-package cdlatex
   :ensure t
-  :hook (LaTeX-mode . cdlatex-mode))
+  :hook (LaTeX-mode. cdlatex-mode))
 
 (use-package auctex-latexmk
   :ensure t
@@ -643,6 +661,99 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :ensure t
   :commands matlab-shell
   )
+
+;; Org mode
+(setq-default fill-column 80)
+
+(use-package org
+  :ensure t
+  :mode ("\\.org\\'" . org-mode)
+  :init
+  (add-hook 'org-mode-hook 'auto-fill-mode)
+  (defun add-pcomplete-to-capf ()
+    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+  (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
+  (add-hook 'org-mode-hook (lambda ()
+			     (unless (featurep 'ox-md)
+			       (require 'ox-md)) ; Enable exporting to markdown
+			     (unless (featurep 'ox-beamer)
+			       (require 'ox-beamer)) ; Enable exporting to beamers via LaTeX
+                             (setq-local company-minimum-prefix-length 1)
+			     ))
+  (add-hook 'org-mode-hook (lambda ()
+			     (electric-pair-local-mode t))) ; Enable emacs-native electric pair mode in org mode
+
+  (defun org-capture/helm (p)
+    "Load helm before calling 'org-capture', P."
+    (interactive "P")
+    (unless (featurep 'helm)
+      (require 'helm))
+    (org-capture))
+  (define-key global-map (kbd "C-c 2") 'org-capture/helm) ; Org-capture
+  (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
+  (setq org-capture-templates
+	'(("t" "Todo list item"
+	   entry (file+headline "~/notes/tasks.org" "Tasks")
+	   "* TODO %?\n %i\n %a")
+
+	  ("j" "Journal entry"
+	   entry (file+olp+datetree "~/notes/journal.org" "Journals")
+	   "* %U %^{Title}\n %?")
+
+	  ("b" "Tidbit: quote, zinger, one-liner or textlet"
+	   entry (file+headline "~/notes/tidbits.org" "Tidbits")
+	   "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
+
+	  ("n" "Notes"
+	   entry (file "~/notes/notes.org" )
+	   "* %?")
+	  ))
+  :config
+  (setq org-startup-indented t)		; Indent the tree structure
+  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
+  (setq org-latex-listings 'listings)
+  ;; (add-to-list 'org-latex-packages-alist '("" "minted")) ; Use minted package to export code blocks
+  ;; (setq org-latex-listings 'minted)
+  (setq org-latex-pdf-process
+	'("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setq org-src-fontify-natively t)
+  (setq org-latex-caption-above '(image table)) ; Set the caption in exported pdf above
+  (setq org-preview-latex-default-process 'imagemagick)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (emacs-lisp . t)
+     (C . t)
+     (js . t)
+     (ditaa . t)
+     (dot . t)
+     (org . t)
+     (shell . t )
+     (latex . t )
+     ))				      ; Babel stuff
+  ;; (setq org-confirm-babel-evaluate nil) ; Don’t ask before evaluating code blocks.
+
+  (setq org-export-use-babel nil)	      ; Stop Org from evaluating code blocks to speed exports
+  )
+
+(use-package htmlize
+  :ensure t
+  :commands htmlize-buffer)		; Enable org exporting to html
+(setq org-html-postamble nil)		; Don't include a footer with my contact and publishing information at the bottom of every exported HTML document
+
+;; Eshell
+(define-key global-map (kbd "C-c 1") 'eshell) ; Eshell mode
+(add-hook 'shell-mode-hook (lambda ()
+			     (setq-local company-minimum-prefix-length 1)
+			     ))
+(setq password-cache-expiry 3600)	; Enable password caching for one hour
+
+;; ESS and R
+(use-package ess
+  :ensure t
+  :commands R)
 
 (provide 'init)
 
