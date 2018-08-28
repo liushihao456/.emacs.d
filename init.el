@@ -45,7 +45,7 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-    (ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 jedi treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
+    (company-anaconda anaconda-mode web-mode ob-async ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(truncate-lines t))
@@ -66,21 +66,56 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq inhibit-startup-message t) ; hide the startup message
-(setq mac-option-key-is-meta nil
-      mac-command-key-is-meta t
-      mac-command-modifier 'meta
-      mac-option-modifier 'none)
+(setq
+ ;; mac-option-key-is-meta nil
+ ;; mac-command-key-is-meta t
+ mac-command-modifier 'meta
+ mac-option-modifier 'none)
 ;; change all prompts to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
-;; English Font
-(set-face-attribute
- 'default nil :font "Monaco 12")
-;; Chinese Font
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-  (set-fontset-font (frame-parameter nil 'font)
-		    charset
-		    ;; (font-spec :family "Microsoft Yahei" :size 14)))
-		    (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)))
+
+;; Kill currnet line and copy current line
+(defadvice kill-region (before slick-cut activate compile)
+  "When called interactively with no active region, kill a single line instead."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (list (line-beginning-position) (line-beginning-position 2)))))
+
+(defadvice kill-ring-save (before slick-copy activate compile)
+  "When called interactively with no active region, copy a single line instead."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end))
+     (message "Copied line")
+     (list (line-beginning-position) (line-beginning-position 2)))))
+
+;; ;; English Font
+;; (set-face-attribute
+;;  'default nil :font "Monaco 12")
+;; ;; Chinese Font
+;; (dolist (charset '(kana han symbol cjk-misc bopomofo))
+;;   (set-fontset-font (frame-parameter nil 'font)
+;; 		    charset
+;; 		    ;; (font-spec :family "Microsoft Yahei" :size 14)))
+;; 		    (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)))
+
+(defun s-font()
+  (interactive)
+  ;; font config for org table showing.
+  (set-frame-font "Monaco-12")
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font)
+                      charset
+                      (font-spec :family "WenQuanYi Micro Hei Mono" :size 14))))
+
+(add-to-list 'after-make-frame-functions
+             (lambda (new-frame)
+               (select-frame new-frame)
+               (if window-system
+                   (s-font))))
+(if window-system
+    (s-font))
 
 ;; (set-frame-font "monaco-12") ; set font to Monaco
 
@@ -106,6 +141,7 @@
   :ensure t
   :config
   (powerline-center-theme)
+  (setq powerline-image-apple-rgb t)
   )
 
 (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
@@ -125,8 +161,7 @@
 ;; Show key bindings on the right
 (use-package which-key
   :ensure t
-  :hook ((prog-mode . which-key-mode)
-	 (text-mode . which-key-mode))
+  :hook ((prog-mode text-mode) . which-key-mode)
   :config
   (which-key-setup-side-window-right)
   )
@@ -142,11 +177,7 @@
 (use-package yasnippet
   :ensure t
   :ensure yasnippet-snippets
-  ;; :custom
-  ;; (yas/root-directory "~/.emacs.d/snippets")
-  :hook ((prog-mode . yas-minor-mode)
-	 (LaTeX-mode . yas-minor-mode)
-         (org-mode . yas-minor-mode))
+  :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
   :config
   (setq yas/root-directory "~/.emacs.d/snippets")
   (yas-load-directory yas/root-directory)
@@ -156,7 +187,7 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode) . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
@@ -470,30 +501,30 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   )
 
 ;; Python
-;; (use-package anaconda-mode
-;;   :ensure t
-;;   :ensure company-anaconda
-;;   :hook ((python-mode . anaconda-mode)
-;; 	 (python-mode . anaconda-eldoc-mode))
-;;   :config
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends nil)
-;;   (add-to-list 'company-backends '(company-anaconda company-files))
-;;   ;; make sure the company backends are set again when opening another python file.
-;;   (defun my/anaconda-setup ()
-;;     "Add company-anaconda to company-backends in python mode."
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends nil)
-;;     (add-to-list 'company-backends '(company-anaconda company-files))
-;;     )
-;;   (add-hook 'python-mode-hook 'my/anaconda-setup)
-;;   )
-
-(use-package jedi
+(use-package anaconda-mode
   :ensure t
-  :custom (jedi:complete-on-dot t)
-  :hook (python-mode . jedi:ac-setup)
+  :ensure company-anaconda
+  :hook ((python-mode . anaconda-mode)
+	 (python-mode . anaconda-eldoc-mode))
+  :config
+  (make-local-variable 'company-backends)
+  (setq company-backends nil)
+  (add-to-list 'company-backends '(company-anaconda company-files))
+  ;; make sure the company backends are set again when opening another python file.
+  (defun my/anaconda-setup ()
+    "Add company-anaconda to company-backends in python mode."
+    (make-local-variable 'company-backends)
+    (setq company-backends nil)
+    (add-to-list 'company-backends '(company-anaconda company-files))
+    )
+  (add-hook 'python-mode-hook 'my/anaconda-setup)
   )
+
+;; (use-package jedi
+;;   :ensure t
+;;   :custom (jedi:complete-on-dot t)
+;;   :hook (python-mode . jedi:ac-setup)
+;;   )
 
 ;; (use-package company-jedi
 ;;   :ensure t
@@ -665,11 +696,18 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 ;; Org mode
 (setq-default fill-column 80)
 
+;; (use-package ob-ipython
+;;   :ensure t
+;;   :defer t)
+
 (use-package org
   :ensure t
+  :ensure ob-ipython
+  :ensure ob-async
   :mode ("\\.org\\'" . org-mode)
   :init
   (add-hook 'org-mode-hook 'auto-fill-mode)
+  ;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
   (defun add-pcomplete-to-capf ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
@@ -679,6 +717,48 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 			     (unless (featurep 'ox-beamer)
 			       (require 'ox-beamer)) ; Enable exporting to beamers via LaTeX
                              (setq-local company-minimum-prefix-length 1)
+
+			     (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
+			     (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
+			     (add-to-list 'org-latex-packages-alist '("" "xcolor"))
+			     (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
+			     (setq org-latex-listings 'listings)
+			     ;; (add-to-list 'org-latex-packages-alist '("" "minted")) ; Use minted package to export code blocks
+			     ;; (setq org-latex-listings 'minted)
+			     (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}"
+							       ("\\section{%s}" . "\\section*{%s}")
+							       ("\\subsection{%s}" . "\\subsection*{%s}")
+							       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+							       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+							       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+			     (setq org-latex-compiler "xelatex")
+			     (setq org-latex-pdf-process
+				   '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+				     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+				     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+			     (setq org-latex-caption-above '(image table)) ; Set the caption in exported pdf above
+			     (org-babel-do-load-languages
+			      'org-babel-load-languages
+			      '((python . t)
+				(ipython . t)
+				(emacs-lisp . t)
+				(C . t)
+				(js . t)
+				(ditaa . t)
+				(dot . t)
+				(org . t)
+				(shell . t )
+				(latex . t )
+				))				      ; Babel stuff
+			     (add-to-list 'org-latex-listings-langs '(ipython "Python"))
+			     (setq ob-async-no-async-languages-alist '("ipython"))
+			     (setq org-src-fontify-natively t
+				   org-src-tab-acts-natively t)
+			     (setq org-preview-latex-default-process 'imagemagick)
+			     
+			     ;; (setq org-confirm-babel-evaluate nil) ; Don’t ask before evaluating code blocks.
+			     (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed exports
+			     (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
 			     ))
   (add-hook 'org-mode-hook (lambda ()
 			     (electric-pair-local-mode t))) ; Enable emacs-native electric pair mode in org mode
@@ -690,7 +770,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
       (require 'helm))
     (org-capture))
   (define-key global-map (kbd "C-c 2") 'org-capture/helm) ; Org-capture
-  (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
+
   (setq org-capture-templates
 	'(("t" "Todo list item"
 	   entry (file+headline "~/notes/tasks.org" "Tasks")
@@ -710,32 +790,6 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 	  ))
   :config
   (setq org-startup-indented t)		; Indent the tree structure
-  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-  (setq org-latex-listings 'listings)
-  ;; (add-to-list 'org-latex-packages-alist '("" "minted")) ; Use minted package to export code blocks
-  ;; (setq org-latex-listings 'minted)
-  (setq org-latex-pdf-process
-	'("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-  (setq org-src-fontify-natively t)
-  (setq org-latex-caption-above '(image table)) ; Set the caption in exported pdf above
-  (setq org-preview-latex-default-process 'imagemagick)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (emacs-lisp . t)
-     (C . t)
-     (js . t)
-     (ditaa . t)
-     (dot . t)
-     (org . t)
-     (shell . t )
-     (latex . t )
-     ))				      ; Babel stuff
-  ;; (setq org-confirm-babel-evaluate nil) ; Don’t ask before evaluating code blocks.
-
-  (setq org-export-use-babel nil)	      ; Stop Org from evaluating code blocks to speed exports
   )
 
 (use-package htmlize
@@ -753,7 +807,19 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 ;; ESS and R
 (use-package ess
   :ensure t
-  :commands R)
+  :commands R
+  )
+
+(use-package web-mode
+  :ensure t
+  :mode "\\.html?\\'"
+  :config
+  (setq web-mode-engines-alist
+	'(("django"    . "\\.html\\'")))
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-auto-expanding t)
+  )
 
 (provide 'init)
 

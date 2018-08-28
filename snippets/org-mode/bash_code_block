@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
-# name: bash_code_block
-# key: <ba
+# name: shell_code_block
+# key: sh
 # --
-#+BEGIN_SRC bash
+#+BEGIN_SRC shell
 $0
 #+END_SRC

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ipython_code_block
+# key: ip
+# --
+#+BEGIN_SRC ipython :preamble "# -*- coding: utf-8 -*-" :results raw drawer :session :async t
+$0
+#+END_SRC
