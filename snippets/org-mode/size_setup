@@ -2,11 +2,7 @@
 # name: size_setup
 # key: ss
 # --
-#+LATEX_HEADER: \textwidth=6.6in
-#+LATEX_HEADER: \textheight=8.9in
-#+LATEX_HEADER: \headheight=0.0in
-#+LATEX_HEADER: \oddsidemargin=0.0in
-#+LATEX_HEADER: \headsep=0.0in
-#+LATEX_HEADER: \topmargin=0.0in
+#+LATEX_HEADER: \usepackage{geometry}
+#+LATEX_HEADER: \geometry{a4paper,left=2cm,right=2cm,top=3cm,bottom=3cm}
 #+LATEX_HEADER: \def\baselinestretch{1.3}
 $0

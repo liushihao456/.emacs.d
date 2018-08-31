@@ -5,6 +5,7 @@
 #+LATEX_HEADER_EXTRA: \setCJKmainfont{Songti SC}
 #+LATEX_HEADER: \setlength\parindent{0pt}
 #+LATEX_HEADER: \lstset{numbers=left,
+#+LATEX_HEADER:   showstringspaces=false,
 #+LATEX_HEADER:   basicstyle=\linespread{1.0}\small\ttfamily,
 #+LATEX_HEADER:   numberstyle=\tiny, 
 #+LATEX_HEADER:   keywordstyle= \color{blue!70},commentstyle=\color{red!50!green!50!blue!50}, 

@@ -2,6 +2,6 @@
 # name: C++-code-block
 # key: cpp
 # --
-#+BEGIN_SRC C++
+#+BEGIN_SRC C++ :async :results output
 $0
 #+END_SRC

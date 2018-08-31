@@ -43,9 +43,10 @@
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
  '(global-hl-line-mode t)
+ '(org-agenda-files (quote ("~/notes/notes.org")))
  '(package-selected-packages
    (quote
-    (company-anaconda anaconda-mode web-mode ob-async ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
+    (zenburn-theme org-ref company-jedi web-mode ob-async ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(truncate-lines t))
@@ -187,7 +188,7 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode) . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
@@ -501,24 +502,24 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   )
 
 ;; Python
-(use-package anaconda-mode
-  :ensure t
-  :ensure company-anaconda
-  :hook ((python-mode . anaconda-mode)
-	 (python-mode . anaconda-eldoc-mode))
-  :config
-  (make-local-variable 'company-backends)
-  (setq company-backends nil)
-  (add-to-list 'company-backends '(company-anaconda company-files))
-  ;; make sure the company backends are set again when opening another python file.
-  (defun my/anaconda-setup ()
-    "Add company-anaconda to company-backends in python mode."
-    (make-local-variable 'company-backends)
-    (setq company-backends nil)
-    (add-to-list 'company-backends '(company-anaconda company-files))
-    )
-  (add-hook 'python-mode-hook 'my/anaconda-setup)
-  )
+;; (use-package anaconda-mode
+;;   :ensure t
+;;   :ensure company-anaconda
+;;   :hook ((python-mode . anaconda-mode)
+;; 	 (python-mode . anaconda-eldoc-mode))
+;;   :config
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends nil)
+;;   (add-to-list 'company-backends '(company-anaconda company-files))
+;;   ;; make sure the company backends are set again when opening another python file.
+;;   (defun my/anaconda-setup ()
+;;     "Add company-anaconda to company-backends in python mode."
+;;     (make-local-variable 'company-backends)
+;;     (setq company-backends nil)
+;;     (add-to-list 'company-backends '(company-anaconda company-files))
+;;     )
+;;   (add-hook 'python-mode-hook 'my/anaconda-setup)
+;;   )
 
 ;; (use-package jedi
 ;;   :ensure t
@@ -526,13 +527,13 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 ;;   :hook (python-mode . jedi:ac-setup)
 ;;   )
 
-;; (use-package company-jedi
-;;   :ensure t
-;;   :init
-;;   (defun my/python-mode-hook ()
-;;     (add-to-list 'company-backends 'company-jedi))
-;;   (add-hook 'python-mode-hook 'my/python-mode-hook)
-;;   )
+(use-package company-jedi
+  :ensure t
+  :init
+  (defun my/python-mode-hook ()
+    (add-to-list 'company-backends '(company-jedi company-files)))
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
+  )
 
 ;; (use-package jedi-core
 ;;   :ensure t
@@ -704,6 +705,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :ensure t
   :ensure ob-ipython
   :ensure ob-async
+  :ensure org-ref
   :mode ("\\.org\\'" . org-mode)
   :init
   (add-hook 'org-mode-hook 'auto-fill-mode)
@@ -717,7 +719,12 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 			     (unless (featurep 'ox-beamer)
 			       (require 'ox-beamer)) ; Enable exporting to beamers via LaTeX
                              (setq-local company-minimum-prefix-length 1)
-
+			     (unless (featurep 'cdlatex)
+			       (require 'cdlatex))
+			     (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
+			     (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
+			     (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
+			     
 			     (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
 			     (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
 			     (add-to-list 'org-latex-packages-alist '("" "xcolor"))
@@ -725,18 +732,34 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 			     (setq org-latex-listings 'listings)
 			     ;; (add-to-list 'org-latex-packages-alist '("" "minted")) ; Use minted package to export code blocks
 			     ;; (setq org-latex-listings 'minted)
-			     (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}"
+			     (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
+\\ctexset{section/format=\\Large\\bfseries}"
 							       ("\\section{%s}" . "\\section*{%s}")
 							       ("\\subsection{%s}" . "\\subsection*{%s}")
 							       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 							       ("\\paragraph{%s}" . "\\paragraph*{%s}")
 							       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+			     (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
+\\ctexset{section/format=\\Large\\bfseries}"
+							       ("\\part{%s}" . "\\part*{%s}")
+							       ("\\chapter{%s}" . "\\chapter*{%s}")
+							       ("\\section{%s}" . "\\section*{%s}")
+							       ("\\subsection{%s}" . "\\subsection*{%s}")
+							       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+			     (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
+							       ("\\part{%s}" . "\\part*{%s}")
+							       ("\\chapter{%s}" . "\\chapter*{%s}")
+							       ("\\section{%s}" . "\\section*{%s}")
+							       ("\\subsection{%s}" . "\\subsection*{%s}")
+							       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 			     (setq org-latex-compiler "xelatex")
 			     (setq org-latex-pdf-process
-				   '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+				   '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
 				     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-				     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-			     (setq org-latex-caption-above '(image table)) ; Set the caption in exported pdf above
+				     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+				     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+				     ))
+			     (setq org-latex-caption-above '(table)) ; Set the caption in exported pdf above
 			     (org-babel-do-load-languages
 			      'org-babel-load-languages
 			      '((python . t)
@@ -752,13 +775,17 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 				))				      ; Babel stuff
 			     (add-to-list 'org-latex-listings-langs '(ipython "Python"))
 			     (setq ob-async-no-async-languages-alist '("ipython"))
-			     (setq org-src-fontify-natively t
-				   org-src-tab-acts-natively t)
-			     (setq org-preview-latex-default-process 'imagemagick)
+			     (setq org-src-fontify-natively t)
+			     (setq org-preview-latex-default-process 'dvipng)
 			     
 			     ;; (setq org-confirm-babel-evaluate nil) ; Don’t ask before evaluating code blocks.
 			     (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed exports
 			     (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
+
+			     ;; (unless (featurep 'org-ref)
+			     ;;   (require 'org-ref))
+			     ;; (setq reftex-default-bibliography '("~/RA/mybib.bib"))
+			     ;; (setq org-ref-default-bibliography '("~/RA/mybib.bib"))
 			     ))
   (add-hook 'org-mode-hook (lambda ()
 			     (electric-pair-local-mode t))) ; Enable emacs-native electric pair mode in org mode
@@ -802,6 +829,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 (add-hook 'shell-mode-hook (lambda ()
 			     (setq-local company-minimum-prefix-length 1)
 			     ))
+(setq password-cache t)			; enable password caching
 (setq password-cache-expiry 3600)	; Enable password caching for one hour
 
 ;; ESS and R
@@ -820,6 +848,39 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-auto-expanding t)
   )
+
+;; mu4e
+(use-package mu4e
+  :load-path "/usr/local/Cellar/mu/HEAD/share/emacs/site-lisp/mu4e"
+  :bind ("M-m" . mu4e)
+  :config
+  (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
+  (setq mu4e-maildir "~/mail")		; Mail folder set to ~/mail
+  (setq mu4e-get-mail-command "offlineimap") ; Fetch mail by offlineimap
+  (setq mu4e-update-interval 300)		; Fetch mail in 300 sec interval
+
+  (setq mu4e-sent-folder   "/pkumailbox/Sent Items")
+  (setq mu4e-drafts-folder "/pkumailbox/Drafts")
+  (setq mu4e-trash-folder  "/pkumailbox/Trash")
+  (setq mu4e-refile-folder  "/pkumailbox/Archive")
+
+  (setq mu4e-view-show-images t)
+  (setq mu4e-compose-signature-auto-include nil)
+
+  ;; Send emails
+  (setq message-send-mail-function 'smtpmail-send-it
+	smtpmail-stream-type 'ssl
+	starttls-use-gnutls t)
+  ;; Personal info
+  (setq user-full-name "Shihao, Liu")
+  (setq user-mail-address "liushihao@pku.edu.cn")
+  ;; Smtpmail setup
+  (setq smtpmail-smtp-server "mail.pku.edu.cn")
+  (setq smtpmail-default-smtp-server "mail.pku.edu.cn")
+  (setq smtpmail-smtp-service 465)
+  (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
+  )
+
 
 (provide 'init)
 
