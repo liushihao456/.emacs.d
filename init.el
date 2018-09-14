@@ -22,12 +22,12 @@
 
 (setq use-package-compute-statistics t)
 
-(use-package auto-package-update
-  :ensure t
-  :config
-  (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe))
+;; (use-package auto-package-update
+;;   :ensure t
+;;   :config
+;;   (setq auto-package-update-delete-old-versions t)
+;;   (setq auto-package-update-hide-results t)
+;;   (auto-package-update-maybe))
 
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
@@ -46,7 +46,7 @@
  '(org-agenda-files (quote ("~/notes/notes.org")))
  '(package-selected-packages
    (quote
-    (zenburn-theme org-ref company-jedi web-mode ob-async ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
+    (julia-mode zenburn-theme org-ref company-jedi web-mode ob-async ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(truncate-lines t))
@@ -74,6 +74,7 @@
  mac-option-modifier 'none)
 ;; change all prompts to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
@@ -188,7 +189,7 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode) . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode inferior-ess-mode julia-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
@@ -529,6 +530,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 
 (use-package company-jedi
   :ensure t
+  :defer t
   :init
   (defun my/python-mode-hook ()
     (add-to-list 'company-backends '(company-jedi company-files)))
@@ -650,7 +652,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :ensure auctex
   :ensure helm-bibtex
   :init
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode) ; Enable spell check in latex mode
+  ;; (add-hook 'LaTeX-mode-hook 'flyspell-mode) ; Enable spell check in latex mode
   (add-hook 'LaTeX-mode-hook 'auto-fill-mode) ; Enable auto-fill in latex mode
   (add-hook 'LaTeX-mode-hook 'reftex-mode)    ; Enable reftex mode in latex mode
   :config
@@ -680,7 +682,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 
 (use-package cdlatex
   :ensure t
-  :hook (LaTeX-mode. cdlatex-mode))
+  :hook (LaTeX-mode . cdlatex-mode))
 
 (use-package auctex-latexmk
   :ensure t
@@ -697,9 +699,6 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 ;; Org mode
 (setq-default fill-column 80)
 
-;; (use-package ob-ipython
-;;   :ensure t
-;;   :defer t)
 
 (use-package org
   :ensure t
@@ -721,8 +720,13 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
                              (setq-local company-minimum-prefix-length 1)
 			     (unless (featurep 'cdlatex)
 			       (require 'cdlatex))
-			     (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
-			     (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
+			     (unless (featurep 'ess-julia)
+			       (require 'ess-julia))
+			     (unless (featurep 'ob-julia)
+			       (load "~/.emacs.d/packages/ob-julia/ob-julia.el")
+			       )
+			     ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
+			     ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
 			     (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 			     
 			     (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
@@ -770,8 +774,9 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 				(ditaa . t)
 				(dot . t)
 				(org . t)
-				(shell . t )
-				(latex . t )
+				(shell . t)
+				(latex . t)
+				(julia . t)
 				))				      ; Babel stuff
 			     (add-to-list 'org-latex-listings-langs '(ipython "Python"))
 			     (setq ob-async-no-async-languages-alist '("ipython"))
@@ -832,11 +837,16 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 (setq password-cache t)			; enable password caching
 (setq password-cache-expiry 3600)	; Enable password caching for one hour
 
+(use-package julia-mode
+  :ensure t
+  :defer t)
+
 ;; ESS and R
 (use-package ess
   :ensure t
-  :commands R
+  :commands (R julia)
   )
+
 
 (use-package web-mode
   :ensure t
@@ -863,7 +873,8 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   (setq mu4e-drafts-folder "/pkumailbox/Drafts")
   (setq mu4e-trash-folder  "/pkumailbox/Trash")
   (setq mu4e-refile-folder  "/pkumailbox/Archive")
-
+  (setq mu4e-attachment-dir  "~/Downloads")
+  
   (setq mu4e-view-show-images t)
   (setq mu4e-compose-signature-auto-include nil)
 
