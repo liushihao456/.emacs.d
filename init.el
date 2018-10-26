@@ -20,14 +20,14 @@
   (add-to-list 'load-path "~/.emacs.d/packages/bind-key")
   (require 'use-package))
 
-(setq use-package-compute-statistics t)
+;; (setq use-package-compute-statistics t)
 
-;; (use-package auto-package-update
-;;   :ensure t
-;;   :config
-;;   (setq auto-package-update-delete-old-versions t)
-;;   (setq auto-package-update-hide-results t)
-;;   (auto-package-update-maybe))
+;;(use-package auto-package-update
+;;  :ensure t
+;;  :config
+;;  (setq auto-package-update-delete-old-versions t)
+;;  (setq auto-package-update-hide-results t)
+;;  (auto-package-update-maybe))
 
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
@@ -46,7 +46,7 @@
  '(org-agenda-files (quote ("~/notes/notes.org")))
  '(package-selected-packages
    (quote
-    (julia-mode zenburn-theme org-ref company-jedi web-mode ob-async ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent auto-yasnippet multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
+    (flycheck magit zenburn-theme org-ref company-jedi web-mode ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(truncate-lines t))
@@ -68,10 +68,9 @@
 
 (setq inhibit-startup-message t) ; hide the startup message
 (setq
- ;; mac-option-key-is-meta nil
- ;; mac-command-key-is-meta t
  mac-command-modifier 'meta
- mac-option-modifier 'none)
+ mac-option-modifier 'none
+ )
 ;; change all prompts to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
@@ -105,7 +104,7 @@
 (defun s-font()
   (interactive)
   ;; font config for org table showing.
-  (set-frame-font "Monaco-12")
+  (set-frame-font "Consolas-13")
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
                       charset
@@ -189,7 +188,7 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode inferior-ess-mode julia-mode) . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode inferior-ess-mode R-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
@@ -268,14 +267,6 @@ narrowed."
   :bind ("C-x g" . magit-status)
   :config
   (message "Magit loaded.")
-  )
-
-(use-package auto-yasnippet
-  :ensure t
-  :bind (("C-c c" . aya-create)
-	 ("C-c e" . aya-expand))
-  :config
-  (message "Auto-yasnippet loaded.")
   )
 
 (use-package aggressive-indent
@@ -423,6 +414,7 @@ _d_: dir
 
 (use-package dumb-jump
   :ensure t
+  :pin manual
   :init
   (defun dumb-jump-go/helm (p)
     "Load helm before calling 'dumb-jump-go', P."
@@ -703,7 +695,6 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 (use-package org
   :ensure t
   :ensure ob-ipython
-  :ensure ob-async
   :ensure org-ref
   :mode ("\\.org\\'" . org-mode)
   :init
@@ -720,11 +711,8 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
                              (setq-local company-minimum-prefix-length 1)
 			     (unless (featurep 'cdlatex)
 			       (require 'cdlatex))
-			     (unless (featurep 'ess-julia)
-			       (require 'ess-julia))
-			     (unless (featurep 'ob-julia)
-			       (load "~/.emacs.d/packages/ob-julia/ob-julia.el")
-			       )
+			     (unless (featurep 'ess-site)
+			       (require 'ess-site))
 			     ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
 			     ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
 			     (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
@@ -776,12 +764,12 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 				(org . t)
 				(shell . t)
 				(latex . t)
-				(julia . t)
+				(R . t)
 				))				      ; Babel stuff
 			     (add-to-list 'org-latex-listings-langs '(ipython "Python"))
-			     (setq ob-async-no-async-languages-alist '("ipython"))
 			     (setq org-src-fontify-natively t)
 			     (setq org-preview-latex-default-process 'dvipng)
+			     (setq org-src-window-setup 'current-window)
 			     
 			     ;; (setq org-confirm-babel-evaluate nil) ; Don’t ask before evaluating code blocks.
 			     (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed exports
@@ -837,14 +825,10 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 (setq password-cache t)			; enable password caching
 (setq password-cache-expiry 3600)	; Enable password caching for one hour
 
-(use-package julia-mode
-  :ensure t
-  :defer t)
-
 ;; ESS and R
 (use-package ess
   :ensure t
-  :commands (R julia)
+  :commands R
   )
 
 

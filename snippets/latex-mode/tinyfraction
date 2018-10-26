@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: tinyfraction
+# key: tf
+# --
+\tfrac{$1}{$2}$0
