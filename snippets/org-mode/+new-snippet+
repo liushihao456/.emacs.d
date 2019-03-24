@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: gnuplot-code-block
+# key: gp
+# --
+#+BEGIN_SRC gnuplot
+  $0
+#+END_SRC

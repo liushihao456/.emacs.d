@@ -12,7 +12,7 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives
 	     '("melpa" . "http://melpa.org/packages/") t)
-(package-initialize)
+;; (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
 (eval-when-compile
@@ -22,12 +22,12 @@
 
 ;; (setq use-package-compute-statistics t)
 
-;;(use-package auto-package-update
-;;  :ensure t
-;;  :config
-;;  (setq auto-package-update-delete-old-versions t)
-;;  (setq auto-package-update-hide-results t)
-;;  (auto-package-update-maybe))
+;; (use-package auto-package-update
+;;   :ensure t
+;;   :config
+;;   (setq auto-package-update-delete-old-versions t)
+;;   (setq auto-package-update-hide-results t)
+;;   (auto-package-update-maybe))
 
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
@@ -41,14 +41,38 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(TeX-command-default "LatexMk" t)
+ '(aggressive-indent-excluded-modes
+   '(inf-ruby-mode makefile-mode makefile-gmake-mode python-mode text-mode yaml-mode java-mode) t)
  '(column-number-mode t)
+ '(company-backends
+   '((company-files company-keywords company-capf company-yasnippet)
+     (company-abbrev company-dabbrev)) t)
+ '(company-idle-delay 0 t)
+ '(custom-safe-themes
+   '("08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
  '(global-hl-line-mode t)
- '(org-agenda-files (quote ("~/notes/notes.org")))
+ '(helm-autoresize-mode t t)
+ '(helm-mode-fuzzy-match t t)
+ '(org-agenda-files '("~/notes/notes.org"))
  '(package-selected-packages
-   (quote
-    (flycheck magit zenburn-theme org-ref company-jedi web-mode ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update)))
+   '(gnuplot flycheck magit zenburn-theme org-ref company-jedi web-mode ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update))
+ '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
+ '(treemacs-change-root-without-asking nil t)
+ '(treemacs-collapse-dirs 3 t)
+ '(treemacs-follow-after-init t t)
+ '(treemacs-git-integration t t)
+ '(treemacs-goto-tag-strategy 'refetch-index t)
+ '(treemacs-header-function 'treemacs-projectile-create-header t)
+ '(treemacs-indentation 2 t)
+ '(treemacs-is-never-other-window nil t)
+ '(treemacs-never-persist nil t)
+ '(treemacs-show-hidden-files t t)
+ '(treemacs-silent-refresh nil t)
+ '(treemacs-sorting 'alphabetic-desc t)
+ '(treemacs-width 25 t)
  '(truncate-lines t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -120,30 +144,58 @@
 
 ;; (set-frame-font "monaco-12") ; set font to Monaco
 
+;;; Scrolling.
+;; Good speed and allow scrolling through large images (pixel-scroll).
+;; Note: Scroll lags when point must be moved but increasing the number
+;;       of lines that point moves in pixel-scroll.el ruins large image
+;;       scrolling. So unfortunately I think we'll just have to live with
+;;       this.
+(pixel-scroll-mode)
+(setq pixel-dead-time 0) ; Never go back to the old scrolling behaviour.
+(setq pixel-resolution-fine-flag t) ; Scroll by number of pixels instead of lines (t = frame-char-height pixels).
+(setq mouse-wheel-scroll-amount '(1)) ; Distance in pixel-resolution to scroll each mouse wheel event.
+(setq mouse-wheel-progressive-speed nil) ; Progressive speed is too fast for me.
+
 ;; (use-package zenburn-theme
 ;;   :ensure t
 ;;   :config
-;;   (load-theme 'zenburn-theme t)
+;;   (load-theme 'zenburn t)
 ;;   )
 
+(use-package solarized-theme
+  :ensure t
+  :config
+  ;; Don't change the font for some headings and titles
+  (setq solarized-use-variable-pitch nil)
+  ;; Don't change size of org-mode headlines (but keep other size-changes)
+  (setq solarized-scale-org-headlines nil)
+  ;; ;; Avoid all font-size changes
+  ;; (setq solarized-height-minus-1 1.0)
+  ;; (setq solarized-height-plus-1 1.0)
+  ;; (setq solarized-height-plus-2 1.0)
+  ;; (setq solarized-height-plus-3 1.0)
+  ;; (setq solarized-height-plus-4 1.0)
+  (load-theme 'solarized-light t)
+  )
 ;; (use-package doom-themes
 ;;   :ensure t
 ;;   :config
-;;   (load-theme 'doom-one t)
+;;   ;; (load-theme 'doom-one t)
+;;   (load-theme 'doom-solarized-light t)
 ;;   )
 
-(use-package zerodark-theme
-  :ensure t
-  :config
-  (load-theme 'zerodark t)
-  )
+;; (use-package zerodark-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'zerodark t)
+;;   )
 
-(use-package powerline
-  :ensure t
-  :config
-  (powerline-center-theme)
-  (setq powerline-image-apple-rgb t)
-  )
+;; (use-package powerline
+;;   :ensure t
+;;   :config
+;;   (powerline-center-theme)
+;;   (setq powerline-image-apple-rgb t)
+;;   )
 
 (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
 
@@ -412,33 +464,33 @@ _d_: dir
   (global-set-key (kbd "C-x c") 'hydra-helm/body)
   )
 
-(use-package dumb-jump
-  :ensure t
-  :pin manual
-  :init
-  (defun dumb-jump-go/helm (p)
-    "Load helm before calling 'dumb-jump-go', P."
-    (interactive "P")
-    (unless (featurep 'helm)
-      (require 'helm))
-    (dumb-jump-go)
-    )
-  :custom
-  (dumb-jump-force-searcher 'ag)
-  (dumb-jump-selector 'helm)
-  :bind ("M-g" . hydra-dumb-jump/body)
-  :hydra (hydra-dumb-jump (:color blue :columns 3)
-			  "
-                               Dumb Jump
-^^^^^^^^----------------------------------------------------------------------"
-			  ("j" dumb-jump-go/helm "Go")
-			  ("o" dumb-jump-go-other-window "Other window")
-			  ("e" dumb-jump-go-prefer-external "Go external")
-			  ("b" dumb-jump-back "Back")
-			  ("i" dumb-jump-go-prompt "Prompt")
-			  ("l" dumb-jump-quick-look "Quick look")
-			  ("x" dumb-jump-go-prefer-external-other-window "Go external other window"))
-  )
+;; (use-package dumb-jump
+;;   :ensure t
+;;   :pin manual
+;;   :init
+;;   (defun dumb-jump-go/helm (p)
+;;     "Load helm before calling 'dumb-jump-go', P."
+;;     (interactive "P")
+;;     (unless (featurep 'helm)
+;;       (require 'helm))
+;;     (dumb-jump-go)
+;;     )
+;;   :custom
+;;   (dumb-jump-force-searcher 'ag)
+;;   (dumb-jump-selector 'helm)
+;;   :bind ("M-g" . hydra-dumb-jump/body)
+;;   :hydra (hydra-dumb-jump (:color blue :columns 3)
+;; 			  "
+;;                                Dumb Jump
+;; ^^^^^^^^----------------------------------------------------------------------"
+;; 			  ("j" dumb-jump-go/helm "Go")
+;; 			  ("o" dumb-jump-go-other-window "Other window")
+;; 			  ("e" dumb-jump-go-prefer-external "Go external")
+;; 			  ("b" dumb-jump-back "Back")
+;; 			  ("i" dumb-jump-go-prompt "Prompt")
+;; 			  ("l" dumb-jump-quick-look "Quick look")
+;; 			  ("x" dumb-jump-go-prefer-external-other-window "Go external other window"))
+;;   )
 
 (use-package treemacs
   :ensure t
@@ -666,7 +718,8 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
   (setq bibtex-completion-bibliography ; set up helm-bibtex
 	'("~/RA/mybib.bib"
-	  "~/RA/newadded.bib"))
+	  "~/RA/newadded.bib"
+	  "~/paper/pub/thesis.bib"))
   (require 'helm-bibtex)
   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
@@ -688,10 +741,14 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :commands matlab-shell
   )
 
+;; Gnuplot mode
+(use-package gnuplot
+  :ensure t
+  :mode ("\\.gnuplot\\' \\.gp\\'" . gnuplot-mode)
+  )
+
 ;; Org mode
 (setq-default fill-column 80)
-
-
 (use-package org
   :ensure t
   :ensure ob-ipython
@@ -700,6 +757,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   :init
   (add-hook 'org-mode-hook 'auto-fill-mode)
   ;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+  ;; (setq org-startup-with-inline-images t) ; Display inline images by default
   (defun add-pcomplete-to-capf ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
@@ -716,7 +774,9 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 			     ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
 			     ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
 			     (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-			     
+
+			     (setq org-image-actual-width '(400)) ; Prevent inline images being too big
+			     (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
 			     (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
 			     (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
 			     (add-to-list 'org-latex-packages-alist '("" "xcolor"))
@@ -765,6 +825,7 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 				(shell . t)
 				(latex . t)
 				(R . t)
+				(gnuplot . t)
 				))				      ; Babel stuff
 			     (add-to-list 'org-latex-listings-langs '(ipython "Python"))
 			     (setq org-src-fontify-natively t)
