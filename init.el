@@ -10,8 +10,8 @@
 ;;; Code:
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 ;; (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -20,7 +20,15 @@
   (add-to-list 'load-path "~/.emacs.d/packages/bind-key")
   (require 'use-package))
 
-;; (setq use-package-compute-statistics t)
+(use-package yahoo-weather
+  :load-path "~/.emacs.d/packages/yahoo-weather"
+  :config
+  (setq yahoo-weather-locationid "1816670")
+  (setq yahoo-weather-apikey "e5f1e557685536c2fe98e7dfabe201de")
+  (yahoo-weather-mode)
+  )
+
+(setq use-package-compute-statistics t)
 
 ;; (use-package auto-package-update
 ;;   :ensure t
@@ -50,30 +58,16 @@
      (company-abbrev company-dabbrev)) t)
  '(company-idle-delay 0 t)
  '(custom-safe-themes
-   '("08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
+   '("e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
  '(global-hl-line-mode t)
  '(helm-autoresize-mode t t)
  '(helm-mode-fuzzy-match t t)
  '(org-agenda-files '("~/notes/notes.org"))
  '(package-selected-packages
-   '(gnuplot flycheck magit zenburn-theme org-ref company-jedi web-mode ob-ipython ess htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex helm-bibtex auctex company-lsp lsp-java lsp-ui lsp-mode company-irony irony py-autopep8 treemacs-projectile treemacs dumb-jump helm-swoop helm-projectile projectile smartparens hydra aggressive-indent multiple-cursors expand-region hungry-delete undo-tree company yasnippet-snippets yasnippet ace-window which-key powerline zerodark-theme auto-package-update))
+   '(rainbow-delimiters spaceline spaceline-all-the-icons neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi ob-ipython htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop helm-projectile hungry-delete undo-tree yasnippet auto-package-update))
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
- '(scroll-bar-mode nil)
- '(treemacs-change-root-without-asking nil t)
- '(treemacs-collapse-dirs 3 t)
- '(treemacs-follow-after-init t t)
- '(treemacs-git-integration t t)
- '(treemacs-goto-tag-strategy 'refetch-index t)
- '(treemacs-header-function 'treemacs-projectile-create-header t)
- '(treemacs-indentation 2 t)
- '(treemacs-is-never-other-window nil t)
- '(treemacs-never-persist nil t)
- '(treemacs-show-hidden-files t t)
- '(treemacs-silent-refresh nil t)
- '(treemacs-sorting 'alphabetic-desc t)
- '(treemacs-width 25 t)
- '(truncate-lines t))
+ '(scroll-bar-mode nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -126,8 +120,10 @@
 ;; 		    (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)))
 
 (defun s-font()
+  "Set the fonts."
   (interactive)
   ;; font config for org table showing.
+  ;; (set-frame-font "Consolas-13")
   (set-frame-font "Consolas-13")
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
@@ -142,7 +138,7 @@
 (if window-system
     (s-font))
 
-;; (set-frame-font "monaco-12") ; set font to Monaco
+;; (set-frame-font "Monaco-13") ; set font to Monaco
 
 ;;; Scrolling.
 ;; Good speed and allow scrolling through large images (pixel-scroll).
@@ -150,11 +146,11 @@
 ;;       of lines that point moves in pixel-scroll.el ruins large image
 ;;       scrolling. So unfortunately I think we'll just have to live with
 ;;       this.
-(pixel-scroll-mode)
-(setq pixel-dead-time 0) ; Never go back to the old scrolling behaviour.
-(setq pixel-resolution-fine-flag t) ; Scroll by number of pixels instead of lines (t = frame-char-height pixels).
-(setq mouse-wheel-scroll-amount '(1)) ; Distance in pixel-resolution to scroll each mouse wheel event.
-(setq mouse-wheel-progressive-speed nil) ; Progressive speed is too fast for me.
+;; (pixel-scroll-mode)
+;; (setq pixel-dead-time 0) ; Never go back to the old scrolling behaviour.
+;; (setq pixel-resolution-fine-flag t) ; Scroll by number of pixels instead of lines (t = frame-char-height pixels).
+;; (setq mouse-wheel-scroll-amount '(1)) ; Distance in pixel-resolution to scroll each mouse wheel event.
+;; (setq mouse-wheel-progressive-speed nil) ; Progressive speed is too fast for me.
 
 ;; (use-package zenburn-theme
 ;;   :ensure t
@@ -162,27 +158,22 @@
 ;;   (load-theme 'zenburn t)
 ;;   )
 
-(use-package solarized-theme
-  :ensure t
-  :config
-  ;; Don't change the font for some headings and titles
-  (setq solarized-use-variable-pitch nil)
-  ;; Don't change size of org-mode headlines (but keep other size-changes)
-  (setq solarized-scale-org-headlines nil)
-  ;; ;; Avoid all font-size changes
-  ;; (setq solarized-height-minus-1 1.0)
-  ;; (setq solarized-height-plus-1 1.0)
-  ;; (setq solarized-height-plus-2 1.0)
-  ;; (setq solarized-height-plus-3 1.0)
-  ;; (setq solarized-height-plus-4 1.0)
-  (load-theme 'solarized-light t)
-  )
-;; (use-package doom-themes
+;; (use-package solarized-theme
 ;;   :ensure t
 ;;   :config
-;;   ;; (load-theme 'doom-one t)
-;;   (load-theme 'doom-solarized-light t)
+;;   (setq solarized-use-variable-pitch nil) ; Don't change the font for some headings and titles
+;;   (setq solarized-scale-org-headlines nil) ; Don't change size of org-mode headlines (but keep other size-changes)
+;;   (load-theme 'solarized-light t)
 ;;   )
+
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; (load-theme 'doom-one t)
+  ;; (load-theme 'doom-one-light t)
+  (load-theme 'doom-solarized-light t)
+  (doom-themes-neotree-config)
+  )
 
 ;; (use-package zerodark-theme
 ;;   :ensure t
@@ -190,11 +181,76 @@
 ;;   (load-theme 'zerodark t)
 ;;   )
 
+;; (use-package doom-modeline
+;;   :ensure t
+;;   :hook (after-init . doom-modeline-mode)
+;;   :config
+;;   (setq doom-modeline-bar-width 3)
+;;   (setq doom-modeline-height 20)
+;;   (setq doom-modeline-minor-modes t)
+;;   ;; If non-nil, only display one number for checker information if applicable.
+;;   (setq doom-modeline-checker-simple-format nil)
+;;   ;; Whether display perspective name or not. Non-nil to display in mode-line.
+;;   (setq doom-modeline-persp-name t)
+;;   ;; Whether display `lsp' state or not. Non-nil to display in mode-line.
+;;   (setq doom-modeline-lsp t)
+;;   ;; Whether display mu4e notifications or not. Requires `mu4e-alert' package.
+;;   (setq doom-modeline-mu4e t)
+;;   )
+
+(use-package spaceline
+  :ensure t
+  :pin melpa-stable
+  )
+
+(use-package spaceline-config
+  :ensure spaceline
+  :config
+  (spaceline-helm-mode 1)
+  (spaceline-emacs-theme)
+  )
+
+(use-package spaceline-all-the-icons
+  :ensure t
+  :pin melpa-stable
+  :after spaceline
+  :config
+  (spaceline-all-the-icons-theme)
+  (which-function-mode)
+  ;; (spaceline-all-the-icons--setup-anzu)
+  (setq spaceline-all-the-icons-separator-type 'arrow)
+  (setq spaceline-all-the-icons-icon-set-modified 'circle)
+  ;; (spaceline-toggle-all-the-icons-bookmark-on)
+  (setq spaceline-all-the-icons-icon-set-bookmark 'star)
+  ;; (spaceline-toggle-all-the-icons-dedicated-on)
+  (setq spaceline-all-the-icons-icon-set-dedicated 'sticky-note)
+  
+  (spaceline-toggle-all-the-icons-sunrise-on)
+  (spaceline-toggle-all-the-icons-sunset-on)
+  (setq spaceline-all-the-icons-icon-set-sun-time 'rise/set)
+  ;; (spaceline-toggle-all-the-icons-window-number-on)
+  ;; (setq spaceline-all-the-icons-icon-set-window-numbering 'circle)
+  ;; (spaceline-toggle-all-the-icons-eyebrowse-workspace-on)
+  ;; (setq spaceline-all-the-icons-icon-set-eyebrowse-slot 'circle)
+  (spaceline-toggle-all-the-icons-weather-on)
+  (spaceline-toggle-all-the-icons-temperature-on)
+  (setq spaceline-all-the-icons-icon-set-mc 'pointer)
+  (spaceline-all-the-icons--setup-package-updates)
+  (spaceline-all-the-icons-theme 'mu4e-alert-segment)
+  )
+
+
+;; fancy-battery
+(use-package fancy-battery
+  :ensure t
+  :hook (after-init . fancy-battery-mode)
+  )
+
 ;; (use-package powerline
 ;;   :ensure t
-;;   :config
-;;   (powerline-center-theme)
-;;   (setq powerline-image-apple-rgb t)
+;;   ;; :config
+;;   ;; (powerline-center-theme)
+;;   ;; (setq powerline-image-apple-rgb t)
 ;;   )
 
 (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
@@ -210,6 +266,12 @@
   )
 
 (setq-default bidi-display-reordering nil) ; improve long-line performance
+
+;; Rainbow delimiters
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
 
 ;; Show key bindings on the right
 (use-package which-key
@@ -240,7 +302,7 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode inferior-ess-mode R-mode) . company-mode)
+  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode python-mode message-mode inferior-ess-mode ess-r-mode) . company-mode)
   :custom
   (company-idle-delay 0)
   (company-backends '((company-files company-keywords company-capf company-yasnippet)
@@ -492,58 +554,66 @@ _d_: dir
 ;; 			  ("x" dumb-jump-go-prefer-external-other-window "Go external other window"))
 ;;   )
 
-(use-package treemacs
-  :ensure t
-  :init
-  (defun treemacs-projectile/helm (p)
-    "Load helm before calling 'treemancs-projectile', P."
-    (interactive "P")
-    (unless (featurep 'helm)
-      (require 'helm))
-    (treemacs-projectile)
-    )
-  :custom
-  (treemacs-follow-after-init t)
-  (treemacs-width 25)
-  (treemacs-indentation 2)
-  (treemacs-git-integration t)
-  (treemacs-collapse-dirs 3)
-  (treemacs-silent-refresh nil)
-  (treemacs-change-root-without-asking nil)
-  (treemacs-sorting 'alphabetic-desc)
-  (treemacs-show-hidden-files t)
-  (treemacs-never-persist nil)
-  (treemacs-is-never-other-window nil)
-  (treemacs-goto-tag-strategy 'refetch-index)
-  :config
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  :bind (("C-x a" . hydra-treemacs/body)
-	 ("C-c a" . treemacs-helpful-hydra))
-  :hydra (hydra-treemacs (:color blue :hint nil)
-			 "
-^Toggle^                            ^Windows^                          ^Find^
-^ ^
-^^^^^^^^-------------------------------------------------------------------------------
-^ ^
-_a_: Treemacs                       _s_: Select treemacs window        _f_: Find files
-^ ^
-_p_: Treemacs projectile            _d_: Delete other windows          _b_: Find bookmark
-^ ^"
-                         ("a" treemacs)
-			 ("s" treemacs-select-window)
-			 ("f" treemacs-find-file)
-			 ("p" treemacs-projectile/helm)
-			 ("d" treemacs-delete-other-windows)
-			 ("b" treemacs-bookmark))
-  
-  )
+;; (use-package treemacs
+;;   :ensure t
+;;   :init
+;;   (defun treemacs-projectile/helm (p)
+;;     "Load helm before calling 'treemancs-projectile', P."
+;;     (interactive "P")
+;;     (unless (featurep 'helm)
+;;       (require 'helm))
+;;     (treemacs-projectile)
+;;     )
+;;   :custom
+;;   (treemacs-follow-after-init t)
+;;   (treemacs-width 25)
+;;   (treemacs-indentation 2)
+;;   (treemacs-git-integration t)
+;;   (treemacs-collapse-dirs 3)
+;;   (treemacs-silent-refresh nil)
+;;   (treemacs-change-root-without-asking nil)
+;;   (treemacs-sorting 'alphabetic-desc)
+;;   (treemacs-show-hidden-files t)
+;;   (treemacs-never-persist nil)
+;;   (treemacs-is-never-other-window nil)
+;;   (treemacs-goto-tag-strategy 'refetch-index)
+;;   :config
+;;   (treemacs-follow-mode t)
+;;   (treemacs-filewatch-mode t)
+;;   :bind (("C-x a" . hydra-treemacs/body)
+;; 	 ("C-c a" . treemacs-helpful-hydra))
+;;   :hydra (hydra-treemacs (:color blue :hint nil)
+;; 			 "
+;; ^Toggle^                            ^Windows^                          ^Find^
+;; ^ ^
+;; ^^^^^^^^-------------------------------------------------------------------------------
+;; ^ ^
+;; _a_: Treemacs                       _s_: Select treemacs window        _f_: Find files
+;; ^ ^
+;; _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find bookmark
+;; ^ ^"
+;;                          ("a" treemacs)
+;; 			 ("s" treemacs-select-window)
+;; 			 ("f" treemacs-find-file)
+;; 			 ("p" treemacs-projectile/helm)
+;; 			 ("d" treemacs-delete-other-windows)
+;; 			 ("b" treemacs-bookmark))
+;;   )
 
-(use-package treemacs-projectile
+;; (use-package treemacs-projectile
+;;   :ensure t
+;;   :commands treemacs-projectile
+;;   :custom
+;;   (treemacs-header-function #'treemacs-projectile-create-header)
+;;   )
+
+(use-package neotree
   :ensure t
-  :commands treemacs-projectile
-  :custom
-  (treemacs-header-function #'treemacs-projectile-create-header)
+  :bind ("C-x a" . neotree-toggle)
+  :config
+  ;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (setq neo-smart-open t)
+  (setq neo-window-width 32)
   )
 
 ;; Python
@@ -774,7 +844,8 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 			     ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
 			     ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
 			     (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-
+			     
+			     (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
 			     (setq org-image-actual-width '(400)) ; Prevent inline images being too big
 			     (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
 			     (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
@@ -906,9 +977,14 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
 
 ;; mu4e
 (use-package mu4e
-  :load-path "/usr/local/Cellar/mu/HEAD/share/emacs/site-lisp/mu4e"
+  :ensure mu4e-alert
+  :load-path "/usr/local/Cellar/mu/1.0_1/share/emacs/site-lisp/mu/mu4e"
   :bind ("M-m" . mu4e)
   :config
+  (mu4e-alert-enable-mode-line-display)
+  ;; (mu4e-alert-set-default-style 'notifier)
+  ;; (mu4e-alert-enable-notifications)
+  
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
   (setq mu4e-maildir "~/mail")		; Mail folder set to ~/mail
   (setq mu4e-get-mail-command "offlineimap") ; Fetch mail by offlineimap
@@ -937,6 +1013,12 @@ _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find
   (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
   )
 
+;; ghub
+(use-package ghub
+  :ensure t
+  :ensure graphql
+  :defer t
+  )
 
 (provide 'init)
 
