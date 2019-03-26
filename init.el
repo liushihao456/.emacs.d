@@ -43,21 +43,24 @@
  ;; If there is more than one, they won't work right.
  '(TeX-command-default "LatexMk" t)
  '(aggressive-indent-excluded-modes
-   '(inf-ruby-mode makefile-mode makefile-gmake-mode python-mode text-mode yaml-mode java-mode) t)
+   '(inf-ruby-mode makefile-mode makefile-gmake-mode python-mode text-mode yaml-mode java-mode))
  '(column-number-mode t)
  '(company-backends
    '((company-files company-keywords company-capf company-yasnippet)
-     (company-abbrev company-dabbrev)) t)
- '(company-idle-delay 0 t)
+     (company-abbrev company-dabbrev)))
+ '(company-idle-delay 0)
  '(custom-safe-themes
    '("e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
  '(global-hl-line-mode t)
- '(helm-autoresize-mode t t)
- '(helm-mode-fuzzy-match t t)
+ '(helm-autoresize-mode t)
+ '(helm-mode-fuzzy-match t)
+ '(menu-bar-mode nil)
  '(package-selected-packages
-   '(rainbow-delimiters neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi ob-ipython htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update))
+   '(ccls lsp-ui lsp-mode rainbow-delimiters neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi ob-ipython htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update))
  '(python-shell-interpreter "python3")
- '(scroll-bar-mode nil))
+ '(scroll-bar-mode nil)
+ '(tool-bar-mode nil)
+ '(truncate-lines t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -145,7 +148,7 @@
 (use-package zenburn-theme
   :ensure t
   :config
-  (load-theme 'zenburn t)
+  ;; (load-theme 'zenburn t)
   )
 
 (use-package doom-themes
@@ -153,7 +156,7 @@
   :config
   ;; (load-theme 'doom-one t)
   ;; (load-theme 'doom-one-light t)
-  ;; (load-theme 'doom-solarized-light t)
+  (load-theme 'doom-solarized-light t)
   (doom-themes-neotree-config)
   )
 
@@ -325,8 +328,10 @@ narrowed."
   (aggressive-indent-excluded-modes '(inf-ruby-mode makefile-mode makefile-gmake-mode python-mode
 						    text-mode yaml-mode java-mode))
   :hook ((emacs-lisp-mode . aggressive-indent-mode)
-	 (c-mode . aggressive-indent-mode)
-	 (c++-mode . aggressive-indent-mode))
+	 ;; Conflicts with ccls LSP
+	 ;; (c-mode . aggressive-indent-mode)
+	 ;; (c++-mode . aggressive-indent-mode)
+	 )
   :config
   (electric-indent-local-mode -1)
   (defun turn-off-electric-indent-mode ()
@@ -373,19 +378,21 @@ _k_: kill                         _q_: quit
 
 (use-package projectile
   :ensure t
+  :init
+  (projectile-mode t)
   :custom
   (projectile-enable-caching t)
   :config
   (define-key projectile-mode-map (kbd "C-c C-p") nil)
-  (projectile-mode t)
   )
 
 (use-package helm-projectile
   :ensure t
+  :init
+  (helm-projectile-on)
   :bind (:map projectile-mode-map
 	      ("C-c p" . hydra-helm-projectile/body))
   :config
-  (helm-projectile-on)
   :hydra (hydra-helm-projectile (:color blue
 					:hint nil)
 				"
@@ -427,6 +434,8 @@ _d_: dir
 
 (use-package helm
   :ensure t
+  :init
+  (helm-mode t)
   :custom
   (helm-autoresize-mode t)
   (helm-mode-fuzzy-match t)
@@ -458,7 +467,6 @@ _d_: dir
 		     ("s" helm-do-grep-ag "ag")
 		     ("t" helm-bibtex "bibtex"))
   :config
-  (helm-mode t)
   (global-set-key (kbd "C-x c") 'hydra-helm/body)
   )
 
@@ -500,91 +508,90 @@ _d_: dir
   (setq neo-window-width 32)
   )
 
-;; Python
-;; (use-package anaconda-mode
+;; ;; Python
+;; ;; (use-package anaconda-mode
+;; ;;   :ensure t
+;; ;;   :ensure company-anaconda
+;; ;;   :hook ((python-mode . anaconda-mode)
+;; ;; 	 (python-mode . anaconda-eldoc-mode))
+;; ;;   :config
+;; ;;   (make-local-variable 'company-backends)
+;; ;;   (setq company-backends nil)
+;; ;;   (add-to-list 'company-backends '(company-anaconda company-files))
+;; ;;   ;; make sure the company backends are set again when opening another python file.
+;; ;;   (defun my/anaconda-setup ()
+;; ;;     "Add company-anaconda to company-backends in python mode."
+;; ;;     (make-local-variable 'company-backends)
+;; ;;     (setq company-backends nil)
+;; ;;     (add-to-list 'company-backends '(company-anaconda company-files))
+;; ;;     )
+;; ;;   (add-hook 'python-mode-hook 'my/anaconda-setup)
+;; ;;   )
+
+;; ;; (use-package jedi
+;; ;;   :ensure t
+;; ;;   :custom (jedi:complete-on-dot t)
+;; ;;   :hook (python-mode . jedi:ac-setup)
+;; ;;   )
+
+;; (use-package company-jedi
 ;;   :ensure t
-;;   :ensure company-anaconda
-;;   :hook ((python-mode . anaconda-mode)
-;; 	 (python-mode . anaconda-eldoc-mode))
+;;   :defer t
+;;   :init
+;;   (defun my/python-mode-hook ()
+;;     (add-to-list 'company-backends '(company-jedi company-files)))
+;;   (add-hook 'python-mode-hook 'my/python-mode-hook)
+;;   )
+
+;; ;; (use-package jedi-core
+;; ;;   :ensure t
+;; ;;   :ensure company-jedi
+;; ;;   :hook (python-mode . jedi:setup)
+;; ;;   :config
+;; ;;   (message "Jedi loaded.")
+;; ;;   (setq jedi:complete-on-dot t)
+;; ;;   (setq jedi:use-shortcuts t)
+
+;; ;;   (make-local-variable 'company-backends)
+;; ;;   (setq company-backends nil)
+;; ;;   (add-to-list 'company-backends 'company-jedi)
+
+;; ;;   ;; make sure the company backends are set again when opening another python file.
+;; ;;   (defun my/jedi-setup ()
+;; ;;     "Add company-jedi to company-backends in python mode."
+;; ;;     (make-local-variable 'company-backends)
+;; ;;     (setq company-backends nil)
+;; ;;     (add-to-list 'company-backends '(company-jedi company-yasnippet company-files))
+;; ;;     )
+;; ;;   (add-hook 'python-mode-hook 'my/jedi-setup)
+;; ;;   )
+
+;; (use-package py-autopep8
+;;   :ensure t
+;;   :hook (python-mode . py-autopep8-enable-on-save))
+
+;; ;; C++
+;; (use-package irony
+;;   :ensure t
+;;   :ensure company-irony
+;;   :hook ((c-mode . irony-mode)
+;; 	 (c++-mode . irony-mode)
+;; 	 (irony-mode . irony-cdb-autosetup-compile-options))
 ;;   :config
+;;   (message "Irony loaded.")
 ;;   (make-local-variable 'company-backends)
 ;;   (setq company-backends nil)
-;;   (add-to-list 'company-backends '(company-anaconda company-files))
-;;   ;; make sure the company backends are set again when opening another python file.
-;;   (defun my/anaconda-setup ()
-;;     "Add company-anaconda to company-backends in python mode."
+;;   (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
+
+;;   (defun my/irony-mode ()
+;;     "Add company-irony to company-backends in C and C++ mode."
 ;;     (make-local-variable 'company-backends)
 ;;     (setq company-backends nil)
-;;     (add-to-list 'company-backends '(company-anaconda company-files))
+;;     (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
 ;;     )
-;;   (add-hook 'python-mode-hook 'my/anaconda-setup)
+;;   (add-hook 'c-mode-hook 'my/irony-mode)
+;;   (add-hook 'c++-mode-hook 'my/irony-mode)
 ;;   )
-
-;; (use-package jedi
-;;   :ensure t
-;;   :custom (jedi:complete-on-dot t)
-;;   :hook (python-mode . jedi:ac-setup)
-;;   )
-
-(use-package company-jedi
-  :ensure t
-  :defer t
-  :init
-  (defun my/python-mode-hook ()
-    (add-to-list 'company-backends '(company-jedi company-files)))
-  (add-hook 'python-mode-hook 'my/python-mode-hook)
-  )
-
-;; (use-package jedi-core
-;;   :ensure t
-;;   :ensure company-jedi
-;;   :hook (python-mode . jedi:setup)
-;;   :config
-;;   (message "Jedi loaded.")
-;;   (setq jedi:complete-on-dot t)
-;;   (setq jedi:use-shortcuts t)
-
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends nil)
-;;   (add-to-list 'company-backends 'company-jedi)
-
-;;   ;; make sure the company backends are set again when opening another python file.
-;;   (defun my/jedi-setup ()
-;;     "Add company-jedi to company-backends in python mode."
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends nil)
-;;     (add-to-list 'company-backends '(company-jedi company-yasnippet company-files))
-;;     )
-;;   (add-hook 'python-mode-hook 'my/jedi-setup)
-;;   )
-
-(use-package py-autopep8
-  :ensure t
-  :hook (python-mode . py-autopep8-enable-on-save))
-
-;; C++
-(use-package irony
-  :ensure t
-  :ensure company-irony
-  :hook ((c-mode . irony-mode)
-	 (c++-mode . irony-mode)
-	 (irony-mode . irony-cdb-autosetup-compile-options))
-  :config
-  (message "Irony loaded.")
-  (make-local-variable 'company-backends)
-  (setq company-backends nil)
-  (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
-
-  (defun my/irony-mode ()
-    "Add company-irony to company-backends in C and C++ mode."
-    (make-local-variable 'company-backends)
-    (setq company-backends nil)
-    (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
-    )
-  (add-hook 'c-mode-hook 'my/irony-mode)
-  (add-hook 'c++-mode-hook 'my/irony-mode)
-
-  )
 
 ;; (use-package rtags
 ;;   :ensure t
@@ -596,53 +603,53 @@ _d_: dir
 ;;   (rtags-display-result-backend 'helm)
 ;;   )
 
-;; Java
-(use-package lsp-mode
-  :ensure t
-  :hook java-mode
-  :config
-  (setq lsp-eldoc-render-all nil
-	lsp-highlight-symbol-at-point nil)
-  )
+;; ;; Java
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :hook java-mode
+;;   :config
+;;   (setq lsp-eldoc-render-all nil
+;; 	lsp-highlight-symbol-at-point nil)
+;;   )
 
-(use-package lsp-ui
-  :ensure t
-  :commands (lsp-ui-sideline-mode lsp-ui-flycheck-enable)
-  :config
-  (setq lsp-ui-sideline-enable t
-	lsp-ui-sideline-show-symbol t
-	lsp-ui-sideline-show-hover t
-	lsp-ui-sideline-show-code-actions t
-	lsp-ui-sideline-update-mode 'point)
-  )
+;; (use-package lsp-ui
+;;   :ensure t
+;;   :commands (lsp-ui-sideline-mode lsp-ui-flycheck-enable)
+;;   :config
+;;   (setq lsp-ui-sideline-enable t
+;; 	lsp-ui-sideline-show-symbol t
+;; 	lsp-ui-sideline-show-hover t
+;; 	lsp-ui-sideline-show-code-actions t
+;; 	lsp-ui-sideline-update-mode 'point)
+;;   )
 
-(use-package lsp-java
-  :ensure t
-  :ensure company-lsp
-  :hook (java-mode . lsp-java-enable)
-  :config
-  (lsp-ui-sideline-mode)
-  (setq lsp-java--workspace-folders (list "~/javaproj"))
-  (setq company-lsp-enable-snippet t)
-  (setq company-lsp-cache-candidates t)
-  (lsp-ui-flycheck-enable t)
-  (setq lsp-ui-sideline-enable t
-	lsp-ui-sideline-show-symbol t
-	lsp-ui-sideline-show-hover t
-	lsp-ui-sideline-show-code-actions t
-	lsp-ui-sideline-update-mode 'point)
-  (make-local-variable 'company-backends)
-  (setq company-backends nil)
-  (add-to-list 'company-backends '(company-lsp company-yasnippet company-files))
-  
-  (add-hook 'java-mode-hook  (lambda ()
-			       (lsp-ui-sideline-mode)
-			       (lsp-ui-flycheck-enable t)
-			       (make-local-variable 'company-backends)
-			       (setq company-backends nil)
-			       (add-to-list 'company-backends '(company-lsp company-yasnippet company-files))
-  			       ))
-  )
+;; (use-package lsp-java
+;;   :ensure t
+;;   :ensure company-lsp
+;;   :hook (java-mode . lsp-java-enable)
+;;   :config
+;;   (lsp-ui-sideline-mode)
+;;   (setq lsp-java--workspace-folders (list "~/javaproj"))
+;;   (setq company-lsp-enable-snippet t)
+;;   (setq company-lsp-cache-candidates t)
+;;   (lsp-ui-flycheck-enable t)
+;;   (setq lsp-ui-sideline-enable t
+;; 	lsp-ui-sideline-show-symbol t
+;; 	lsp-ui-sideline-show-hover t
+;; 	lsp-ui-sideline-show-code-actions t
+;; 	lsp-ui-sideline-update-mode 'point)
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends nil)
+;;   (add-to-list 'company-backends '(company-lsp company-yasnippet company-files))
+
+;;   (add-hook 'java-mode-hook  (lambda ()
+;; 			       (lsp-ui-sideline-mode)
+;; 			       (lsp-ui-flycheck-enable t)
+;; 			       (make-local-variable 'company-backends)
+;; 			       (setq company-backends nil)
+;; 			       (add-to-list 'company-backends '(company-lsp company-yasnippet company-files))
+;;   			       ))
+;;   )
 
 ;; LaTeX
 (use-package tex
@@ -907,6 +914,32 @@ _d_: dir
   :defer t
   )
 
-(provide 'init)
+;; lsp mode
+(use-package lsp-mode
+  :ensure t
+  :pin melpa-stable
+  :commands lsp
+  :init
+  (add-hook 'python-mode-hook 'lsp)
+  )
+(use-package lsp-ui
+  :ensure t
+  :pin melpa-stable
+  :commands lsp-ui-mode
+  )
+(use-package company-lsp
+  :ensure t
+  :pin melpa-stable
+  :commands company-lsp)
 
+;; Lsp c++
+(use-package ccls
+  :ensure t
+  :hook ((c-mode c++-mode objc-mode) .
+         (lambda () (require 'ccls) (lsp)))
+  :config
+  (setq ccls-executable "/usr/local/bin/ccls")
+  )
+
+(provide 'init)
 ;;; init.el ends here
