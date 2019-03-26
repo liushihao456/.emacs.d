@@ -20,14 +20,6 @@
   (add-to-list 'load-path "~/.emacs.d/packages/bind-key")
   (require 'use-package))
 
-(use-package yahoo-weather
-  :load-path "~/.emacs.d/packages/yahoo-weather"
-  :config
-  (setq yahoo-weather-locationid "1816670")
-  (setq yahoo-weather-apikey "e5f1e557685536c2fe98e7dfabe201de")
-  (yahoo-weather-mode)
-  )
-
 (setq use-package-compute-statistics t)
 
 ;; (use-package auto-package-update
@@ -62,10 +54,8 @@
  '(global-hl-line-mode t)
  '(helm-autoresize-mode t t)
  '(helm-mode-fuzzy-match t t)
- '(org-agenda-files '("~/notes/notes.org"))
  '(package-selected-packages
-   '(rainbow-delimiters spaceline spaceline-all-the-icons neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi ob-ipython htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop helm-projectile hungry-delete undo-tree yasnippet auto-package-update))
- '(projectile-enable-caching t)
+   '(rainbow-delimiters neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi ob-ipython htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil))
 
@@ -152,26 +142,18 @@
 ;; (setq mouse-wheel-scroll-amount '(1)) ; Distance in pixel-resolution to scroll each mouse wheel event.
 ;; (setq mouse-wheel-progressive-speed nil) ; Progressive speed is too fast for me.
 
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'zenburn t)
-;;   )
-
-;; (use-package solarized-theme
-;;   :ensure t
-;;   :config
-;;   (setq solarized-use-variable-pitch nil) ; Don't change the font for some headings and titles
-;;   (setq solarized-scale-org-headlines nil) ; Don't change size of org-mode headlines (but keep other size-changes)
-;;   (load-theme 'solarized-light t)
-;;   )
+(use-package zenburn-theme
+  :ensure t
+  :config
+  (load-theme 'zenburn t)
+  )
 
 (use-package doom-themes
   :ensure t
   :config
   ;; (load-theme 'doom-one t)
   ;; (load-theme 'doom-one-light t)
-  (load-theme 'doom-solarized-light t)
+  ;; (load-theme 'doom-solarized-light t)
   (doom-themes-neotree-config)
   )
 
@@ -181,77 +163,30 @@
 ;;   (load-theme 'zerodark t)
 ;;   )
 
-;; (use-package doom-modeline
-;;   :ensure t
-;;   :hook (after-init . doom-modeline-mode)
-;;   :config
-;;   (setq doom-modeline-bar-width 3)
-;;   (setq doom-modeline-height 20)
-;;   (setq doom-modeline-minor-modes t)
-;;   ;; If non-nil, only display one number for checker information if applicable.
-;;   (setq doom-modeline-checker-simple-format nil)
-;;   ;; Whether display perspective name or not. Non-nil to display in mode-line.
-;;   (setq doom-modeline-persp-name t)
-;;   ;; Whether display `lsp' state or not. Non-nil to display in mode-line.
-;;   (setq doom-modeline-lsp t)
-;;   ;; Whether display mu4e notifications or not. Requires `mu4e-alert' package.
-;;   (setq doom-modeline-mu4e t)
-;;   )
-
-(use-package spaceline
-  :ensure t
-  :pin melpa-stable
-  )
-
-(use-package spaceline-config
-  :ensure spaceline
-  :config
-  (spaceline-helm-mode 1)
-  (spaceline-emacs-theme)
-  )
-
-(use-package spaceline-all-the-icons
-  :ensure t
-  :pin melpa-stable
-  :after spaceline
-  :config
-  (spaceline-all-the-icons-theme)
-  (which-function-mode)
-  ;; (spaceline-all-the-icons--setup-anzu)
-  (setq spaceline-all-the-icons-separator-type 'arrow)
-  (setq spaceline-all-the-icons-icon-set-modified 'circle)
-  ;; (spaceline-toggle-all-the-icons-bookmark-on)
-  (setq spaceline-all-the-icons-icon-set-bookmark 'star)
-  ;; (spaceline-toggle-all-the-icons-dedicated-on)
-  (setq spaceline-all-the-icons-icon-set-dedicated 'sticky-note)
-  
-  (spaceline-toggle-all-the-icons-sunrise-on)
-  (spaceline-toggle-all-the-icons-sunset-on)
-  (setq spaceline-all-the-icons-icon-set-sun-time 'rise/set)
-  ;; (spaceline-toggle-all-the-icons-window-number-on)
-  ;; (setq spaceline-all-the-icons-icon-set-window-numbering 'circle)
-  ;; (spaceline-toggle-all-the-icons-eyebrowse-workspace-on)
-  ;; (setq spaceline-all-the-icons-icon-set-eyebrowse-slot 'circle)
-  (spaceline-toggle-all-the-icons-weather-on)
-  (spaceline-toggle-all-the-icons-temperature-on)
-  (setq spaceline-all-the-icons-icon-set-mc 'pointer)
-  (spaceline-all-the-icons--setup-package-updates)
-  (spaceline-all-the-icons-theme 'mu4e-alert-segment)
-  )
-
-
 ;; fancy-battery
 (use-package fancy-battery
   :ensure t
   :hook (after-init . fancy-battery-mode)
   )
 
-;; (use-package powerline
-;;   :ensure t
-;;   ;; :config
-;;   ;; (powerline-center-theme)
-;;   ;; (setq powerline-image-apple-rgb t)
-;;   )
+;; Doom modeline
+(use-package doom-modeline
+  :ensure t
+  :config
+  (doom-modeline-def-segment clock
+    (let* ((hour (string-to-number (format-time-string "%I"))))
+      (concat
+       (propertize (format-time-string " %H:%M ") 'face `(:height 1.0)))))
+
+  (doom-modeline-def-modeline 'my/doom-modeline
+    '(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
+    '(misc-info persp-name lsp irc mu4e github debug fancy-battery minor-modes input-method buffer-encoding major-mode process vcs checker clock))
+
+  (add-hook 'doom-modeline-mode-hook (lambda () (doom-modeline-set-modeline 'my/doom-modeline 'default)))
+  (doom-modeline-mode)
+  (setq doom-modeline-bar-width 3)
+  (setq doom-modeline-height 25)
+  )
 
 (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
 
@@ -261,7 +196,8 @@
   (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title "Emacs and the changing world.") ; change the title
   (setq dashboard-items '((recents  . 10)
-                          (projects . 10)))
+                          (projects . 10)
+			  ))
   (message "Dashboard loaded.")
   )
 
@@ -458,7 +394,7 @@ _k_: kill                         _q_: quit
 
 ^^^^^^^^-----------------------------------------------------------------------------------------------------------------
 
-_f_: files                        _e_: recent files               _s s_: ag                       _c_: compile peoject
+_f_: files                        _e_: recent files               _s s_: ag                       _c_: compile project
 
 _a_: other files                  _p_: proj                       _s g_: grep
 
@@ -554,58 +490,6 @@ _d_: dir
 ;; 			  ("x" dumb-jump-go-prefer-external-other-window "Go external other window"))
 ;;   )
 
-;; (use-package treemacs
-;;   :ensure t
-;;   :init
-;;   (defun treemacs-projectile/helm (p)
-;;     "Load helm before calling 'treemancs-projectile', P."
-;;     (interactive "P")
-;;     (unless (featurep 'helm)
-;;       (require 'helm))
-;;     (treemacs-projectile)
-;;     )
-;;   :custom
-;;   (treemacs-follow-after-init t)
-;;   (treemacs-width 25)
-;;   (treemacs-indentation 2)
-;;   (treemacs-git-integration t)
-;;   (treemacs-collapse-dirs 3)
-;;   (treemacs-silent-refresh nil)
-;;   (treemacs-change-root-without-asking nil)
-;;   (treemacs-sorting 'alphabetic-desc)
-;;   (treemacs-show-hidden-files t)
-;;   (treemacs-never-persist nil)
-;;   (treemacs-is-never-other-window nil)
-;;   (treemacs-goto-tag-strategy 'refetch-index)
-;;   :config
-;;   (treemacs-follow-mode t)
-;;   (treemacs-filewatch-mode t)
-;;   :bind (("C-x a" . hydra-treemacs/body)
-;; 	 ("C-c a" . treemacs-helpful-hydra))
-;;   :hydra (hydra-treemacs (:color blue :hint nil)
-;; 			 "
-;; ^Toggle^                            ^Windows^                          ^Find^
-;; ^ ^
-;; ^^^^^^^^-------------------------------------------------------------------------------
-;; ^ ^
-;; _a_: Treemacs                       _s_: Select treemacs window        _f_: Find files
-;; ^ ^
-;; _p_: Treemacs projectile            _d_: Delete other windows          _b_: Find bookmark
-;; ^ ^"
-;;                          ("a" treemacs)
-;; 			 ("s" treemacs-select-window)
-;; 			 ("f" treemacs-find-file)
-;; 			 ("p" treemacs-projectile/helm)
-;; 			 ("d" treemacs-delete-other-windows)
-;; 			 ("b" treemacs-bookmark))
-;;   )
-
-;; (use-package treemacs-projectile
-;;   :ensure t
-;;   :commands treemacs-projectile
-;;   :custom
-;;   (treemacs-header-function #'treemacs-projectile-create-header)
-;;   )
 
 (use-package neotree
   :ensure t
@@ -846,6 +730,8 @@ _d_: dir
 			     (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 			     
 			     (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
+			     (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick)  )
+			     (add-to-list 'image-file-name-extensions "eps")
 			     (setq org-image-actual-width '(400)) ; Prevent inline images being too big
 			     (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
 			     (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
@@ -926,7 +812,8 @@ _d_: dir
   (setq org-capture-templates
 	'(("t" "Todo list item"
 	   entry (file+headline "~/notes/tasks.org" "Tasks")
-	   "* TODO %?\n %i\n %a")
+	   "* TODO %?\n %i\n")
+	  ;; "* TODO %?\n %i\n %a")
 
 	  ("j" "Journal entry"
 	   entry (file+olp+datetree "~/notes/journal.org" "Journals")
