@@ -1,9 +1,6 @@
-*.el~
 .DS_Store
 recentf
-recentf~
 *.local
-*.local~
 projectile.cache
 projectile-bookmarks.eld
 eshell/
