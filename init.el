@@ -50,10 +50,9 @@
    (quote
     ("e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
  '(global-hl-line-mode t)
- '(menu-bar-mode nil)
  '(package-selected-packages
    (quote
-    (ob-async jupyter ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls lsp-ui lsp-mode neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
+    (quickrun lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls lsp-ui lsp-mode neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil)
@@ -239,14 +238,14 @@
 (use-package zenburn-theme
   :ensure t
   :config
-  (load-theme 'zenburn t)
+  ;; (load-theme 'zenburn t)
   )
 
 (use-package doom-themes
   :ensure t
   :config
   ;; (load-theme 'doom-one t)
-  ;; (load-theme 'doom-one-light t)
+  (load-theme 'doom-one-light t)
   ;; (load-theme 'doom-solarized-light t)
   (doom-themes-neotree-config)
   )
@@ -382,11 +381,14 @@
 	 )
   :hydra (hydra-multiple-cursors (:hint nil)
 				 "
- Previous^^                Next^^           Miscellaneous      % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
-------------------------------------------------------------------------------------
- [_p_]   Next              [_n_]   Next     [_l_] Edit lines   [_0_] Insert numbers
- [_P_]   Skip              [_N_]   Skip     [_a_] Mark all     [_A_] Insert letters
- [_M-p_] Unmark            [_M-n_] Unmark   [_s_] Search
+ Previous^^                  Next^^                 Miscellaneous         % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+---------------------------------------------------------------------------------------------------
+ [_p_]   Next                [_n_]   Next           [_l_] Edit lines        [_0_] Insert numbers
+
+ [_P_]   Skip                [_N_]   Skip           [_a_] Mark all          [_A_] Insert letters
+
+ [_M-p_] Unmark              [_M-n_] Unmark         [_s_] Search
+
  [Click] Cursor at point   [_q_]   Quit
 "
 				 ("l" mc/edit-lines :exit t)
@@ -786,7 +788,9 @@ narrowed."
      ))
   (add-to-list 'org-latex-listings-langs '(ipython "Python"))
   (setq org-src-fontify-natively t)
-  (setq org-preview-latex-default-process 'dvipng)
+  (setq org-preview-latex-default-process 'dvisvgm)
+  (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+					       ("begin" "$1" "$" "$$" "\\(" "\\[")))
   (setq org-src-window-setup 'current-window)
   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed exports
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
@@ -876,17 +880,27 @@ narrowed."
 
   (defhydra hydra-mu4e-headers (:color blue :hint nil)
     "
- ^General^   | ^Search^           | _!_: read    | _#_: deferred  | ^Switches^
--^^----------+-^^-----------------| _?_: unread  | _%_: pattern   |-^^------------------
-_n_: next    | _s_: search        | _r_: refile  | _&_: custom    | _O_: sorting
-_p_: prev    | _S_: edit prev qry | _u_: unmk    | _+_: flag      | _P_: threading
-_]_: n unred | _/_: narrow search | _U_: unmk *  | _-_: unflag    | _Q_: full-search
-_[_: p unred | _b_: search bkmk   | _d_: trash   | _T_: thr       | _V_: skip dups
-_y_: sw view | _B_: edit bkmk     | _D_: delete  | _t_: subthr    | _W_: include-related
-_R_: reply   | _{_: previous qry  | _m_: move    |-^^-------------+-^^------------------
-_C_: compose | _}_: next query    | _a_: action  | _|_: thru shl  | _`_: update, reindex
-_F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context-switch
-           | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2maildir "
+ ^General^         ^Search^              _!_: read       _#_: deferred    ^Switches^
+
+-^^-----------------^^-----------------  _?_: unread     _%_: pattern    -^^------------------
+
+_n_: next          _s_: search           _r_: refile     _&_: custom      _O_: sorting
+
+_p_: prev          _S_: edit prev qry    _u_: unmk       _+_: flag        _P_: threading
+
+_]_: n unred       _/_: narrow search    _U_: unmk *     _-_: unflag      _Q_: full-search
+
+_[_: p unred       _b_: search bkmk      _d_: trash      _T_: thr         _V_: skip dups
+
+_y_: sw view       _B_: edit bkmk        _D_: delete     _t_: subthr      _W_: include-related
+
+_R_: reply         _{_: previous qry     _m_: move      -^^----------------^^------------------
+
+_C_: compose       _}_: next query       _a_: action     _|_: thru shl    _`_: update, reindex
+
+_F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: context-switch
+
+--------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir "
 
     ;; general
     ("n" mu4e-headers-next)
@@ -967,8 +981,8 @@ _F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context
   :init
   (add-hook 'python-mode-hook 'lsp)
   (setq xref-prompt-for-identifier '(not xref-find-definitions
-                                         xref-find-definitions-other-window
-                                         xref-find-definitions-other-frame
+					 xref-find-definitions-other-window
+					 xref-find-definitions-other-frame
 					 xref-find-references))
   (setq lsp-prefer-flymake nil)
   (defhydra hydra-lsp (:exit t :hint nil)
@@ -1019,16 +1033,24 @@ _F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context
   :pin melpa-stable
   :commands company-lsp)
 
-
-
 ;; Lsp c++
 (use-package ccls
   :ensure t
+  :after lsp
   :hook ((c-mode c++-mode objc-mode) .
          (lambda () (require 'ccls) (lsp)))
   :config
   (setq ccls-executable "/usr/local/bin/ccls")
   )
+
+(use-package lsp-java
+  :ensure t
+  :after lsp
+  :hook (java-mode . (lambda () (require 'lsp-java) (lsp)))
+  )
+
+(use-package quickrun
+  :ensure t)
 
 (provide 'init)
 ;;; init.el ends here

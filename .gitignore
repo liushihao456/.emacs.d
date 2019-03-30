@@ -7,7 +7,6 @@ eshell/
 .python-environments/
 workspace/
 auto-save-list/
-eclipse.jdt.ls/
 irony/
 .mc-lists.el
 .last-package-update-day

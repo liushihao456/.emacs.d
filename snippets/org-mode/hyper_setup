@@ -2,10 +2,9 @@
 # name: hyper_setup
 # key: hy
 # --
+#+LATEX_HEADER_EXTRA: \usepackage{hyperref}
 #+LATEX_HEADER_EXTRA: \hypersetup{
-#+LATEX_HEADER_EXTRA:     colorlinks,
-#+LATEX_HEADER_EXTRA:     linkcolor={red!50!black},
-#+LATEX_HEADER_EXTRA:     citecolor={blue!50!black},
-#+LATEX_HEADER_EXTRA:     urlcolor={blue!80!black}
+#+LATEX_HEADER_EXTRA:     colorlinks=false,
+#+LATEX_HEADER_EXTRA:     pdfborder={0 0 0},
 #+LATEX_HEADER_EXTRA: }
 $0
