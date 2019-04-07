@@ -52,7 +52,7 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-    (quickrun lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls lsp-ui lsp-mode neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
+    (dap-mode lsp-mode quickrun lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls lsp-ui neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme company-jedi htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp company-irony py-autopep8 dumb-jump helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil)
@@ -103,9 +103,10 @@
   "Set the fonts."
   (interactive)
   ;; font config for org table showing.
-  (set-frame-font "Consolas-13")
+  ;; (set-frame-font "Consolas-13")
   ;; (set-frame-font "Fira Code-13")
   ;; (set-frame-font "Monaco-13")
+  (set-frame-font "DejaVu Sans Mono-12")
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
                       charset
@@ -245,7 +246,7 @@
   :ensure t
   :config
   ;; (load-theme 'doom-one t)
-  (load-theme 'doom-one-light t)
+  ;; (load-theme 'doom-one-light t)
   ;; (load-theme 'doom-solarized-light t)
   (doom-themes-neotree-config)
   )
@@ -265,9 +266,9 @@
 (use-package flycheck
   :ensure t
   :hook (prog-mode . flycheck-mode)
-  :config
-  (add-hook 'python-mode-hook (lambda ()
-				(setq-local flycheck-python-flake8-executable "/usr/local/bin/flake8")))
+  ;; :config
+  ;; (add-hook 'python-mode-hook (lambda ()
+  ;; 				(setq-local flycheck-python-flake8-executable "/usr/local/bin/flake8")))
   )
 
 ;; Doom modeline
@@ -381,8 +382,11 @@
 	 )
   :hydra (hydra-multiple-cursors (:hint nil)
 				 "
+
  Previous^^                  Next^^                 Miscellaneous         % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+
 ---------------------------------------------------------------------------------------------------
+
  [_p_]   Next                [_n_]   Next           [_l_] Edit lines        [_0_] Insert numbers
 
  [_P_]   Skip                [_N_]   Skip           [_a_] Mark all          [_A_] Insert letters
@@ -493,131 +497,6 @@ narrowed."
   (setq neo-smart-open t)
   (setq neo-window-width 32)
   )
-
-;; ;; Python
-
-;; ;; (use-package jedi
-;; ;;   :ensure t
-;; ;;   :custom (jedi:complete-on-dot t)
-;; ;;   :hook (python-mode . jedi:ac-setup)
-;; ;;   )
-
-;; (use-package company-jedi
-;;   :ensure t
-;;   :defer t
-;;   :init
-;;   (defun my/python-mode-hook ()
-;;     (add-to-list 'company-backends '(company-jedi company-files)))
-;;   (add-hook 'python-mode-hook 'my/python-mode-hook)
-;;   )
-
-;; ;; (use-package jedi-core
-;; ;;   :ensure t
-;; ;;   :ensure company-jedi
-;; ;;   :hook (python-mode . jedi:setup)
-;; ;;   :config
-;; ;;   (message "Jedi loaded.")
-;; ;;   (setq jedi:complete-on-dot t)
-;; ;;   (setq jedi:use-shortcuts t)
-
-;; ;;   (make-local-variable 'company-backends)
-;; ;;   (setq company-backends nil)
-;; ;;   (add-to-list 'company-backends 'company-jedi)
-
-;; ;;   ;; make sure the company backends are set again when opening another python file.
-;; ;;   (defun my/jedi-setup ()
-;; ;;     "Add company-jedi to company-backends in python mode."
-;; ;;     (make-local-variable 'company-backends)
-;; ;;     (setq company-backends nil)
-;; ;;     (add-to-list 'company-backends '(company-jedi company-yasnippet company-files))
-;; ;;     )
-;; ;;   (add-hook 'python-mode-hook 'my/jedi-setup)
-;; ;;   )
-
-;; (use-package py-autopep8
-;;   :ensure t
-;;   :hook (python-mode . py-autopep8-enable-on-save))
-
-;; ;; C++
-;; (use-package irony
-;;   :ensure t
-;;   :ensure company-irony
-;;   :hook ((c-mode . irony-mode)
-;; 	 (c++-mode . irony-mode)
-;; 	 (irony-mode . irony-cdb-autosetup-compile-options))
-;;   :config
-;;   (message "Irony loaded.")
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends nil)
-;;   (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
-
-;;   (defun my/irony-mode ()
-;;     "Add company-irony to company-backends in C and C++ mode."
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends nil)
-;;     (add-to-list 'company-backends '(company-irony company-yasnippet company-files))
-;;     )
-;;   (add-hook 'c-mode-hook 'my/irony-mode)
-;;   (add-hook 'c++-mode-hook 'my/irony-mode)
-;;   )
-
-;; (use-package rtags
-;;   :ensure t
-;;   :ensure helm-rtags
-;;   :hook (((c-mode c++-mode) . rtags-start-process-unless-running)
-;; 	 ((c-mode c++-mode) . rtags-diagnostics))
-;;   :custom
-;;   (rtags-completions-enabled t)
-;;   (rtags-display-result-backend 'helm)
-;;   )
-
-;; ;; Java
-;; (use-package lsp-mode
-;;   :ensure t
-;;   :hook java-mode
-;;   :config
-;;   (setq lsp-eldoc-render-all nil
-;; 	lsp-highlight-symbol-at-point nil)
-;;   )
-
-;; (use-package lsp-ui
-;;   :ensure t
-;;   :commands (lsp-ui-sideline-mode lsp-ui-flycheck-enable)
-;;   :config
-;;   (setq lsp-ui-sideline-enable t
-;; 	lsp-ui-sideline-show-symbol t
-;; 	lsp-ui-sideline-show-hover t
-;; 	lsp-ui-sideline-show-code-actions t
-;; 	lsp-ui-sideline-update-mode 'point)
-;;   )
-
-;; (use-package lsp-java
-;;   :ensure t
-;;   :ensure company-lsp
-;;   :hook (java-mode . lsp-java-enable)
-;;   :config
-;;   (lsp-ui-sideline-mode)
-;;   (setq lsp-java--workspace-folders (list "~/javaproj"))
-;;   (setq company-lsp-enable-snippet t)
-;;   (setq company-lsp-cache-candidates t)
-;;   (lsp-ui-flycheck-enable t)
-;;   (setq lsp-ui-sideline-enable t
-;; 	lsp-ui-sideline-show-symbol t
-;; 	lsp-ui-sideline-show-hover t
-;; 	lsp-ui-sideline-show-code-actions t
-;; 	lsp-ui-sideline-update-mode 'point)
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends nil)
-;;   (add-to-list 'company-backends '(company-lsp company-yasnippet company-files))
-
-;;   (add-hook 'java-mode-hook  (lambda ()
-;; 			       (lsp-ui-sideline-mode)
-;; 			       (lsp-ui-flycheck-enable t)
-;; 			       (make-local-variable 'company-backends)
-;; 			       (setq company-backends nil)
-;; 			       (add-to-list 'company-backends '(company-lsp company-yasnippet company-files))
-;;   			       ))
-;;   )
 
 ;; LaTeX
 (use-package tex
@@ -813,6 +692,7 @@ narrowed."
 (setq org-html-postamble nil)		; Don't include a footer with my contact and publishing information at the bottom of every exported HTML document
 
 ;; Eshell
+(setq display-buffer-alist '(("\\`\\*e?shell" display-buffer-pop-up-window)))
 (define-key global-map (kbd "C-c 1") 'eshell) ; Eshell mode
 (add-hook 'shell-mode-hook (lambda ()
 			     (setq-local company-minimum-prefix-length 1)
@@ -980,6 +860,8 @@ _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: c
   :commands lsp
   :init
   (add-hook 'python-mode-hook 'lsp)
+  :config
+  (require 'dap-python)
   (setq xref-prompt-for-identifier '(not xref-find-definitions
 					 xref-find-definitions-other-window
 					 xref-find-definitions-other-frame
@@ -1036,21 +918,39 @@ _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: c
 ;; Lsp c++
 (use-package ccls
   :ensure t
-  :after lsp
   :hook ((c-mode c++-mode objc-mode) .
-         (lambda () (require 'ccls) (lsp)))
+         (lambda () (require 'ccls) (require 'lsp) (lsp)))
   :config
   (setq ccls-executable "/usr/local/bin/ccls")
   )
 
 (use-package lsp-java
   :ensure t
-  :after lsp
-  :hook (java-mode . (lambda () (require 'lsp-java) (lsp)))
+  :hook (java-mode . (lambda ()
+		       (require 'lsp-java)
+		       (require 'lsp)
+		       (require 'dap-java)
+		       (lsp)))
+  )
+
+(use-package dap-mode
+  :ensure t
+  :config
+  (dap-mode t)
+  (dap-ui-mode t)
   )
 
 (use-package quickrun
-  :ensure t)
+  :ensure t
+  :config
+  ;; Use this parameter as C++ default
+  (quickrun-add-command "c++/c1z"
+    '((:command . "g++")
+      (:exec    . ("%c -std=c++11 %o -o %e %s"
+		   "%e %a"))
+      (:remove  . ("%e")))
+    :default "c++")
+  )
 
 (provide 'init)
 ;;; init.el ends here

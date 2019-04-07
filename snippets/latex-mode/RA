@@ -8,6 +8,7 @@
 \usepackage{amsfonts}
 \usepackage{multirow}
 \usepackage{booktabs}
+\usepackage{bm}
 
 \textwidth=6.6in
 \textheight=8.9in
