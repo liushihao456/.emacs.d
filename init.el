@@ -52,7 +52,7 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-	(shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery ghub graphql mu4e-alert gnuplot zenburn-theme htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
+	(linum-relative gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery ghub graphql mu4e-alert zenburn-theme htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil)
@@ -110,7 +110,9 @@
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
                       charset
-                      (font-spec :family "WenQuanYi Micro Hei Mono" :size 14))))
+					  ;; (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)
+					  (font-spec :family "Hiragino Sans GB" :size 14)
+					  )))
 
 (add-to-list 'after-make-frame-functions
              (lambda (new-frame)
@@ -508,23 +510,16 @@ narrowed."
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
   (add-hook 'LaTeX-mode-hook (lambda ()
-			       (setq TeX-engine 'xetex)
-			       (setq TeX-command-extra-options "-shell-escape")))
+							   (setq TeX-engine 'xetex)
+							   (setq TeX-command-extra-options "-shell-escape")))
   (reftex-mode t)
-  ;; (setq TeX-source-correlate-mode t)
-
-  ;; (setq TeX-view-program-selection
-  ;; 	'((output-dvi "open")
-  ;; 	  (output-pdf "open")
-  ;; 	  (output-html "open")))
-  
   (setq TeX-show-compilation t)
   (setq reftex-plug-into-AUCTeX t)
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
   (setq bibtex-completion-bibliography ; set up helm-bibtex
-	'("~/RA/mybib.bib"
-	  "~/RA/newadded.bib"
-	  "~/paper/pub/thesis.bib"))
+		'("~/RA/mybib.bib"
+		  "~/RA/newadded.bib"
+		  "~/paper/pub/thesis.bib"))
   (require 'helm-bibtex)
   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
@@ -550,7 +545,8 @@ narrowed."
 ;; Gnuplot mode
 (use-package gnuplot
   :ensure t
-  :mode ("\\.gnuplot\\' \\.gp\\'" . gnuplot-mode)
+  :mode (("\\.gnuplot\\'" . gnuplot-mode)
+		 ("\\.gp\\'" . gnuplot-mode))
   )
 
 ;; ESS and R
@@ -560,7 +556,6 @@ narrowed."
   :config
   (setq ess-eval-visibly 'nowait)	; Allow asynchronous executing
   )
-
 
 ;; Org mode
 (setq-default fill-column 80)
@@ -710,7 +705,8 @@ narrowed."
 
 (use-package web-mode
   :ensure t
-  :mode ("\\.html?\\'" "\\.xml")
+  :mode (("\\.html?\\'" . web-mode)
+		 ("\\.xml\\'" . web-mode))
   :config
   (setq web-mode-engines-alist
 		'(("django"    . "\\.html\\'")))
@@ -870,39 +866,25 @@ narrowed."
 										 xref-find-references))
   )
 
-(use-package company-jedi
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'python-mode-hook (lambda ()
-								(require 'company-jedi)
-								(add-to-list 'company-backends 'company-jedi)
-								))
-  :config
-  (define-key python-mode-map (kbd "M-.") 'jedi:goto-definition)
-  (define-key python-mode-map (kbd "M-,") 'jedi:goto-definition-pop-marker)
-  (define-key python-mode-map (kbd "C-c d") 'jedi:show-doc)
-  (define-key python-mode-map (kbd "C-c r") 'helm-jedi-related-names)
-  )
-
-;; lsp mode
 (setq-default c-basic-offset 4
               tab-width 4
               indent-tabs-mode t)
 
 (global-set-key (kbd "C-c `") 'compile)
+
+;; lsp mode
 (use-package lsp-mode
   :ensure t
   :ensure helm-lsp
+  :ensure company-jedi
   :commands lsp
+  :hook (python-mode . (lambda ()
+						 (lsp)
+						 (setq-local company-backends '(company-jedi company-files))
+						 ))
   :config
   ;; (setq lsp-print-io t)
   ;; (setq lsp-print-performance t)
-  ;; (require 'lsp-clients)
-  ;; (add-hook 'python-mode-hook (lambda ()
-  ;; 								(lsp)
-  ;; 								(delete 'company-lsp company-backends)
-  ;; 								))
 
   (setq lsp-prefer-flymake nil)
   (defhydra hydra-lsp (:exit t :hint nil)
@@ -941,6 +923,7 @@ narrowed."
     )
   (global-set-key (kbd "C-x l") 'hydra-lsp/body)
   )
+
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
@@ -959,6 +942,7 @@ narrowed."
   (setq ccls-executable "~/.emacs.d/ccls")
   )
 
+;; Lsp java
 (use-package lsp-java
   :ensure t
   :defer t
@@ -1029,6 +1013,8 @@ narrowed."
 						(require 'dap-java)
 						))
 		 ;; (python-mode . (lambda ()
+		 ;; 				  (dap-mode t)
+		 ;; 				  (dap-ui-mode t)
 		 ;; 				  (require 'dap-python)
 		 ;; 				  ))
 		 )
@@ -1075,11 +1061,39 @@ narrowed."
   (global-set-key (kbd "C-c 4") 'dap-hydra)
   )
 
+;; Chinese input method
+(use-package pyim
+  :ensure t
+  :ensure pyim-wbdict
+  :ensure posframe
+  :demand t
+  :config
+  (require 'pyim-wbdict)
+  (pyim-wbdict-v98-enable)
+  (setq default-input-method "pyim")
+  (setq pyim-default-scheme 'wubi)
+  (require 'posframe)
+  (setq pyim-page-tooltip 'posframe)
+  (setq pyim-posframe-border-width 5)
+  (setq pyim-page-length 5)
+  )
+
+;; (use-package linum-relative
+;;   :ensure t
+;;   :config
+;;   (setq linum-relative-backend 'display-line-numbers-mode)
+;;   (linum-relative-toggle)
+;;   )
+
 ;; (use-package evil
 ;;   :ensure t
 ;;   :config
 ;;   (require 'evil)
 ;;   (evil-mode 1)
+;;   (setq evil-insert-state-cursor nil)
+;;   (setq evil-replace-state-cursor nil)
+;;   (setq evil-operator-state-cursor nil)
+;;   (setq evil-default-state 'emacs)
 ;;   )
 
 
