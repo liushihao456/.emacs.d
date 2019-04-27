@@ -52,9 +52,10 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-	(linum-relative gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors expand-region company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery ghub graphql mu4e-alert zenburn-theme htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop hungry-delete undo-tree yasnippet auto-package-update)))
+	(gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery ghub graphql mu4e-alert zenburn-theme htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet auto-package-update)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
+ '(send-mail-function (quote smtpmail-send-it))
  '(tool-bar-mode nil)
  '(truncate-lines t))
 
@@ -105,15 +106,14 @@
   ;; (set-frame-font "Consolas-13")
   ;; (set-frame-font "Fira Code-13")
   ;; (set-frame-font "Monaco-13")
-  (set-frame-font "Source Code Pro-13")
+  (set-frame-font "Source Code Pro-14")
   ;; (set-frame-font "DejaVu Sans Mono-12")
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
                       charset
 					  ;; (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)
-					  (font-spec :family "Hiragino Sans GB" :size 14)
+					  (font-spec :family "Hiragino Sans GB" :size 16)
 					  )))
-
 (add-to-list 'after-make-frame-functions
              (lambda (new-frame)
                (select-frame new-frame)
@@ -273,10 +273,10 @@
 (use-package flycheck
   :ensure t
   :hook (prog-mode . flycheck-mode)
-  :config
-  (setq flycheck-python-flake8-executable "python3")
-  (setq flycheck-python-pylint-executable "python3")
-  (setq flycheck-flake8-maximum-line-length 120)
+  ;; :config
+  ;; (setq flycheck-python-flake8-executable "python3")
+  ;; (setq flycheck-python-pylint-executable "python3")
+  ;; (setq flycheck-flake8-maximum-line-length 120)
   )
 
 ;; Doom modeline
@@ -358,20 +358,6 @@
   (setq undo-tree-visualizer-diff t)
   )
 
-(use-package hungry-delete
-  :ensure t
-  :hook ((emacs-lisp-mode . hungry-delete-mode)
-		 (c-mode . hungry-delete-mode)
-		 (c++-mode . hungry-delete-mode)
-		 (java-mode . hungry-delete-mode)
-		 (python-mode . hungry-delete-mode)
-		 (matlab-mode . hungry-delete-mode))
-  )
-
-(use-package expand-region
-  :ensure t
-  :bind ("C-=" . er/expand-region)
-  )
 
 (use-package multiple-cursors
   :ensure t
@@ -687,6 +673,8 @@ narrowed."
 (use-package shell-pop
   :ensure t
   :bind ("C-c 1" . shell-pop)
+  :custom
+  (shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
   :config
   (setq shell-pop-universal-key "\C-c1")
   (setq shell-pop-full-span t)
@@ -719,32 +707,67 @@ narrowed."
   :ensure mu4e-alert
   :load-path "/usr/local/Cellar/mu/1.0_1/share/emacs/site-lisp/mu/mu4e"
   :bind (("M-m" . mu4e)
-
 		 :map mu4e-headers-mode-map
-		 ("{" . mu4e-headers-query-prev)             ; differs from built-in
-		 ("}" . mu4e-headers-query-next)             ; differs from built-in
-		 ;; ("o" . my/org-capture-mu4e)                 ; differs from built-in
-		 ("A" . mu4e-headers-mark-for-action)        ; differs from built-in
-		 ("`" . mu4e-update-mail-and-index)          ; differs from built-in
-		 ("|" . mu4e-view-pipe)               	     ; does not seem to be built in any longer
 		 ("." . hydra-mu4e-headers/body)
 		 )
   :config
   (mu4e-alert-enable-mode-line-display)
-  ;; (mu4e-alert-set-default-style 'notifier)
-  ;; (mu4e-alert-enable-notifications)
   
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
-  (setq mu4e-maildir "~/mail")		; Mail folder set to ~/mail
-  (setq mu4e-get-mail-command "offlineimap") ; Fetch mail by offlineimap
-  (setq mu4e-update-interval 300)		; Fetch mail in 300 sec interval
+  (setq mu4e-maildir (expand-file-name "~/Maildir"))		; Mail folder set to ~/mail
+  (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a")
+  (setq mu4e-update-interval 300)
+  (setq mu4e-view-prefer-html t)
+  (setq mu4e-headers-auto-update t)
+  ;; (setq mu4e-compose-format-flowed t)
 
-  (setq mu4e-sent-folder   "/pkumailbox/Sent Items")
-  (setq mu4e-drafts-folder "/pkumailbox/Drafts")
-  (setq mu4e-trash-folder  "/pkumailbox/Trash")
-  (setq mu4e-refile-folder  "/pkumailbox/Archive")
+  ;; ;; To view selected message in the browser, no signin, just html mail
+  (add-to-list 'mu4e-view-actions
+  			   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+  ;; Don't save message to Sent Messages, IMAP takes care of this
+  (setq mu4e-sent-messages-behavior 'delete)
+  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+  ;; <tab> to navigate to links, <RET> to open them in browser
+  (add-hook 'mu4e-view-mode-hook
+			(lambda()
+			  ;; try to emulate some of the eww key-bindings
+			  (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
+			  (local-set-key (kbd "<tab>") 'shr-next-link)
+			  (local-set-key (kbd "<backtab>") 'shr-previous-link)))
+
+  ;; Dynamically setting the width of the columns so it takes up the whole width
+  (add-hook 'mu4e-headers-mode-hook
+  			(defun my/mu4e-change-headers ()
+  			  (interactive)
+  			  (setq mu4e-headers-fields
+  					`((:human-date . 12)
+  					  (:flags . 4)
+  					  (:from-or-to . 25)
+  					  (:subject . ,(- (window-body-width) 47))
+  					  (:size . 7)))))
+
+  ;; Rename files when moving
+  ;; NEEDED FOR MBSYNC
+  (setq mu4e-change-filenames-when-moving t)
+  (setq message-kill-buffer-on-exit t)
+  (setq mu4e-compose-dont-reply-to-self t)
+
+  ;; ;; Convert org mode to HTML automatically
+  ;; (require 'org-mu4e)
+  ;; (setq org-mu4e-convert-to-html t)
+
+  ;; Show full addresses in view message (instead of just names)
+  ;; Toggle per name with M-RET
+  (setq mu4e-view-show-addresses 't)
+  ;; Don't ask when quitting
+  (setq mu4e-confirm-quit nil)
+
+  (setq mu4e-sent-folder   "/liushihao-pku/Sent Items")
+  (setq mu4e-drafts-folder "/liushihao-pku/Drafts")
+  (setq mu4e-trash-folder  "/liushihao-pku/Trash")
+  (setq mu4e-refile-folder  "/liushihao-pku/Archive")
   (setq mu4e-attachment-dir  "~/Downloads")
-  
+
   (setq mu4e-view-show-images t)
   (setq mu4e-compose-signature-auto-include nil)
 
@@ -762,91 +785,91 @@ narrowed."
   (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
 
   (defhydra hydra-mu4e-headers (:color blue :hint nil)
-    "
-          ^General^         ^Search^              _!_: read       _#_: deferred    ^Switches^
-         
-         -^^-----------------^^-----------------  _?_: unread     _%_: pattern    -^^------------------
-         
-         _n_: next          _s_: search           _r_: refile     _&_: custom      _O_: sorting
-         
-         _p_: prev          _S_: edit prev qry    _u_: unmk       _+_: flag        _P_: threading
-         
-         _]_: n unred       _/_: narrow search    _U_: unmk *     _-_: unflag      _Q_: full-search
-         
-         _[_: p unred       _b_: search bkmk      _d_: trash      _T_: thr         _V_: skip dups
-         
-         _y_: sw view       _B_: edit bkmk        _D_: delete     _t_: subthr      _W_: include-related
-         
-         _R_: reply         _{_: previous qry     _m_: move      -^^----------------^^------------------
-         
-         _C_: compose       _}_: next query       _a_: action     _|_: thru shl    _`_: update, reindex
-         
-         _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: context-switch
-         
-         --------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir
-"
+	"
+  ^General^         ^Search^              _!_: read       _#_: deferred    ^Switches^
+  
+  -^^-----------------^^-----------------  _?_: unread     _%_: pattern    -^^------------------
+  
+  _n_: next          _s_: search           _r_: refile     _&_: custom      _O_: sorting
+  
+  _p_: prev          _S_: edit prev qry    _u_: unmk       _+_: flag        _P_: threading
+  
+  _]_: n unred       _/_: narrow search    _U_: unmk *     _-_: unflag      _Q_: full-search
+  
+  _[_: p unred       _b_: search bkmk      _d_: trash      _T_: thr         _V_: skip dups
+	   
+	   _y_: sw view       _B_: edit bkmk        _D_: delete     _t_: subthr      _W_: include-related
+	   
+	   _R_: reply         _{_: previous qry     _m_: move      -^^----------------^^------------------
+	   
+	   _C_: compose       _}_: next query       _a_: action     _|_: thru shl    _`_: update, reindex
+	   
+	   _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: context-switch
+	   
+	   --------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir
+	   "
 
-    ;; general
-    ("n" mu4e-headers-next)
-    ("p" mu4e-headers-previous)
-    ("[" mu4e-select-next-unread)
-    ("]" mu4e-select-previous-unread)
-    ("y" mu4e-select-other-view)
-    ("R" mu4e-compose-reply)
-    ("C" mu4e-compose-new)
-    ("F" mu4e-compose-forward)
-    ;; ("o" my/org-capture-mu4e)                  ; differs from built-in
+	;; general
+	("n" mu4e-headers-next)
+	("p" mu4e-headers-previous)
+	("[" mu4e-select-next-unread)
+	("]" mu4e-select-previous-unread)
+	("y" mu4e-select-other-view)
+	("R" mu4e-compose-reply)
+	("C" mu4e-compose-new)
+	("F" mu4e-compose-forward)
+	;; ("o" my/org-capture-mu4e)                  ; differs from built-in
 
-    ;; search
-    ("s" mu4e-headers-search)
-    ("S" mu4e-headers-search-edit)
-    ("/" mu4e-headers-search-narrow)
-    ("b" mu4e-headers-search-bookmark)
-    ("B" mu4e-headers-search-bookmark-edit)
-    ("{" mu4e-headers-query-prev)              ; differs from built-in
-    ("}" mu4e-headers-query-next)              ; differs from built-in
-    ("C-+" mu4e-headers-split-view-grow)
-    ("C--" mu4e-headers-split-view-shrink)
+	;; search
+	("s" mu4e-headers-search)
+	("S" mu4e-headers-search-edit)
+	("/" mu4e-headers-search-narrow)
+	("b" mu4e-headers-search-bookmark)
+	("B" mu4e-headers-search-bookmark-edit)
+	("{" mu4e-headers-query-prev)              ; differs from built-in
+	("}" mu4e-headers-query-next)              ; differs from built-in
+	("C-+" mu4e-headers-split-view-grow)
+	("C--" mu4e-headers-split-view-shrink)
 
-    ;; mark stuff
-    ("!" mu4e-headers-mark-for-read)
-    ("?" mu4e-headers-mark-for-unread)
-    ("r" mu4e-headers-mark-for-refile)
-    ("u" mu4e-headers-mark-for-unmark)
-    ("U" mu4e-mark-unmark-all)
-    ("d" mu4e-headers-mark-for-trash)
-    ("D" mu4e-headers-mark-for-delete)
-    ("m" mu4e-headers-mark-for-move)
-    ("a" mu4e-headers-action)                  ; not really a mark per-se
-    ("A" mu4e-headers-mark-for-action)         ; differs from built-in
-    ("*" mu4e-headers-mark-for-something)
+	;; mark stuff
+	("!" mu4e-headers-mark-for-read)
+	("?" mu4e-headers-mark-for-unread)
+	("r" mu4e-headers-mark-for-refile)
+	("u" mu4e-headers-mark-for-unmark)
+	("U" mu4e-mark-unmark-all)
+	("d" mu4e-headers-mark-for-trash)
+	("D" mu4e-headers-mark-for-delete)
+	("m" mu4e-headers-mark-for-move)
+	("a" mu4e-headers-action)                  ; not really a mark per-se
+	("A" mu4e-headers-mark-for-action)         ; differs from built-in
+	("*" mu4e-headers-mark-for-something)
 
-    ("#" mu4e-mark-resolve-deferred-marks)
-    ("%" mu4e-headers-mark-pattern)
-    ("&" mu4e-headers-mark-custom)
-    ("+" mu4e-headers-mark-for-flag)
-    ("-" mu4e-headers-mark-for-unflag)
-    ("t" mu4e-headers-mark-subthread)
-    ("T" mu4e-headers-mark-thread)
+	("#" mu4e-mark-resolve-deferred-marks)
+	("%" mu4e-headers-mark-pattern)
+	("&" mu4e-headers-mark-custom)
+	("+" mu4e-headers-mark-for-flag)
+	("-" mu4e-headers-mark-for-unflag)
+	("t" mu4e-headers-mark-subthread)
+	("T" mu4e-headers-mark-thread)
 
-    ;; miscellany
-    ("q" mu4e~headers-quit-buffer)
-    ("H" mu4e-display-manual)
-    ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
+	;; miscellany
+	("q" mu4e~headers-quit-buffer)
+	("H" mu4e-display-manual)
+	("|" mu4e-view-pipe)                       ; does not seem built-in any longer
 
-    ;; switches
-    ("O" mu4e-headers-change-sorting)
-    ("P" mu4e-headers-toggle-threading)
-    ("Q" mu4e-headers-toggle-full-search)
-    ("V" mu4e-headers-toggle-skip-duplicates)
-    ("W" mu4e-headers-toggle-include-related)
+	;; switches
+	("O" mu4e-headers-change-sorting)
+	("P" mu4e-headers-toggle-threading)
+	("Q" mu4e-headers-toggle-full-search)
+	("V" mu4e-headers-toggle-skip-duplicates)
+	("W" mu4e-headers-toggle-include-related)
 
-    ;; more miscellany
-    ("`" mu4e-update-mail-and-index)           ; differs from built-in
-    (";" mu4e-context-switch)
-    ("j" mu4e~headers-jump-to-maildir)
+	;; more miscellany
+	("`" mu4e-update-mail-and-index)           ; differs from built-in
+	(";" mu4e-context-switch)
+	   ("j" mu4e~headers-jump-to-maildir)
 
-    ("." nil))
+	   ("." nil))
   )
 
 ;; ghub
@@ -949,7 +972,9 @@ narrowed."
   :hook (java-mode . (lambda ()
 					   (require 'lsp-java)
 					   (require 'lsp)
-					   (lsp)))
+					   (lsp)
+					   (setq-local company-backends '(company-lsp company-files))
+					   ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
   )
@@ -1096,6 +1121,9 @@ narrowed."
 ;;   (setq evil-default-state 'emacs)
 ;;   )
 
-
 (provide 'init)
 ;;; init.el ends here
+
+
+
+
