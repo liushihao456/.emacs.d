@@ -1,3 +1,4 @@
+;;; package --- Summary
 ;;; Commentary:
 ;; init.el --- Emacs configuration
 
@@ -19,19 +20,11 @@
   (add-to-list 'load-path "~/.emacs.d/packages/use-package")
   (add-to-list 'load-path "~/.emacs.d/packages/bind-key")
   (require 'use-package))
-
 (setq use-package-compute-statistics t)
 
 (use-package use-package-hydra
   :load-path "~/.emacs.d/packages/use-package-hydra"
   :ensure hydra)
-
-;; (use-package auto-package-update
-;;   :ensure t
-;;   :config
-;;   (setq auto-package-update-delete-old-versions t)
-;;   (setq auto-package-update-hide-results t)
-;;   (auto-package-update-maybe))
 
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
@@ -52,10 +45,9 @@
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-	(gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens aggressive-indent magit multiple-cursors company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery ghub graphql mu4e-alert zenburn-theme htmlize org-latex helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet auto-package-update)))
+	(gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens magit multiple-cursors company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery mu4e-alert zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
- '(send-mail-function (quote smtpmail-send-it))
  '(tool-bar-mode nil)
  '(truncate-lines t))
 
@@ -99,28 +91,10 @@
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
-(defun s-font()
-  "Set the fonts."
-  (interactive)
-  ;; font config for org table showing.
-  ;; (set-frame-font "Consolas-13")
-  ;; (set-frame-font "Fira Code-13")
-  ;; (set-frame-font "Monaco-13")
-  (set-frame-font "Source Code Pro-14")
-  ;; (set-frame-font "DejaVu Sans Mono-12")
-  (dolist (charset '(kana han symbol cjk-misc bopomofo))
-    (set-fontset-font (frame-parameter nil 'font)
-                      charset
-					  ;; (font-spec :family "WenQuanYi Micro Hei Mono" :size 14)
-					  (font-spec :family "Hiragino Sans GB" :size 16)
-					  )))
-(add-to-list 'after-make-frame-functions
-             (lambda (new-frame)
-               (select-frame new-frame)
-               (if window-system
-                   (s-font))))
-(if window-system
-    (s-font))
+(setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
+(set-face-attribute 'default nil :font "Source Code Pro-13")
+(set-fontset-font t 'han      (font-spec :family "STkaiti"))
+(set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
 
 (use-package helm
   :ensure t
@@ -187,10 +161,10 @@
   :init
   (helm-projectile-on)
   :bind (:map projectile-mode-map
-	      ("C-c p" . hydra-helm-projectile/body))
+			  ("C-c p" . hydra-helm-projectile/body))
   :hydra (hydra-helm-projectile (:color blue
-					:hint nil)
-				"
+										:hint nil)
+								"
 
 		 ^Find^                            ^List^                          ^Grep^                          ^Compile^
 
@@ -206,39 +180,22 @@
 
 		 [_d_] dir
 		 "
-				("f" helm-projectile-find-file)
-				("a" helm-projectile-find-other-file)
-				("F" helm-projectile-find-file-in-known-projects)
-				("g" helm-projectile-find-file-dwim)
-				("d" helm-projectile-find-dir)
+								("f" helm-projectile-find-file)
+								("a" helm-projectile-find-other-file)
+								("F" helm-projectile-find-file-in-known-projects)
+								("g" helm-projectile-find-file-dwim)
+								("d" helm-projectile-find-dir)
 
-				("e" helm-projectile-recentf)
-				("p" helm-projectile-switch-project)
-				("b" helm-projectile-switch-to-buffer)
-				("h" helm-projectile)
+								("e" helm-projectile-recentf)
+								("p" helm-projectile-switch-project)
+								("b" helm-projectile-switch-to-buffer)
+								("h" helm-projectile)
 
-				("s s" helm-projectile-ag)
-				("s g" helm-projectile-grep)
+								("s s" helm-projectile-ag)
+								("s g" helm-projectile-grep)
 
-				("c" projectile-compile-project))
+								("c" projectile-compile-project))
   )
-
-
-
-
-;; (set-frame-font "Monaco-13") ; set font to Monaco
-
-;;; Scrolling.
-;; Good speed and allow scrolling through large images (pixel-scroll).
-;; Note: Scroll lags when point must be moved but increasing the number
-;;       of lines that point moves in pixel-scroll.el ruins large image
-;;       scrolling. So unfortunately I think we'll just have to live with
-;;       this.
-;; (pixel-scroll-mode)
-;; (setq pixel-dead-time 0) ; Never go back to the old scrolling behaviour.
-;; (setq pixel-resolution-fine-flag t) ; Scroll by number of pixels instead of lines (t = frame-char-height pixels).
-;; (setq mouse-wheel-scroll-amount '(1)) ; Distance in pixel-resolution to scroll each mouse wheel event.
-;; (setq mouse-wheel-progressive-speed nil) ; Progressive speed is too fast for me.
 
 ;; (use-package zenburn-theme
 ;;   :ensure t
@@ -333,10 +290,9 @@
 
 (use-package company
   :ensure t
-  :hook ((c-mode c++-mode matlab-mode emacs-lisp-mode org-mode eshell-mode shell-mode python-mode inferior-python-mode message-mode inferior-ess-mode ess-r-mode) . company-mode)
+  :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
   :config
   (setq company-idle-delay 0)
-  (setq company-transformers '(company-sort-by-occurrence))
   (setq company-selection-wrap-around t)
   )
 
@@ -408,49 +364,25 @@ narrowed."
   (interactive "P")
   (declare (interactive-only))
   (cond ((and (buffer-narrowed-p) (not p)) (widen))
-	((region-active-p)
-	 (narrow-to-region (region-beginning) (region-end)))
-	(t (narrow-to-defun))))
+		((region-active-p)
+		 (narrow-to-region (region-beginning) (region-end)))
+		(t (narrow-to-defun))))
 (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
 
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
-  :config
-  (message "Magit loaded.")
-  )
-
-(use-package aggressive-indent
-  :ensure t
-  :hook ((emacs-lisp-mode . aggressive-indent-mode)
-	 ;; Conflicts with ccls LSP
-	 ;; (c-mode . aggressive-indent-mode)
-	 ;; (c++-mode . aggressive-indent-mode)
-	 )
-  :config
-  (setq aggressive-indent-excluded-modes '(inf-ruby-mode makefile-mode makefile-gmake-mode python-mode
-							 text-mode yaml-mode java-mode))
-  (electric-indent-local-mode -1)
-  (defun turn-off-electric-indent-mode ()
-    "Turn off electric indent mode in current buffer."
-    (electric-indent-local-mode -1))
-  (add-hook 'emacs-lisp-mode 'turn-off-electric-indent-mode)
-  ;; (add-hook 'c-mode 'turn-off-electric-indent-mode)
-  ;; (add-hook 'c++-mode 'turn-off-electric-indent-mode)
   )
 
 (use-package smartparens
   :ensure t
-  :hook (((prog-mode LaTeX-mode) . show-smartparens-mode)
-		 ((prog-mode LaTeX-mode) . turn-on-smartparens-mode))
+  :hook (((prog-mode LaTeX-mode org-mode) . show-smartparens-mode)
+		 ((prog-mode LaTeX-mode org-mode) . turn-on-smartparens-mode))
   :bind (:map smartparens-mode-map
 			  ("C-c s" . hydra-smartparens-navigation/body)
 			  ("C-k" . sp-kill-hybrid-sexp)
 			  ("M-k" . sp-backward-kill-sexp)
-			  ("C-<right>" . sp-forward-slurp-sexp)
-			  ("M-<right>" . sp-forward-barf-sexp)
-			  ("C-<left>" . sp-backward-slurp-sexp)
-			  ("M-<left>" . sp-backward-barf-sexp))
+			  )
   :hydra (hydra-smartparens-navigation (:hint nil)
 									   "
 
@@ -478,9 +410,10 @@ narrowed."
   :ensure t
   :bind ("C-x a" . neotree-toggle)
   :config
-  ;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (setq projectile-switch-project-action 'neotree-projectile-action)
   (setq neo-smart-open t)
   (setq neo-window-width 32)
+  (setq neo-vc-integration (quote (face)))
   )
 
 ;; LaTeX
@@ -547,19 +480,16 @@ narrowed."
 (setq-default fill-column 80)
 (use-package org
   :ensure t
-  :ensure org-ref
+  ;; :ensure org-ref
   :ensure ob-ipython
-  :ensure ob-async
   :mode ("\\.org\\'" . org-mode)
   :init
   (add-hook 'org-mode-hook 'auto-fill-mode)
-  ;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
   ;; (setq org-startup-with-inline-images t) ; Display inline images by default
   (defun add-pcomplete-to-capf ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
   (add-hook 'org-mode-hook (lambda ()
-							 (electric-pair-local-mode t) ; Enable emacs-native electric pair mode in org mode
 							 (setq-local company-minimum-prefix-length 1)))
   (define-key global-map (kbd "C-c 2") 'org-capture) ; Org-capture
   (setq org-capture-templates
@@ -582,10 +512,13 @@ narrowed."
 		  ))
   :config
   (setq org-startup-indented t)		; Indent the tree structure
-  (require 'ob-async)
-  (require 'ox-md)
-  (require 'ox-beamer)
-  (require 'cdlatex)
+  ;; It is slow to require org-ref
+  ;; (require 'org-ref)
+  ;; (setq reftex-default-bibliography '("~/RA/mybib.bib"))
+  ;; (setq org-ref-default-bibliography '("~/RA/mybib.bib"))
+
+  ;; (require 'cdlatex)
+  ;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
   ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
   ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
@@ -593,6 +526,9 @@ narrowed."
   (add-to-list 'image-file-name-extensions "eps")
   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
+  (require 'ox-md)
+  (require 'ox-beamer)
+  (require 'ox-latex)
   (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
   (add-to-list 'org-latex-packages-alist '("" "xcolor"))
@@ -652,22 +588,13 @@ narrowed."
   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed up exports
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-
-  (setq ob-async-no-async-languages-alist '("ipython"))
-  (add-hook 'ob-async-pre-execute-src-block-hook
-            '(lambda ()
-               (setq org-babel-python-command "python3")))
-
-  (require 'org-ref)
-  (setq reftex-default-bibliography '("~/RA/mybib.bib"))
-  (setq org-ref-default-bibliography '("~/RA/mybib.bib"))
   )
-
 
 (use-package htmlize
   :ensure t
-  :commands htmlize-buffer)		; Enable org exporting to html
-(setq org-html-postamble nil)		; Don't include a footer with my contact and publishing information at the bottom of every exported HTML document
+  :commands htmlize-buffer		; Enable org exporting to html
+  :config (setq org-html-postamble nil)		; Don't include a footer with my contact and publishing information at the bottom of every exported HTML document
+  )
 
 ;; Shell
 (use-package shell-pop
@@ -743,7 +670,7 @@ narrowed."
   					`((:human-date . 12)
   					  (:flags . 4)
   					  (:from-or-to . 25)
-  					  (:subject . ,(- (window-body-width) 47))
+  					  (:subject . ,(- (window-body-width) 60))
   					  (:size . 7)))))
 
   ;; Rename files when moving
@@ -867,16 +794,9 @@ narrowed."
 	;; more miscellany
 	("`" mu4e-update-mail-and-index)           ; differs from built-in
 	(";" mu4e-context-switch)
-	   ("j" mu4e~headers-jump-to-maildir)
+	("j" mu4e~headers-jump-to-maildir)
 
-	   ("." nil))
-  )
-
-;; ghub
-(use-package ghub
-  :ensure t
-  :ensure graphql
-  :defer t
+	("." nil))
   )
 
 (use-package helm-xref
@@ -1029,62 +949,62 @@ narrowed."
   :commands (lldb)
   )
 
-(use-package dap-mode
-  :ensure t
-  :defer t
-  :hook ((java-mode . (lambda ()
-						(dap-mode t)
-						(dap-ui-mode t)
-						(require 'dap-java)
-						))
-		 ;; (python-mode . (lambda ()
-		 ;; 				  (dap-mode t)
-		 ;; 				  (dap-ui-mode t)
-		 ;; 				  (require 'dap-python)
-		 ;; 				  ))
-		 )
-  :init
-  (defun my/window-visible (b-name)
-	"Return whether B-NAME is visible."
-	(-> (-compose 'buffer-name 'window-buffer)
-		(-map (window-list))
-		(-contains? b-name)))
+;; (use-package dap-mode
+;;   :ensure t
+;;   :defer t
+;;   :hook ((java-mode . (lambda ()
+;; 						(dap-mode t)
+;; 						(dap-ui-mode t)
+;; 						(require 'dap-java)
+;; 						))
+;; 		 ;; (python-mode . (lambda ()
+;; 		 ;; 				  (dap-mode t)
+;; 		 ;; 				  (dap-ui-mode t)
+;; 		 ;; 				  (require 'dap-python)
+;; 		 ;; 				  ))
+;; 		 )
+;;   :init
+;;   (defun my/window-visible (b-name)
+;; 	"Return whether B-NAME is visible."
+;; 	(-> (-compose 'buffer-name 'window-buffer)
+;; 		(-map (window-list))
+;; 		(-contains? b-name)))
 
-  (defun my/show-debug-windows (session)
-	"Show debug windows."
-	(let ((lsp--cur-workspace (dap--debug-session-workspace session)))
-      (save-excursion
-		;; display locals
-		(unless (my/window-visible dap-ui--locals-buffer)
-          (dap-ui-locals))
-		;; display sessions
-		(unless (my/window-visible dap-ui--sessions-buffer)
-          (dap-ui-sessions))
-		(unless (my/window-visible "*dap-ui-repl*")
-          (dap-ui-repl))
-		(unless (my/window-visible "*Breakpoints*")
-          (dap-ui-breakpoints))
-		)))
-  (add-hook 'dap-stopped-hook 'my/show-debug-windows)
-  (defun my/hide-debug-windows (session)
-	"Hide debug windows when all debug sessions are dead."
-	(unless (-filter 'dap--session-running (dap--get-sessions))
-      (and (get-buffer dap-ui--sessions-buffer)
-           (kill-buffer dap-ui--sessions-buffer))
-      (and (get-buffer dap-ui--locals-buffer)
-           (kill-buffer dap-ui--locals-buffer))
-      (and (get-buffer "*Breakpoints*")
-           (kill-buffer "*Breakpoints*"))
-      (and (get-buffer "*dap-ui-repl*")
-           (kill-buffer "*dap-ui-repl*"))
-	  (delete-other-windows)
-	  ))
-  (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
+;;   (defun my/show-debug-windows (session)
+;; 	"Show debug windows."
+;; 	(let ((lsp--cur-workspace (dap--debug-session-workspace session)))
+;;       (save-excursion
+;; 		;; display locals
+;; 		(unless (my/window-visible dap-ui--locals-buffer)
+;;           (dap-ui-locals))
+;; 		;; display sessions
+;; 		(unless (my/window-visible dap-ui--sessions-buffer)
+;;           (dap-ui-sessions))
+;; 		(unless (my/window-visible "*dap-ui-repl*")
+;;           (dap-ui-repl))
+;; 		(unless (my/window-visible "*Breakpoints*")
+;;           (dap-ui-breakpoints))
+;; 		)))
+;;   (add-hook 'dap-stopped-hook 'my/show-debug-windows)
+;;   (defun my/hide-debug-windows (session)
+;; 	"Hide debug windows when all debug sessions are dead."
+;; 	(unless (-filter 'dap--session-running (dap--get-sessions))
+;;       (and (get-buffer dap-ui--sessions-buffer)
+;;            (kill-buffer dap-ui--sessions-buffer))
+;;       (and (get-buffer dap-ui--locals-buffer)
+;;            (kill-buffer dap-ui--locals-buffer))
+;;       (and (get-buffer "*Breakpoints*")
+;;            (kill-buffer "*Breakpoints*"))
+;;       (and (get-buffer "*dap-ui-repl*")
+;;            (kill-buffer "*dap-ui-repl*"))
+;; 	  (delete-other-windows)
+;; 	  ))
+;;   (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
 
-  :config
-  (global-set-key (kbd "C-c 3") 'dap-debug)
-  (global-set-key (kbd "C-c 4") 'dap-hydra)
-  )
+;;   :config
+;;   (global-set-key (kbd "C-c 3") 'dap-debug)
+;;   (global-set-key (kbd "C-c 4") 'dap-hydra)
+;;   )
 
 ;; Chinese input method
 (use-package pyim
@@ -1123,7 +1043,3 @@ narrowed."
 
 (provide 'init)
 ;;; init.el ends here
-
-
-
-
