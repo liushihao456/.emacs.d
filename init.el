@@ -1,10 +1,6 @@
 ;;; package --- Summary
 ;;; Commentary:
-;; init.el --- Emacs configuration
-
-;; INSTALL PACKAGES;;; init -- init Emacs
-;;
-;; Commentary:
+;;   init.el --- Emacs configuration
 ;;   This is where Emacs is inited
 ;; --------------------------------------
 
@@ -41,13 +37,15 @@
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-	("e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
+    ("e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
+ '(electric-pair-mode t)
  '(global-hl-line-mode t)
  '(package-selected-packages
    (quote
-	(gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex smartparens magit multiple-cursors company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree fancy-battery mu4e-alert zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+    (linum-relative gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
+ '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(truncate-lines t))
 
@@ -74,6 +72,8 @@
 ;; change all prompts to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq ring-bell-function 'ignore)
+(setq-default fill-column 80)
 
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
@@ -203,14 +203,6 @@
 ;;   (load-theme 'zenburn t)
 ;;   )
 
-(use-package spacemacs-theme
-  :ensure t
-  :defer t
-  :init
-  (load-theme 'spacemacs-dark t)
-  (setq spacemacs-theme-underline-parens t)
-  )
-
 (use-package doom-themes
   :ensure t
   :config
@@ -220,20 +212,17 @@
   (doom-themes-neotree-config)
   )
 
-
-;; fancy-battery
-(use-package fancy-battery
+(use-package spacemacs-theme
   :ensure t
-  :hook (after-init . fancy-battery-mode)
+  :defer t
+  :init
+  (load-theme 'spacemacs-dark t)
+  (setq spacemacs-theme-underline-parens t)
   )
 
 (use-package flycheck
   :ensure t
-  :hook (prog-mode . flycheck-mode)
-  ;; :config
-  ;; (setq flycheck-python-flake8-executable "python3")
-  ;; (setq flycheck-python-pylint-executable "python3")
-  ;; (setq flycheck-flake8-maximum-line-length 120)
+  ;; :hook (prog-mode . flycheck-mode)
   )
 
 ;; Doom modeline
@@ -242,16 +231,29 @@
   :config
   (doom-modeline-mode)
   (setq doom-modeline-bar-width 3)
-  (setq doom-modeline-height 20)
+  (setq doom-modeline-height 10)
   )
 
 (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
 
 (use-package dashboard
+  :if (< (length command-line-args) 2)
+  :preface
+  (defun my/dashboard-banner ()
+    "Sets a dashboard banner including information on package initialization
+     time and garbage collections."
+    (setq dashboard-banner-logo-title
+          (format "Emacs ready in %.2f seconds with %d garbage collections."
+                  (float-time
+                   (time-subtract after-init-time before-init-time)) gcs-done)))
   :ensure t
+  :init
+  (add-hook 'after-init-hook 'dashboard-refresh-buffer)
+  (add-hook 'dashboard-mode-hook 'my/dashboard-banner)
   :config
   (dashboard-setup-startup-hook)
-  (setq dashboard-banner-logo-title "Emacs and the changing world.") ; change the title
+  (setq dashboard-startup-banner "~/.emacs.d/packages/spacemacs-icon/spacemacs-logo.png")
+  ;; (setq dashboard-banner-logo-title "Emacs and the changing world.") ; change the title
   (setq dashboard-items '((recents  . 10)
                           (projects . 10)
 						  (bookmarks . 5)
@@ -295,16 +297,6 @@
   (setq company-idle-delay 0)
   (setq company-selection-wrap-around t)
   )
-
-;; ;; This sets $MANPATH, $PATH and exec-path from your shell
-;; (use-package exec-path-from-shell
-;;   :if (memq window-system '(mac ns))
-;;   :ensure t
-;;   :config
-;;   (exec-path-from-shell-initialize)
-;;   (exec-path-from-shell-copy-env "CLASSPATH")
-;;   (exec-path-from-shell-copy-env "JAVA_HOME")
-;;   )
 
 (use-package undo-tree
   :ensure t
@@ -372,38 +364,6 @@ narrowed."
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
-  )
-
-(use-package smartparens
-  :ensure t
-  :hook (((prog-mode LaTeX-mode org-mode) . show-smartparens-mode)
-		 ((prog-mode LaTeX-mode org-mode) . turn-on-smartparens-mode))
-  :bind (:map smartparens-mode-map
-			  ("C-c s" . hydra-smartparens-navigation/body)
-			  ("C-k" . sp-kill-hybrid-sexp)
-			  ("M-k" . sp-backward-kill-sexp)
-			  )
-  :hydra (hydra-smartparens-navigation (:hint nil)
-									   "
-
-                                                          Smartparens
-         ^^^^^^^^------------------------------------------------------------------------------------------------
-         [_d_] down              [_a_] backward down              [_f_] forward sexp                [_r_] rewrap
-         
-         [_e_] up                [_u_] backward up                [_b_] backward sexp               [_s_] unwrap
-         
-                               [_q_] quit                       [_k_] kill sexp
-         "
-									   ("d" sp-down-sexp)
-									   ("e" sp-up-sexp)
-									   ("u" sp-backward-up-sexp)
-									   ("a" sp-backward-down-sexp)
-									   ("f" sp-forward-sexp)
-									   ("b" sp-backward-sexp)
-									   ("k" sp-kill-sexp)
-									   ("r" sp-rewrap-sexp)
-									   ("s" sp-splice-sexp)
-									   ("q" nil :color blue))
   )
 
 (use-package neotree
@@ -477,7 +437,6 @@ narrowed."
   )
 
 ;; Org mode
-(setq-default fill-column 80)
 (use-package org
   :ensure t
   ;; :ensure org-ref
@@ -517,21 +476,63 @@ narrowed."
   ;; (setq reftex-default-bibliography '("~/RA/mybib.bib"))
   ;; (setq org-ref-default-bibliography '("~/RA/mybib.bib"))
 
-  ;; (require 'cdlatex)
-  ;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
   ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
   ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-  (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick)  )
+
+  ;; Continuous numbering of org mode equations
+  (defun org-renumber-environment (orig-func &rest args)
+    (let ((results '())
+		  (counter -1)
+		  (numberp))
+      (setq results (loop for (begin .  env) in
+						  (org-element-map (org-element-parse-buffer) 'latex-environment
+										   (lambda (env)
+											 (cons
+											  (org-element-property :begin env)
+											  (org-element-property :value env))))
+						  collect
+						  (cond
+						   ((and (string-match "\\\\begin{equation}" env)
+								 (not (string-match "\\\\tag{" env)))
+							(incf counter)
+							(cons begin counter))
+						   ((string-match "\\\\begin{align}" env)
+							(prog2
+								(incf counter)
+								(cons begin counter)
+							  (with-temp-buffer
+								(insert env)
+								(goto-char (point-min))
+								;; \\ is used for a new line. Each one leads to a number
+								(incf counter (count-matches "\\\\$"))
+								;; unless there are nonumbers.
+								(goto-char (point-min))
+								(decf counter (count-matches "\\nonumber")))))
+						   (t
+							(cons begin nil)))))
+
+      (when (setq numberp (cdr (assoc (point) results)))
+		(setf (car args)
+			  (concat
+			   (format "\\setcounter{equation}{%s}\n" numberp)
+			   (car args)))))
+    (apply orig-func args))
+  (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+  
+  (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
   (add-to-list 'image-file-name-extensions "eps")
   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
   (require 'ox-md)
   (require 'ox-beamer)
   (require 'ox-latex)
+  (setq org-highlight-latex-and-related '(latex script entities))
+  (set-face-foreground 'org-latex-and-related "orange")
   (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-  (add-to-list 'org-latex-packages-alist '("" "xcolor"))
+  ;; (add-to-list 'org-latex-packages-alist '("" "xcolor")) ; xcolor prevents latex-preview to use current text font color
   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
   (setq org-latex-listings 'listings)
   ;; (add-to-list 'org-latex-packages-alist '("" "minted")) ; Use minted package to export code blocks
@@ -581,7 +582,7 @@ narrowed."
      ))
   (add-to-list 'org-latex-listings-langs '(ipython "Python"))
   (setq org-src-fontify-natively t)
-  (setq org-preview-latex-default-process 'dvisvgm)
+  ;; (setq org-preview-latex-default-process 'imagemagick)
   (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 											   ("begin" "$1" "$" "$$" "\\(" "\\[")))
   (setq org-src-window-setup 'current-window)
@@ -650,7 +651,7 @@ narrowed."
 
   ;; ;; To view selected message in the browser, no signin, just html mail
   (add-to-list 'mu4e-view-actions
-  			   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+			   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
   ;; Don't save message to Sent Messages, IMAP takes care of this
   (setq mu4e-sent-messages-behavior 'delete)
   (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
@@ -664,14 +665,14 @@ narrowed."
 
   ;; Dynamically setting the width of the columns so it takes up the whole width
   (add-hook 'mu4e-headers-mode-hook
-  			(defun my/mu4e-change-headers ()
-  			  (interactive)
-  			  (setq mu4e-headers-fields
-  					`((:human-date . 12)
-  					  (:flags . 4)
-  					  (:from-or-to . 25)
-  					  (:subject . ,(- (window-body-width) 60))
-  					  (:size . 7)))))
+			(defun my/mu4e-change-headers ()
+			  (interactive)
+			  (setq mu4e-headers-fields
+					`((:human-date . 12)
+					  (:flags . 4)
+					  (:from-or-to . 25)
+					  (:subject . ,(- (window-body-width) 60))
+					  (:size . 7)))))
 
   ;; Rename files when moving
   ;; NEEDED FOR MBSYNC
@@ -712,7 +713,7 @@ narrowed."
   (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
 
   (defhydra hydra-mu4e-headers (:color blue :hint nil)
-	"
+    "
   ^General^         ^Search^              _!_: read       _#_: deferred    ^Switches^
   
   -^^-----------------^^-----------------  _?_: unread     _%_: pattern    -^^------------------
@@ -736,67 +737,67 @@ narrowed."
 	   --------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir
 	   "
 
-	;; general
-	("n" mu4e-headers-next)
-	("p" mu4e-headers-previous)
-	("[" mu4e-select-next-unread)
-	("]" mu4e-select-previous-unread)
-	("y" mu4e-select-other-view)
-	("R" mu4e-compose-reply)
-	("C" mu4e-compose-new)
-	("F" mu4e-compose-forward)
-	;; ("o" my/org-capture-mu4e)                  ; differs from built-in
+    ;; general
+    ("n" mu4e-headers-next)
+    ("p" mu4e-headers-previous)
+    ("[" mu4e-select-next-unread)
+    ("]" mu4e-select-previous-unread)
+    ("y" mu4e-select-other-view)
+    ("R" mu4e-compose-reply)
+    ("C" mu4e-compose-new)
+    ("F" mu4e-compose-forward)
+    ;; ("o" my/org-capture-mu4e)                  ; differs from built-in
 
-	;; search
-	("s" mu4e-headers-search)
-	("S" mu4e-headers-search-edit)
-	("/" mu4e-headers-search-narrow)
-	("b" mu4e-headers-search-bookmark)
-	("B" mu4e-headers-search-bookmark-edit)
-	("{" mu4e-headers-query-prev)              ; differs from built-in
-	("}" mu4e-headers-query-next)              ; differs from built-in
-	("C-+" mu4e-headers-split-view-grow)
-	("C--" mu4e-headers-split-view-shrink)
+    ;; search
+    ("s" mu4e-headers-search)
+    ("S" mu4e-headers-search-edit)
+    ("/" mu4e-headers-search-narrow)
+    ("b" mu4e-headers-search-bookmark)
+    ("B" mu4e-headers-search-bookmark-edit)
+    ("{" mu4e-headers-query-prev)              ; differs from built-in
+    ("}" mu4e-headers-query-next)              ; differs from built-in
+    ("C-+" mu4e-headers-split-view-grow)
+    ("C--" mu4e-headers-split-view-shrink)
 
-	;; mark stuff
-	("!" mu4e-headers-mark-for-read)
-	("?" mu4e-headers-mark-for-unread)
-	("r" mu4e-headers-mark-for-refile)
-	("u" mu4e-headers-mark-for-unmark)
-	("U" mu4e-mark-unmark-all)
-	("d" mu4e-headers-mark-for-trash)
-	("D" mu4e-headers-mark-for-delete)
-	("m" mu4e-headers-mark-for-move)
-	("a" mu4e-headers-action)                  ; not really a mark per-se
-	("A" mu4e-headers-mark-for-action)         ; differs from built-in
-	("*" mu4e-headers-mark-for-something)
+    ;; mark stuff
+    ("!" mu4e-headers-mark-for-read)
+    ("?" mu4e-headers-mark-for-unread)
+    ("r" mu4e-headers-mark-for-refile)
+    ("u" mu4e-headers-mark-for-unmark)
+    ("U" mu4e-mark-unmark-all)
+    ("d" mu4e-headers-mark-for-trash)
+    ("D" mu4e-headers-mark-for-delete)
+    ("m" mu4e-headers-mark-for-move)
+    ("a" mu4e-headers-action)                  ; not really a mark per-se
+    ("A" mu4e-headers-mark-for-action)         ; differs from built-in
+    ("*" mu4e-headers-mark-for-something)
 
-	("#" mu4e-mark-resolve-deferred-marks)
-	("%" mu4e-headers-mark-pattern)
-	("&" mu4e-headers-mark-custom)
-	("+" mu4e-headers-mark-for-flag)
-	("-" mu4e-headers-mark-for-unflag)
-	("t" mu4e-headers-mark-subthread)
-	("T" mu4e-headers-mark-thread)
+    ("#" mu4e-mark-resolve-deferred-marks)
+    ("%" mu4e-headers-mark-pattern)
+    ("&" mu4e-headers-mark-custom)
+    ("+" mu4e-headers-mark-for-flag)
+    ("-" mu4e-headers-mark-for-unflag)
+    ("t" mu4e-headers-mark-subthread)
+    ("T" mu4e-headers-mark-thread)
 
-	;; miscellany
-	("q" mu4e~headers-quit-buffer)
-	("H" mu4e-display-manual)
-	("|" mu4e-view-pipe)                       ; does not seem built-in any longer
+    ;; miscellany
+    ("q" mu4e~headers-quit-buffer)
+    ("H" mu4e-display-manual)
+    ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
 
-	;; switches
-	("O" mu4e-headers-change-sorting)
-	("P" mu4e-headers-toggle-threading)
-	("Q" mu4e-headers-toggle-full-search)
-	("V" mu4e-headers-toggle-skip-duplicates)
-	("W" mu4e-headers-toggle-include-related)
+    ;; switches
+    ("O" mu4e-headers-change-sorting)
+    ("P" mu4e-headers-toggle-threading)
+    ("Q" mu4e-headers-toggle-full-search)
+    ("V" mu4e-headers-toggle-skip-duplicates)
+    ("W" mu4e-headers-toggle-include-related)
 
-	;; more miscellany
-	("`" mu4e-update-mail-and-index)           ; differs from built-in
-	(";" mu4e-context-switch)
-	("j" mu4e~headers-jump-to-maildir)
+    ;; more miscellany
+    ("`" mu4e-update-mail-and-index)           ; differs from built-in
+    (";" mu4e-context-switch)
+    ("j" mu4e~headers-jump-to-maildir)
 
-	("." nil))
+    ("." nil))
   )
 
 (use-package helm-xref
@@ -809,11 +810,8 @@ narrowed."
 										 xref-find-references))
   )
 
-(setq-default c-basic-offset 4
-              tab-width 4
-              indent-tabs-mode t)
-
-(global-set-key (kbd "C-c `") 'compile)
+(setq-default c-basic-offset 4)
+(setq-default tab-width 4)
 
 ;; lsp mode
 (use-package lsp-mode
@@ -843,9 +841,9 @@ narrowed."
          ^^                      [_i_] implementation
          
 "
-	("d" lsp-find-declaration)
-	("D" lsp-ui-peek-find-definitions)
-	("R" lsp-ui-peek-find-references)
+    ("d" lsp-find-declaration)
+    ("D" lsp-ui-peek-find-definitions)
+    ("R" lsp-ui-peek-find-references)
     ("i" lsp-ui-peek-find-implementation)
     ("t" lsp-find-type-definition)
     ;; ("s" lsp-signature-help)
@@ -880,9 +878,14 @@ narrowed."
   :ensure t
   :defer t
   :hook ((c-mode c++-mode objc-mode) .
-         (lambda () (require 'ccls) (require 'lsp) (lsp)))
-  :config
-  (setq ccls-executable "~/.emacs.d/ccls")
+         (lambda ()
+		   (require 'ccls)
+		   (require 'lsp)
+		   (lsp)
+		   (setq-local company-backends '(company-lsp))
+		   ))
+  :custom
+  (ccls-executable "~/.emacs.d/ccls")
   )
 
 ;; Lsp java
@@ -893,12 +896,12 @@ narrowed."
 					   (require 'lsp-java)
 					   (require 'lsp)
 					   (lsp)
-					   (setq-local company-backends '(company-lsp company-files))
+					   (setq-local company-backends '(company-lsp))
 					   ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
+  (setq lsp-java-format-on-type-enabled nil)
   )
-
 
 ;; gud
 (use-package gud
@@ -919,28 +922,28 @@ narrowed."
          
                                    [_f_] finish
 "
-	("b" gud-break)
-	("d" gud-remove)
-	("l" gud-listb)
+    ("b" gud-break)
+    ("d" gud-remove)
+    ("l" gud-listb)
 
-	("r" gud-run)
-	("s" gud-step)
-	("n" gud-next)
-	("c" gud-cont)
+    ("r" gud-run)
+    ("s" gud-step)
+    ("n" gud-next)
+    ("c" gud-cont)
 
-	("p" gud-print)
-	("f" gud-finish)
+    ("p" gud-print)
+    ("f" gud-finish)
 
-	("<" gud-up)
-	(">" gud-down)
-	("1" gud-bt)
-	("2" gud-bt-all)
+    ("<" gud-up)
+    (">" gud-down)
+    ("1" gud-bt)
+    ("2" gud-bt-all)
 
-	("M-s" gud-stepi)
-	("M-n" gud-nexti)
+    ("M-s" gud-stepi)
+    ("M-n" gud-nexti)
 
-	("q" nil)
-	)
+    ("q" nil)
+    )
   (global-set-key (kbd "C-c g") 'hydra-gud/body)
   )
 
@@ -949,62 +952,62 @@ narrowed."
   :commands (lldb)
   )
 
-;; (use-package dap-mode
-;;   :ensure t
-;;   :defer t
-;;   :hook ((java-mode . (lambda ()
-;; 						(dap-mode t)
-;; 						(dap-ui-mode t)
-;; 						(require 'dap-java)
-;; 						))
-;; 		 ;; (python-mode . (lambda ()
-;; 		 ;; 				  (dap-mode t)
-;; 		 ;; 				  (dap-ui-mode t)
-;; 		 ;; 				  (require 'dap-python)
-;; 		 ;; 				  ))
-;; 		 )
-;;   :init
-;;   (defun my/window-visible (b-name)
-;; 	"Return whether B-NAME is visible."
-;; 	(-> (-compose 'buffer-name 'window-buffer)
-;; 		(-map (window-list))
-;; 		(-contains? b-name)))
+(use-package dap-mode
+  :ensure t
+  :defer t
+  :hook ((java-mode . (lambda ()
+						(dap-mode t)
+						(dap-ui-mode t)
+						(require 'dap-java)
+						))
+		 ;; (python-mode . (lambda ()
+		 ;; 				  (dap-mode t)
+		 ;; 				  (dap-ui-mode t)
+		 ;; 				  (require 'dap-python)
+		 ;; 				  ))
+		 )
+  :init
+  (defun my/window-visible (b-name)
+    "Return whether B-NAME is visible."
+    (-> (-compose 'buffer-name 'window-buffer)
+		(-map (window-list))
+		(-contains? b-name)))
 
-;;   (defun my/show-debug-windows (session)
-;; 	"Show debug windows."
-;; 	(let ((lsp--cur-workspace (dap--debug-session-workspace session)))
-;;       (save-excursion
-;; 		;; display locals
-;; 		(unless (my/window-visible dap-ui--locals-buffer)
-;;           (dap-ui-locals))
-;; 		;; display sessions
-;; 		(unless (my/window-visible dap-ui--sessions-buffer)
-;;           (dap-ui-sessions))
-;; 		(unless (my/window-visible "*dap-ui-repl*")
-;;           (dap-ui-repl))
-;; 		(unless (my/window-visible "*Breakpoints*")
-;;           (dap-ui-breakpoints))
-;; 		)))
-;;   (add-hook 'dap-stopped-hook 'my/show-debug-windows)
-;;   (defun my/hide-debug-windows (session)
-;; 	"Hide debug windows when all debug sessions are dead."
-;; 	(unless (-filter 'dap--session-running (dap--get-sessions))
-;;       (and (get-buffer dap-ui--sessions-buffer)
-;;            (kill-buffer dap-ui--sessions-buffer))
-;;       (and (get-buffer dap-ui--locals-buffer)
-;;            (kill-buffer dap-ui--locals-buffer))
-;;       (and (get-buffer "*Breakpoints*")
-;;            (kill-buffer "*Breakpoints*"))
-;;       (and (get-buffer "*dap-ui-repl*")
-;;            (kill-buffer "*dap-ui-repl*"))
-;; 	  (delete-other-windows)
-;; 	  ))
-;;   (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
+  (defun my/show-debug-windows (session)
+    "Show debug windows."
+    (let ((lsp--cur-workspace (dap--debug-session-workspace session)))
+      (save-excursion
+		;; display locals
+		(unless (my/window-visible dap-ui--locals-buffer)
+          (dap-ui-locals))
+		;; display sessions
+		(unless (my/window-visible dap-ui--sessions-buffer)
+          (dap-ui-sessions))
+		(unless (my/window-visible "*dap-ui-repl*")
+          (dap-ui-repl))
+		(unless (my/window-visible "*Breakpoints*")
+          (dap-ui-breakpoints))
+		)))
+  (add-hook 'dap-stopped-hook 'my/show-debug-windows)
+  (defun my/hide-debug-windows (session)
+    "Hide debug windows when all debug sessions are dead."
+    (unless (-filter 'dap--session-running (dap--get-sessions))
+      (and (get-buffer dap-ui--sessions-buffer)
+           (kill-buffer dap-ui--sessions-buffer))
+      (and (get-buffer dap-ui--locals-buffer)
+           (kill-buffer dap-ui--locals-buffer))
+      (and (get-buffer "*Breakpoints*")
+           (kill-buffer "*Breakpoints*"))
+      (and (get-buffer "*dap-ui-repl*")
+           (kill-buffer "*dap-ui-repl*"))
+      (delete-other-windows)
+      ))
+  (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
 
-;;   :config
-;;   (global-set-key (kbd "C-c 3") 'dap-debug)
-;;   (global-set-key (kbd "C-c 4") 'dap-hydra)
-;;   )
+  :config
+  (global-set-key (kbd "C-c 3") 'dap-debug)
+  (global-set-key (kbd "C-c 4") 'dap-hydra)
+  )
 
 ;; Chinese input method
 (use-package pyim
@@ -1022,13 +1025,6 @@ narrowed."
   (setq pyim-posframe-border-width 5)
   (setq pyim-page-length 5)
   )
-
-;; (use-package linum-relative
-;;   :ensure t
-;;   :config
-;;   (setq linum-relative-backend 'display-line-numbers-mode)
-;;   (linum-relative-toggle)
-;;   )
 
 ;; (use-package evil
 ;;   :ensure t
