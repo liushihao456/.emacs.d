@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: execute
+# key: et
+# --
+${1:exec}.execute(${2:new ${3:Runnable}});$0

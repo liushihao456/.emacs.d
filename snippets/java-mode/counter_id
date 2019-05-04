@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: counter_id
+# key: ci
+# --
+private static int counter = 0;
+private final int id = counter++;$0

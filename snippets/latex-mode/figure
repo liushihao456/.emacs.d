@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: figure
+# key: fg
+# --
+\begin{figure}[${1:H}]
+  \begin{center}
+    $0${3:input{$4}}
+  \end{center}
+  \caption{${2:Figure description}}
+\end{figure}

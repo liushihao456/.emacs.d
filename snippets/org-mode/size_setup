@@ -4,7 +4,7 @@
 # --
 #+LATEX_HEADER: \usepackage{geometry}
 #+LATEX_HEADER: \geometry{a4paper,left=2cm,right=2cm,top=3cm,bottom=3cm}
-#+LATEX_HEADER: \def\baselinestretch{1.3}
 #+LATEX_HEADER: \usepackage{subcaption}
 #+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \setlength{\parskip}{12pt}
 $0

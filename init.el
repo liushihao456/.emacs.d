@@ -37,12 +37,14 @@
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
+    ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
+ '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
  '(global-hl-line-mode t)
+ '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (linum-relative gnuplot posframe pyim-wbdict pyim shell-pop evil spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-async ob-ipython all-the-icons hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key doom-modeline flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+    (gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-ipython hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
@@ -100,7 +102,7 @@
   :ensure t
   :init
   (helm-mode t)
-  :bind (("C-x c" . hydra-helm/body)
+  :bind (("C-c h" . hydra-helm/body)
 		 ("M-x" . helm-M-x)
 		 ("C-x b" . helm-mini)
 		 ("M-y" . helm-show-kill-ring)
@@ -111,7 +113,7 @@
 		 ;; :map helm-map
 		 ;; ([tab] . helm-execute-persistent-action)
 		 )
-  :hydra (hydra-helm (:color blue :hint nil)
+  :hydra (hydra-helm (:color blue :hint nil :exit t)
 					 "
 
 		                                                 Helm
@@ -162,8 +164,7 @@
   (helm-projectile-on)
   :bind (:map projectile-mode-map
 			  ("C-c p" . hydra-helm-projectile/body))
-  :hydra (hydra-helm-projectile (:color blue
-										:hint nil)
+  :hydra (hydra-helm-projectile (:color blue :hint nil :exit t)
 								"
 
 		 ^Find^                            ^List^                          ^Grep^                          ^Compile^
@@ -172,7 +173,7 @@
 
 		 [_f_] files                       [_e_] recent files              [_s s_] ag                      [_c_] compile project
 
-		 [_a_] other files                 [_p_] proj                      [_s g_] grep
+		 [_a_] other files                 [_p_] proj                      [_s g_] grep                    [_i_] clear cache
 
 		 [_F_] files all prj               [_b_] buff curr proj
 
@@ -194,14 +195,16 @@
 								("s s" helm-projectile-ag)
 								("s g" helm-projectile-grep)
 
-								("c" projectile-compile-project))
+								("c" projectile-compile-project)
+								("i" projectile-invalidate-cache)
+								)
   )
 
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'zenburn t)
-;;   )
+(use-package zenburn-theme
+  :ensure t
+  :config
+  (load-theme 'zenburn t)
+  )
 
 (use-package doom-themes
   :ensure t
@@ -212,29 +215,44 @@
   (doom-themes-neotree-config)
   )
 
-(use-package spacemacs-theme
-  :ensure t
-  :defer t
-  :init
-  (load-theme 'spacemacs-dark t)
-  (setq spacemacs-theme-underline-parens t)
-  )
+;; (use-package spacemacs-theme
+;;   :ensure t
+;;   :defer t
+;;   :init
+;;   (load-theme 'spacemacs-dark t)
+;;   (setq spacemacs-theme-underline-parens t)
+;;   )
 
 (use-package flycheck
   :ensure t
-  ;; :hook (prog-mode . flycheck-mode)
+  :hook (prog-mode . flycheck-mode)
+  :bind ("C-c f" . hydra-flycheck/body)
+  :hydra (hydra-flycheck (:hint nil :exit t)
+								"
+                                                       Flycheck
+		 ^^^^^^^^-------------------------------------------------------------------------------------------------
+
+		 [_p_] previous             [_l_] list              [_c_] check buffer            [_s_] select checker
+
+		 [_n_] next                 [_q_] exit              [_v_] setup info              [_d_] disable checker
+
+		 "
+								("p" flycheck-previous-error :exit nil)
+								("n" flycheck-next-error :exit nil)
+
+								("l" flycheck-list-errors)
+								("q" nil)
+
+								("c" flycheck-buffer)
+								("v" flycheck-verify-setup)
+								
+								("s" flycheck-select-checker)
+								("d" flycheck-disable-checker)
+								)
   )
 
-;; Doom modeline
-(use-package doom-modeline
-  :ensure t
-  :config
-  (doom-modeline-mode)
-  (setq doom-modeline-bar-width 3)
-  (setq doom-modeline-height 10)
-  )
-
-(add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
+(setq initial-frame-alist (quote ((fullscreen . maximized))))
+;; (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
 
 (use-package dashboard
   :if (< (length command-line-args) 2)
@@ -252,8 +270,7 @@
   (add-hook 'dashboard-mode-hook 'my/dashboard-banner)
   :config
   (dashboard-setup-startup-hook)
-  (setq dashboard-startup-banner "~/.emacs.d/packages/spacemacs-icon/spacemacs-logo.png")
-  ;; (setq dashboard-banner-logo-title "Emacs and the changing world.") ; change the title
+  ;; (setq dashboard-startup-banner "~/.emacs.d/packages/spacemacs-icon/spacemacs-logo.png")
   (setq dashboard-items '((recents  . 10)
                           (projects . 10)
 						  (bookmarks . 5)
@@ -281,21 +298,25 @@
 
 (use-package yasnippet
   :ensure t
-  :ensure yasnippet-snippets
   :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
   :config
   (setq yas/root-directory "~/.emacs.d/snippets/")
   (yas-load-directory yas/root-directory)
-  (add-hook 'python-mode-hook (lambda ()
-								(setq-local yas-indent-line 'fixed)))
   )
+
+(use-package yasnippet-snippets
+  :ensure t
+  :after yasnippet
+  :pin manual
+)
 
 (use-package company
   :ensure t
   :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
   :config
-  (setq company-idle-delay 0)
+  ;; (setq company-idle-delay 0.5)
   (setq company-selection-wrap-around t)
+  (setq company-dabbrev-downcase nil)
   )
 
 (use-package undo-tree
@@ -305,7 +326,6 @@
   (setq undo-tree-visualizer-timestamps t)
   (setq undo-tree-visualizer-diff t)
   )
-
 
 (use-package multiple-cursors
   :ensure t
@@ -368,9 +388,8 @@ narrowed."
 
 (use-package neotree
   :ensure t
-  :bind ("C-x a" . neotree-toggle)
+  :bind ("C-c a" . neotree-toggle)
   :config
-  (setq projectile-switch-project-action 'neotree-projectile-action)
   (setq neo-smart-open t)
   (setq neo-window-width 32)
   (setq neo-vc-integration (quote (face)))
@@ -449,7 +468,12 @@ narrowed."
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
   (add-hook 'org-mode-hook (lambda ()
-							 (setq-local company-minimum-prefix-length 1)))
+							 (setq-local company-minimum-prefix-length 1)
+                             (turn-on-org-cdlatex)
+                             (auto-composition-mode -1)
+                             (diff-auto-refine-mode -1)
+                             (file-name-shadow-mode -1)
+                             ))
   (define-key global-map (kbd "C-c 2") 'org-capture) ; Org-capture
   (setq org-capture-templates
 		'(("t" "Todo list item"
@@ -476,9 +500,6 @@ narrowed."
   ;; (setq reftex-default-bibliography '("~/RA/mybib.bib"))
   ;; (setq org-ref-default-bibliography '("~/RA/mybib.bib"))
 
-  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-  ;; (org-defkey org-mode-map "`" 'cdlatex-math-symbol)
-  ;; (org-defkey org-mode-map (kbd "C-;") 'cdlatex-math-modify)
   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 
   ;; Continuous numbering of org mode equations
@@ -531,12 +552,9 @@ narrowed."
   (setq org-highlight-latex-and-related '(latex script entities))
   (set-face-foreground 'org-latex-and-related "orange")
   (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
-  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-  ;; (add-to-list 'org-latex-packages-alist '("" "xcolor")) ; xcolor prevents latex-preview to use current text font color
   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
+  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
   (setq org-latex-listings 'listings)
-  ;; (add-to-list 'org-latex-packages-alist '("" "minted")) ; Use minted package to export code blocks
-  ;; (setq org-latex-listings 'minted)
   (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
 \\ctexset{section/format=\\Large\\bfseries}"
 									("\\section{%s}" . "\\section*{%s}")
@@ -632,37 +650,26 @@ narrowed."
 
 ;; mu4e
 (use-package mu4e
-  :ensure mu4e-alert
   :load-path "/usr/local/Cellar/mu/1.0_1/share/emacs/site-lisp/mu/mu4e"
   :bind (("M-m" . mu4e)
 		 :map mu4e-headers-mode-map
 		 ("." . hydra-mu4e-headers/body)
 		 )
   :config
-  (mu4e-alert-enable-mode-line-display)
-  
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
   (setq mu4e-maildir (expand-file-name "~/Maildir"))		; Mail folder set to ~/mail
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a")
   (setq mu4e-update-interval 300)
-  (setq mu4e-view-prefer-html t)
   (setq mu4e-headers-auto-update t)
-  ;; (setq mu4e-compose-format-flowed t)
-
-  ;; ;; To view selected message in the browser, no signin, just html mail
-  (add-to-list 'mu4e-view-actions
-			   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-  ;; Don't save message to Sent Messages, IMAP takes care of this
-  (setq mu4e-sent-messages-behavior 'delete)
-  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
-  ;; <tab> to navigate to links, <RET> to open them in browser
-  (add-hook 'mu4e-view-mode-hook
-			(lambda()
-			  ;; try to emulate some of the eww key-bindings
-			  (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
-			  (local-set-key (kbd "<tab>") 'shr-next-link)
-			  (local-set-key (kbd "<backtab>") 'shr-previous-link)))
-
+  (setq mu4e-compose-signature-auto-include nil)
+  (setq mu4e-view-show-addresses 't)
+  (setq mu4e-confirm-quit nil)
+  (setq mu4e-view-show-images t)
+  (when (fboundp 'imagemagick-register-types)
+	(imagemagick-register-types))
+  (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
+  (add-hook 'mu4e-compose-mode-hook 'visual-line-mode)
+  (add-hook 'mu4e-compose-mode-hook 'company-mode)
   ;; Dynamically setting the width of the columns so it takes up the whole width
   (add-hook 'mu4e-headers-mode-hook
 			(defun my/mu4e-change-headers ()
@@ -673,38 +680,25 @@ narrowed."
 					  (:from-or-to . 25)
 					  (:subject . ,(- (window-body-width) 60))
 					  (:size . 7)))))
-
-  ;; Rename files when moving
-  ;; NEEDED FOR MBSYNC
-  (setq mu4e-change-filenames-when-moving t)
-  (setq message-kill-buffer-on-exit t)
-  (setq mu4e-compose-dont-reply-to-self t)
-
-  ;; ;; Convert org mode to HTML automatically
-  ;; (require 'org-mu4e)
-  ;; (setq org-mu4e-convert-to-html t)
-
-  ;; Show full addresses in view message (instead of just names)
-  ;; Toggle per name with M-RET
-  (setq mu4e-view-show-addresses 't)
-  ;; Don't ask when quitting
-  (setq mu4e-confirm-quit nil)
-
+  (add-to-list 'mu4e-view-actions
+			   '("browser view" . mu4e-action-view-in-browser) t)
+  (add-hook 'mu4e-view-mode-hook
+			(lambda()
+			  (local-set-key (kbd "<tab>") 'org-next-link)
+			  (local-set-key (kbd "<backtab>") 'org-previous-link)))
+  
   (setq mu4e-sent-folder   "/liushihao-pku/Sent Items")
   (setq mu4e-drafts-folder "/liushihao-pku/Drafts")
   (setq mu4e-trash-folder  "/liushihao-pku/Trash")
   (setq mu4e-refile-folder  "/liushihao-pku/Archive")
   (setq mu4e-attachment-dir  "~/Downloads")
 
-  (setq mu4e-view-show-images t)
-  (setq mu4e-compose-signature-auto-include nil)
-
   ;; Send emails
-  (setq message-send-mail-function 'smtpmail-send-it
-		smtpmail-stream-type 'ssl
-		starttls-use-gnutls t)
+  (setq message-send-mail-function 'smtpmail-send-it)
+  (setq smtpmail-stream-type 'ssl)
+  (setq starttls-use-gnutls t)
   ;; Personal info
-  (setq user-full-name "Shihao, Liu")
+  (setq user-full-name "Shihao Liu")
   (setq user-mail-address "liushihao@pku.edu.cn")
   ;; Smtpmail setup
   (setq smtpmail-smtp-server "mail.pku.edu.cn")
@@ -714,28 +708,28 @@ narrowed."
 
   (defhydra hydra-mu4e-headers (:color blue :hint nil)
     "
-  ^General^         ^Search^              _!_: read       _#_: deferred    ^Switches^
-  
+  ^General^         ^Search^               _!_: read       _#_: deferred    ^Switches^
+
   -^^-----------------^^-----------------  _?_: unread     _%_: pattern    -^^------------------
-  
+
   _n_: next          _s_: search           _r_: refile     _&_: custom      _O_: sorting
-  
+
   _p_: prev          _S_: edit prev qry    _u_: unmk       _+_: flag        _P_: threading
-  
+
   _]_: n unred       _/_: narrow search    _U_: unmk *     _-_: unflag      _Q_: full-search
-  
+
   _[_: p unred       _b_: search bkmk      _d_: trash      _T_: thr         _V_: skip dups
-	   
-	   _y_: sw view       _B_: edit bkmk        _D_: delete     _t_: subthr      _W_: include-related
-	   
-	   _R_: reply         _{_: previous qry     _m_: move      -^^----------------^^------------------
-	   
-	   _C_: compose       _}_: next query       _a_: action     _|_: thru shl    _`_: update, reindex
-	   
-	   _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: context-switch
-	   
-	   --------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir
-	   "
+
+  _y_: sw view       _B_: edit bkmk        _D_: delete     _t_: subthr      _W_: include-related
+
+  _R_: reply         _{_: previous qry     _m_: move      -^^----------------^^------------------
+
+  _C_: compose       _}_: next query       _a_: action     _|_: thru shl    _`_: update, reindex
+
+  _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: context-switch
+
+  --------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir
+"
 
     ;; general
     ("n" mu4e-headers-next)
@@ -824,8 +818,18 @@ narrowed."
 						 (setq-local company-backends '(company-jedi company-files))
 						 ))
   :config
-  ;; (setq lsp-print-io t)
-  ;; (setq lsp-print-performance t)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-enable-completion-at-point nil)
+  (setq lsp-enable-folding nil)
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-eldoc-enable-signature-help nil)
+  
+  (setq lsp-pyls-plugins-pylint-enabled nil)
+  (setq lsp-pyls-plugins-mccabe-enabled nil)
+  (setq lsp-pyls-plugins-pycodestyle-enabled nil)
+  (setq lsp-pyls-plugins-jedi-completion-enabled nil)
+  (setq lsp-pyls-plugins-jedi-signature-help-enabled nil)
+  (setq lsp-pyls-plugins-rope-completion-enabled nil)
 
   (setq lsp-prefer-flymake nil)
   (defhydra hydra-lsp (:exit t :hint nil)
@@ -862,16 +866,25 @@ narrowed."
     ("2" helm-lsp-global-workspace-symbol)
     ("a" xref-find-apropos)
     )
-  (global-set-key (kbd "C-x l") 'hydra-lsp/body)
+  (global-set-key (kbd "C-c l") 'hydra-lsp/body)
   )
 
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
+  :bind (:map lsp-ui-imenu-mode-map
+			  ("b" . lsp-ui-imenu--prev-kind)
+			  ("f" . lsp-ui-imenu--next-kind)
+			  ("p" . previous-line)
+			  ("n" . next-line)
+			  )
   )
+
 (use-package company-lsp
   :ensure t
-  :commands company-lsp)
+  :commands company-lsp
+  )
+
 
 ;; Lsp c++
 (use-package ccls
@@ -883,6 +896,11 @@ narrowed."
 		   (require 'lsp)
 		   (lsp)
 		   (setq-local company-backends '(company-lsp))
+           (abbrev-mode -1)
+           (auto-composition-mode -1)
+           (diff-auto-refine-mode -1)
+           (file-name-shadow-mode -1)
+           (eldoc-mode -1)
 		   ))
   :custom
   (ccls-executable "~/.emacs.d/ccls")
@@ -897,18 +915,26 @@ narrowed."
 					   (require 'lsp)
 					   (lsp)
 					   (setq-local company-backends '(company-lsp))
+                       (abbrev-mode -1)
+                       (auto-composition-mode -1)
+                       (diff-auto-refine-mode -1)
+                       (file-name-shadow-mode -1)
+                       (eldoc-mode -1)
 					   ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
   (setq lsp-java-format-on-type-enabled nil)
+  (setq lsp-java-autobuild-enabled nil)
+  (setq lsp-java-signature-help-enabled nil)
+  (setq lsp-java-progress-reports-enabled nil)
+  (setq lsp-java-folding-range-enabled nil)
   )
 
 ;; gud
 (use-package gud
   :commands gud-gdb
   :config
-  (defhydra hydra-gud (:hint nil
-							 :foreign-keys run)
+  (defhydra hydra-gud (:hint nil :foreign-keys run)
     "
           Breakpoint^^               Run^^                 Repl^^              Stack^^          Instruction mode^^
          ----------------------------------------------------------------------------------------------------------
@@ -952,62 +978,62 @@ narrowed."
   :commands (lldb)
   )
 
-(use-package dap-mode
-  :ensure t
-  :defer t
-  :hook ((java-mode . (lambda ()
-						(dap-mode t)
-						(dap-ui-mode t)
-						(require 'dap-java)
-						))
-		 ;; (python-mode . (lambda ()
-		 ;; 				  (dap-mode t)
-		 ;; 				  (dap-ui-mode t)
-		 ;; 				  (require 'dap-python)
-		 ;; 				  ))
-		 )
-  :init
-  (defun my/window-visible (b-name)
-    "Return whether B-NAME is visible."
-    (-> (-compose 'buffer-name 'window-buffer)
-		(-map (window-list))
-		(-contains? b-name)))
+;; (use-package dap-mode
+;;   :ensure t
+;;   :defer t
+;;   :hook ((java-mode . (lambda ()
+;; 						(dap-mode t)
+;; 						(dap-ui-mode t)
+;; 						(require 'dap-java)
+;; 						))
+;; 		 ;; (python-mode . (lambda ()
+;; 		 ;; 				  (dap-mode t)
+;; 		 ;; 				  (dap-ui-mode t)
+;; 		 ;; 				  (require 'dap-python)
+;; 		 ;; 				  ))
+;; 		 )
+;;   :init
+;;   (defun my/window-visible (b-name)
+;;     "Return whether B-NAME is visible."
+;;     (-> (-compose 'buffer-name 'window-buffer)
+;; 		(-map (window-list))
+;; 		(-contains? b-name)))
 
-  (defun my/show-debug-windows (session)
-    "Show debug windows."
-    (let ((lsp--cur-workspace (dap--debug-session-workspace session)))
-      (save-excursion
-		;; display locals
-		(unless (my/window-visible dap-ui--locals-buffer)
-          (dap-ui-locals))
-		;; display sessions
-		(unless (my/window-visible dap-ui--sessions-buffer)
-          (dap-ui-sessions))
-		(unless (my/window-visible "*dap-ui-repl*")
-          (dap-ui-repl))
-		(unless (my/window-visible "*Breakpoints*")
-          (dap-ui-breakpoints))
-		)))
-  (add-hook 'dap-stopped-hook 'my/show-debug-windows)
-  (defun my/hide-debug-windows (session)
-    "Hide debug windows when all debug sessions are dead."
-    (unless (-filter 'dap--session-running (dap--get-sessions))
-      (and (get-buffer dap-ui--sessions-buffer)
-           (kill-buffer dap-ui--sessions-buffer))
-      (and (get-buffer dap-ui--locals-buffer)
-           (kill-buffer dap-ui--locals-buffer))
-      (and (get-buffer "*Breakpoints*")
-           (kill-buffer "*Breakpoints*"))
-      (and (get-buffer "*dap-ui-repl*")
-           (kill-buffer "*dap-ui-repl*"))
-      (delete-other-windows)
-      ))
-  (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
+;;   (defun my/show-debug-windows (session)
+;;     "Show debug windows."
+;;     (let ((lsp--cur-workspace (dap--debug-session-workspace session)))
+;;       (save-excursion
+;; 		;; display locals
+;; 		(unless (my/window-visible dap-ui--locals-buffer)
+;;           (dap-ui-locals))
+;; 		;; display sessions
+;; 		(unless (my/window-visible dap-ui--sessions-buffer)
+;;           (dap-ui-sessions))
+;; 		(unless (my/window-visible "*dap-ui-repl*")
+;;           (dap-ui-repl))
+;; 		(unless (my/window-visible "*Breakpoints*")
+;;           (dap-ui-breakpoints))
+;; 		)))
+;;   (add-hook 'dap-stopped-hook 'my/show-debug-windows)
+;;   (defun my/hide-debug-windows (session)
+;;     "Hide debug windows when all debug sessions are dead."
+;;     (unless (-filter 'dap--session-running (dap--get-sessions))
+;;       (and (get-buffer dap-ui--sessions-buffer)
+;;            (kill-buffer dap-ui--sessions-buffer))
+;;       (and (get-buffer dap-ui--locals-buffer)
+;;            (kill-buffer dap-ui--locals-buffer))
+;;       (and (get-buffer "*Breakpoints*")
+;;            (kill-buffer "*Breakpoints*"))
+;;       (and (get-buffer "*dap-ui-repl*")
+;;            (kill-buffer "*dap-ui-repl*"))
+;;       (delete-other-windows)
+;;       ))
+;;   (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
 
-  :config
-  (global-set-key (kbd "C-c 3") 'dap-debug)
-  (global-set-key (kbd "C-c 4") 'dap-hydra)
-  )
+;;   :config
+;;   (global-set-key (kbd "C-c 3") 'dap-debug)
+;;   (global-set-key (kbd "C-c 4") 'dap-hydra)
+;;   )
 
 ;; Chinese input method
 (use-package pyim
@@ -1025,17 +1051,6 @@ narrowed."
   (setq pyim-posframe-border-width 5)
   (setq pyim-page-length 5)
   )
-
-;; (use-package evil
-;;   :ensure t
-;;   :config
-;;   (require 'evil)
-;;   (evil-mode 1)
-;;   (setq evil-insert-state-cursor nil)
-;;   (setq evil-replace-state-cursor nil)
-;;   (setq evil-operator-state-cursor nil)
-;;   (setq evil-default-state 'emacs)
-;;   )
 
 (provide 'init)
 ;;; init.el ends here

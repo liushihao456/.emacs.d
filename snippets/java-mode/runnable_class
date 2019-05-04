@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: runnable_class
+# key: rc
+# --
+class ${1:Class} ${2:extends ${3:BaseClass} }implements Runnable$4 {
+      $0${5:
+      public $1($6) {
+
+      }
+      }@Override
+      public void run() {
+             
+      }
+}

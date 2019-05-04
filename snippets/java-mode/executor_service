@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: executor_service
+# key: es
+# --
+ExecutorService exec = Executors.newCachedThreadPool(${1:ThreadFactory});$0
