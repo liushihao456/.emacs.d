@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: synchronized
+# key: sd
+# --
+synchronized (${1:this}) {
+             $0
+}

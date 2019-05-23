@@ -5,6 +5,7 @@
 ;; --------------------------------------
 
 ;;; Code:
+(setq gc-cons-threshold (* 50 1000 1000))
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
@@ -34,20 +35,29 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(blink-cursor-mode nil)
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
     ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
+ '(evil-disable-insert-state-bindings t)
+ '(evil-insert-state-cursor nil t)
+ '(evil-operator-state-cursor nil t)
+ '(evil-replace-state-cursor nil t)
  '(global-hl-line-mode t)
+ '(helm-autoresize-mode t)
+ '(helm-mode-fuzzy-match t)
  '(indent-tabs-mode nil)
  '(package-selected-packages
    (quote
-    (gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-ipython hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+    (general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-ipython hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+ '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
+ '(split-width-threshold 150)
  '(tool-bar-mode nil)
  '(truncate-lines t))
 
@@ -93,111 +103,139 @@
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
+(require 'ansi-color)
+(defun my/colorize-compilation-buffer ()
+  "Apply ansi-color to compilation output."
+  (ansi-color-apply-on-region compilation-filter-start (point)))
+(add-hook 'compilation-filter-hook 'my/colorize-compilation-buffer)
+
 (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
 (set-face-attribute 'default nil :font "Source Code Pro-13")
 (set-fontset-font t 'han      (font-spec :family "STkaiti"))
 (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
+(global-set-key (kbd "C-c 3") 'whitespace-cleanup)
+
+(use-package evil
+  :ensure t
+  :ensure evil-surround
+  :custom
+  (evil-disable-insert-state-bindings t)
+  (evil-insert-state-cursor nil)
+  (evil-replace-state-cursor nil)
+  (evil-operator-state-cursor nil)
+  :config
+  (evil-set-initial-state 'dashboard-mode 'motion)
+  (evil-set-initial-state 'use-package-statistics-mode 'motion)
+  (evil-set-initial-state 'rst-mode 'motion)
+  (evil-set-initial-state 'neotree-mode 'motion)
+  (evil-set-initial-state 'message-mode 'motion)
+  (evil-mode 1)
+  (define-key evil-motion-state-map " " nil)
+  (define-key evil-normal-state-map " " nil)
+  (define-key evil-visual-state-map " " nil)
+  (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
+  (evil-define-key '(normal motion) 'global
+    (kbd "SPC w") 'evil-window-map)
+  (global-evil-surround-mode 1)
+  )
+
+(use-package general
+  :ensure t
+  )
 
 (use-package helm
   :ensure t
+  :ensure helm-ag
+  :ensure helm-swoop
   :init
   (helm-mode t)
-  :bind (("C-c h" . hydra-helm/body)
-		 ("M-x" . helm-M-x)
-		 ("C-x b" . helm-mini)
-		 ("M-y" . helm-show-kill-ring)
-		 ("C-x C-f" . helm-find-files)
-		 ("C-x r b" . helm-filtered-bookmarks)
-		 ("C-s" . helm-swoop)
-		 ("C-r" . helm-swoop-back-to-last-point)
-		 ;; :map helm-map
-		 ;; ([tab] . helm-execute-persistent-action)
-		 )
-  :hydra (hydra-helm (:color blue :hint nil :exit t)
-					 "
+  :general
+  ("M-x" 'helm-M-x
+   "M-y" 'helm-show-kill-ring)
+  (:states '(normal motion)
+           :prefix "SPC"
+           "b" 'helm-mini
+           "k" 'kill-buffer
+           "D" 'dired
+           "B" 'ibuffer
+           )
+  (:states '(normal motion)
+           :prefix "SPC h"
+           "w" 'helm-swoop
+           "/" 'helm-find
+           "i" 'helm-semantic-or-imenu
+           "I" 'helm-imenu-in-all-buffers
+           "b" 'helm-resume
+           "a" 'helm-apropos
+           "m" 'helm-man-woman
+           "s" 'helm-do-grep-ag
+           "p" 'helm-list-emacs-process
+           "t" 'helm-bibtex
+           "c" 'helm-colors
+           "8" 'helm-ucs
+           "f" 'helm-find-files
+           )
+  (:states 'visual
+           :prefix "SPC r"
+           "s" 'copy-to-register
+           "r" 'copy-rectangle-to-register
+           )
+  (:states '(normal motion)
+           :prefix "SPC r"
+           "w" 'window-configuration-to-register
+           "f" 'frameset-to-register
+           "SPC" 'point-to-register
+           "j" 'jump-to-register
+           "h" 'helm-register
 
-		                                                 Helm
-		 ^^^^^^^^------------------------------------------------------------------------------------------------------
-		 [_/_] find                        [_b_] resume                     [_s_] ag                       [_c_] colors
-
-		 [_i_] imenu                       [_a_] apropos                    [_p_] list emacs processes     [_8_] ucs
-
-		 [_I_] imenu all buffers           [_m_] man                        [_t_] bibtex
-^^^^
-"
-					 ("/" helm-find)
-					 ("i" helm-semantic-or-imenu)
-					 ("I" helm-imenu-in-all-buffers)
-
-					 ("b" helm-resume)
-					 ("a" helm-apropos)
-					 ("m" helm-man-woman)
-
-					 ("s" helm-do-grep-ag)
-					 ("p" helm-list-emacs-process)
-					 ("t" helm-bibtex)
-
-					 ("c" helm-colors)
-					 ("8" helm-ucs)
-					 )
+           "i" 'insert-register
+           
+           "m" 'bookmark-set
+           "M" 'bookmark-set-no-overwrite
+           "b" 'bookmark-jump
+           "l" 'list-bookmarks
+           "B" 'helm-filtered-bookmarks
+           )
+  (:states '(emacs insert)
+           "C-s" 'helm-swoop
+           "C-r" 'helm-swoop-back-to-last-point
+           )
+  :custom
+  (helm-autoresize-mode t)
+  (helm-mode-fuzzy-match t)
   :config
   (setq helm-autoresize-mode t)
-  (setq helm-mode-fuzzy-match t)
   )
-
-(use-package helm-swoop
-  :ensure t
-  :commands (helm-swoop helm-swoop-back-to-last-point))
 
 (use-package projectile
   :ensure t
   :init
   (projectile-mode t)
-  :config
-  (setq projectile-enable-caching t)
-  (define-key projectile-mode-map (kbd "C-c C-p") nil)
+  :custom
+  (projectile-enable-caching t)
   )
 
 (use-package helm-projectile
   :ensure t
   :init
   (helm-projectile-on)
-  :bind (:map projectile-mode-map
-			  ("C-c p" . hydra-helm-projectile/body))
-  :hydra (hydra-helm-projectile (:color blue :hint nil :exit t)
-								"
-
-		 ^Find^                            ^List^                          ^Grep^                          ^Compile^
-
-		 ^^^^^^^^-----------------------------------------------------------------------------------------------------------------
-
-		 [_f_] files                       [_e_] recent files              [_s s_] ag                      [_c_] compile project
-
-		 [_a_] other files                 [_p_] proj                      [_s g_] grep                    [_i_] clear cache
-
-		 [_F_] files all prj               [_b_] buff curr proj
-
-		 [_g_] files at point              [_h_] helm interface
-
-		 [_d_] dir
-		 "
-								("f" helm-projectile-find-file)
-								("a" helm-projectile-find-other-file)
-								("F" helm-projectile-find-file-in-known-projects)
-								("g" helm-projectile-find-file-dwim)
-								("d" helm-projectile-find-dir)
-
-								("e" helm-projectile-recentf)
-								("p" helm-projectile-switch-project)
-								("b" helm-projectile-switch-to-buffer)
-								("h" helm-projectile)
-
-								("s s" helm-projectile-ag)
-								("s g" helm-projectile-grep)
-
-								("c" projectile-compile-project)
-								("i" projectile-invalidate-cache)
-								)
+  :general
+  (:states '(normal motion)
+           :prefix "SPC p"
+           "f" 'helm-projectile-find-file
+           "a" 'helm-projectile-find-other-file
+           "F" 'helm-projectile-find-file-in-known-projects
+           "g" 'helm-projectile-find-file-dwim
+           "d" 'helm-projectile-find-dir
+           "e" 'helm-projectile-recentf
+           "p" 'helm-projectile-switch-project
+           "b" 'helm-projectile-switch-to-buffer
+           "h" 'helm-projectile
+           "s s" 'helm-projectile-ag
+           "s g" 'helm-projectile-grep
+           "c" 'projectile-compile-project
+           "i" 'projectile-invalidate-cache
+           )
   )
 
 (use-package zenburn-theme
@@ -225,56 +263,34 @@
 
 (use-package flycheck
   :ensure t
+  :general
+  (:states '(normal motion)
+           :prefix "SPC f c"
+           "p" 'flycheck-previous-error
+           "n" 'flycheck-next-error
+           "l" 'flycheck-list-errors
+           "c" 'flycheck-buffer
+           "v" 'flycheck-verify-setup
+           "s" 'flycheck-select-checker
+           "d" 'flycheck-disable-checker
+           )
   :hook (prog-mode . flycheck-mode)
-  :bind ("C-c f" . hydra-flycheck/body)
-  :hydra (hydra-flycheck (:hint nil :exit t)
-								"
-                                                       Flycheck
-		 ^^^^^^^^-------------------------------------------------------------------------------------------------
-
-		 [_p_] previous             [_l_] list              [_c_] check buffer            [_s_] select checker
-
-		 [_n_] next                 [_q_] exit              [_v_] setup info              [_d_] disable checker
-
-		 "
-								("p" flycheck-previous-error :exit nil)
-								("n" flycheck-next-error :exit nil)
-
-								("l" flycheck-list-errors)
-								("q" nil)
-
-								("c" flycheck-buffer)
-								("v" flycheck-verify-setup)
-								
-								("s" flycheck-select-checker)
-								("d" flycheck-disable-checker)
-								)
   )
 
 (setq initial-frame-alist (quote ((fullscreen . maximized))))
 ;; (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
 
 (use-package dashboard
-  :if (< (length command-line-args) 2)
-  :preface
-  (defun my/dashboard-banner ()
-    "Sets a dashboard banner including information on package initialization
-     time and garbage collections."
-    (setq dashboard-banner-logo-title
-          (format "Emacs ready in %.2f seconds with %d garbage collections."
-                  (float-time
-                   (time-subtract after-init-time before-init-time)) gcs-done)))
   :ensure t
-  :init
-  (add-hook 'after-init-hook 'dashboard-refresh-buffer)
-  (add-hook 'dashboard-mode-hook 'my/dashboard-banner)
+  :ensure all-the-icons
   :config
   (dashboard-setup-startup-hook)
-  ;; (setq dashboard-startup-banner "~/.emacs.d/packages/spacemacs-icon/spacemacs-logo.png")
-  (setq dashboard-items '((recents  . 10)
-                          (projects . 10)
-						  (bookmarks . 5)
-						  ))
+  (setq dashboard-banner-logo-title nil)
+  (setq dashboard-items '((recents  . 5)
+                          (projects . 5)
+                          (bookmarks . 5)
+                          ))
+  (setq dashboard-set-heading-icons t)
   (setq dashboard-center-content t)
   )
 
@@ -291,7 +307,14 @@
 ;; Quickly switch between windows
 (use-package ace-window
   :ensure t
-  :bind ("M-o" . ace-window)
+  :general
+  (:states '(insert emacs)
+           "M-o" 'ace-window
+           )
+  (:states '(normal motion)
+           :prefix "SPC"
+           "s" 'ace-window
+           )
   :config
   (setq aw-keys '(97 115 100 102 103 104 106 107 108))
   )
@@ -321,78 +344,93 @@
 
 (use-package undo-tree
   :ensure t
+  :general
+  (:states 'normal
+           :prefix "SPC"
+           "u" 'undo-tree-visualize)
   :config
   (global-undo-tree-mode)
   (setq undo-tree-visualizer-timestamps t)
   (setq undo-tree-visualizer-diff t)
+  (unbind-key (kbd "C-x u") undo-tree-map)
   )
 
 (use-package multiple-cursors
   :ensure t
-  :bind ("C-c m" . hydra-multiple-cursors/body)
+  :general
+  (:states '(insert emacs)
+           "C-c m" 'hydra-multiple-cursors/body
+           )
   :hydra (hydra-multiple-cursors (:hint nil)
-								 "
+                                 "
 
           Previous^^                  Next^^                 Miscellaneous         % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
-         
+
          ---------------------------------------------------------------------------------------------------
-         
+
           [_p_]   Next                [_n_]   Next           [_l_] Edit lines        [_0_] Insert numbers
-         
+
           [_P_]   Skip                [_N_]   Skip           [_a_] Mark all          [_A_] Insert letters
-         
+
           [_M-p_] Unmark              [_M-n_] Unmark         [_s_] Search
-         
+
           [Click] Cursor at point   [_q_]   Quit
          "
-								 ("l" mc/edit-lines :exit t)
-								 ("a" mc/mark-all-like-this :exit t)
-								 ("n" mc/mark-next-like-this)
-								 ("N" mc/skip-to-next-like-this)
-								 ("M-n" mc/unmark-next-like-this)
-								 ("p" mc/mark-previous-like-this)
-								 ("P" mc/skip-to-previous-like-this)
-								 ("M-p" mc/unmark-previous-like-this)
-								 ("s" mc/mark-all-in-region-regexp :exit t)
-								 ("0" mc/insert-numbers :exit t)
-								 ("A" mc/insert-letters :exit t)
-								 ("<mouse-1>" mc/add-cursor-on-click)
-								 ;; Help with click recognition in this hydra
-								 ("<down-mouse-1>" ignore)
-								 ("<drag-mouse-1>" ignore)
-								 ("q" nil))
+                                 ("l" mc/edit-lines :exit t)
+                                 ("a" mc/mark-all-like-this :exit t)
+                                 ("n" mc/mark-next-like-this)
+                                 ("N" mc/skip-to-next-like-this)
+                                 ("M-n" mc/unmark-next-like-this)
+                                 ("p" mc/mark-previous-like-this)
+                                 ("P" mc/skip-to-previous-like-this)
+                                 ("M-p" mc/unmark-previous-like-this)
+                                 ("s" mc/mark-all-in-region-regexp :exit t)
+                                 ("0" mc/insert-numbers :exit t)
+                                 ("A" mc/insert-letters :exit t)
+                                 ("<mouse-1>" mc/add-cursor-on-click)
+                                 ;; Help with click recognition in this hydra
+                                 ("<down-mouse-1>" ignore)
+                                 ("<drag-mouse-1>" ignore)
+                                 ("q" nil))
   )
 
 (defun narrow-or-widen-dwim (p)
-  
+
   "If the buffer is narrowed, it widens.  Otherwise, it narrows intelligently.
 Intelligently means: region, org-src-block, org-subtree, or defun,
 whichever applies first.
 Narrowing to org-src-block actually calls `org-edit-src-code'.
- 
+
   With prefix P, don't widen, just narrow even if buffer is already
 narrowed."
 
   (interactive "P")
   (declare (interactive-only))
   (cond ((and (buffer-narrowed-p) (not p)) (widen))
-		((region-active-p)
-		 (narrow-to-region (region-beginning) (region-end)))
-		(t (narrow-to-defun))))
+        ((region-active-p)
+         (narrow-to-region (region-beginning) (region-end)))
+        (t (narrow-to-defun))))
 (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
+;; (define-key evil-visual-state-map (kbd "SPC n") 'narrow-or-widen-dwim)
 
 (use-package magit
   :ensure t
-  :bind ("C-x g" . magit-status)
+  :general
+  (:states '(normal motion)
+           :prefix "SPC m"
+           "g" 'magit-status)
   )
 
 (use-package neotree
   :ensure t
-  :bind ("C-c a" . neotree-toggle)
-  :config
-  (setq neo-smart-open t)
-  (setq neo-window-width 32)
-  (setq neo-vc-integration (quote (face)))
+  :general
+  (:states '(normal motion)
+           :prefix "SPC"
+           "a" 'neotree-toggle)
+  :custom
+  (neo-smart-open t)
+  (neo-window-width 32)
+  (neo-vc-integration (quote (face)))
   )
 
 ;; LaTeX
@@ -408,16 +446,15 @@ narrowed."
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
   (add-hook 'LaTeX-mode-hook (lambda ()
-							   (setq TeX-engine 'xetex)
-							   (setq TeX-command-extra-options "-shell-escape")))
+                               (setq TeX-engine 'xetex)
+                               (setq TeX-command-extra-options "-shell-escape")))
   (reftex-mode t)
   (setq TeX-show-compilation t)
   (setq reftex-plug-into-AUCTeX t)
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
   (setq bibtex-completion-bibliography ; set up helm-bibtex
-		'("~/RA/mybib.bib"
-		  "~/RA/newadded.bib"
-		  "~/paper/pub/thesis.bib"))
+        '("~/projects/RA/mybib.bib"
+          "~/projects/RA/newadded.bib"))
   (require 'helm-bibtex)
   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
@@ -444,7 +481,7 @@ narrowed."
 (use-package gnuplot
   :ensure t
   :mode (("\\.gnuplot\\'" . gnuplot-mode)
-		 ("\\.gp\\'" . gnuplot-mode))
+         ("\\.gp\\'" . gnuplot-mode))
   )
 
 ;; ESS and R
@@ -468,7 +505,7 @@ narrowed."
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
   (add-hook 'org-mode-hook (lambda ()
-							 (setq-local company-minimum-prefix-length 1)
+                             (setq-local company-minimum-prefix-length 1)
                              (turn-on-org-cdlatex)
                              (auto-composition-mode -1)
                              (diff-auto-refine-mode -1)
@@ -476,23 +513,23 @@ narrowed."
                              ))
   (define-key global-map (kbd "C-c 2") 'org-capture) ; Org-capture
   (setq org-capture-templates
-		'(("t" "Todo list item"
-		   entry (file+headline "~/notes/tasks.org" "Tasks")
-		   "* TODO %?\n %i\n")
-		  ;; "* TODO %?\n %i\n %a")
+        '(("t" "Todo list item"
+           entry (file+headline "~/notes/tasks.org" "Tasks")
+           "* TODO %?\n %i\n")
+          ;; "* TODO %?\n %i\n %a")
 
-		  ("j" "Journal entry"
-		   entry (file+olp+datetree "~/notes/journal.org" "Journals")
-		   "* %U %^{Title}\n %?")
+          ("j" "Journal entry"
+           entry (file+olp+datetree "~/notes/journal.org" "Journals")
+           "* %U %^{Title}\n %?")
 
-		  ("b" "Tidbit: quote, zinger, one-liner or textlet"
-		   entry (file+headline "~/notes/tidbits.org" "Tidbits")
-		   "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
+          ("b" "Tidbit: quote, zinger, one-liner or textlet"
+           entry (file+headline "~/notes/tidbits.org" "Tidbits")
+           "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
 
-		  ("n" "Notes"
-		   entry (file "~/notes/notes.org" )
-		   "* %?")
-		  ))
+          ("n" "Notes"
+           entry (file "~/notes/notes.org" )
+           "* %?")
+          ))
   :config
   (setq org-startup-indented t)		; Indent the tree structure
   ;; It is slow to require org-ref
@@ -505,43 +542,43 @@ narrowed."
   ;; Continuous numbering of org mode equations
   (defun org-renumber-environment (orig-func &rest args)
     (let ((results '())
-		  (counter -1)
-		  (numberp))
+          (counter -1)
+          (numberp))
       (setq results (loop for (begin .  env) in
-						  (org-element-map (org-element-parse-buffer) 'latex-environment
-										   (lambda (env)
-											 (cons
-											  (org-element-property :begin env)
-											  (org-element-property :value env))))
-						  collect
-						  (cond
-						   ((and (string-match "\\\\begin{equation}" env)
-								 (not (string-match "\\\\tag{" env)))
-							(incf counter)
-							(cons begin counter))
-						   ((string-match "\\\\begin{align}" env)
-							(prog2
-								(incf counter)
-								(cons begin counter)
-							  (with-temp-buffer
-								(insert env)
-								(goto-char (point-min))
-								;; \\ is used for a new line. Each one leads to a number
-								(incf counter (count-matches "\\\\$"))
-								;; unless there are nonumbers.
-								(goto-char (point-min))
-								(decf counter (count-matches "\\nonumber")))))
-						   (t
-							(cons begin nil)))))
+                          (org-element-map (org-element-parse-buffer) 'latex-environment
+                                           (lambda (env)
+                                             (cons
+                                              (org-element-property :begin env)
+                                              (org-element-property :value env))))
+                          collect
+                          (cond
+                           ((and (string-match "\\\\begin{equation}" env)
+                                 (not (string-match "\\\\tag{" env)))
+                            (incf counter)
+                            (cons begin counter))
+                           ((string-match "\\\\begin{align}" env)
+                            (prog2
+                                (incf counter)
+                                (cons begin counter)
+                              (with-temp-buffer
+                                (insert env)
+                                (goto-char (point-min))
+                                ;; \\ is used for a new line. Each one leads to a number
+                                (incf counter (count-matches "\\\\$"))
+                                ;; unless there are nonumbers.
+                                (goto-char (point-min))
+                                (decf counter (count-matches "\\nonumber")))))
+                           (t
+                            (cons begin nil)))))
 
       (when (setq numberp (cdr (assoc (point) results)))
-		(setf (car args)
-			  (concat
-			   (format "\\setcounter{equation}{%s}\n" numberp)
-			   (car args)))))
+        (setf (car args)
+              (concat
+               (format "\\setcounter{equation}{%s}\n" numberp)
+               (car args)))))
     (apply orig-func args))
   (advice-add 'org-create-formula-image :around #'org-renumber-environment)
-  
+
   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
   (add-to-list 'image-file-name-extensions "eps")
   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
@@ -551,37 +588,37 @@ narrowed."
   (require 'ox-latex)
   (setq org-highlight-latex-and-related '(latex script entities))
   (set-face-foreground 'org-latex-and-related "orange")
-  (setq org-export-coding-system 'utf-8)	       ; Ensure exporting with UTF-8
+  (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
   (setq org-latex-listings 'listings)
   (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
 \\ctexset{section/format=\\Large\\bfseries}"
-									("\\section{%s}" . "\\section*{%s}")
-									("\\subsection{%s}" . "\\subsection*{%s}")
-									("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-									("\\paragraph{%s}" . "\\paragraph*{%s}")
-									("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+                                    ("\\section{%s}" . "\\section*{%s}")
+                                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
   (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
 \\ctexset{section/format=\\Large\\bfseries}"
-									("\\part{%s}" . "\\part*{%s}")
-									("\\chapter{%s}" . "\\chapter*{%s}")
-									("\\section{%s}" . "\\section*{%s}")
-									("\\subsection{%s}" . "\\subsection*{%s}")
-									("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+                                    ("\\part{%s}" . "\\part*{%s}")
+                                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                                    ("\\section{%s}" . "\\section*{%s}")
+                                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
-									("\\part{%s}" . "\\part*{%s}")
-									("\\chapter{%s}" . "\\chapter*{%s}")
-									("\\section{%s}" . "\\section*{%s}")
-									("\\subsection{%s}" . "\\subsection*{%s}")
-									("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+                                    ("\\part{%s}" . "\\part*{%s}")
+                                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                                    ("\\section{%s}" . "\\section*{%s}")
+                                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   (setq org-latex-compiler "xelatex")
   (setq org-latex-pdf-process
-		'(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
-		  "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-		  "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-		  "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-		  ))
+        '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          ))
   (setq org-latex-caption-above '(table)) ; Set the caption in exported pdf above
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -602,7 +639,7 @@ narrowed."
   (setq org-src-fontify-natively t)
   ;; (setq org-preview-latex-default-process 'imagemagick)
   (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-											   ("begin" "$1" "$" "$$" "\\(" "\\[")))
+                                               ("begin" "$1" "$" "$$" "\\(" "\\[")))
   (setq org-src-window-setup 'current-window)
   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed up exports
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
@@ -618,44 +655,41 @@ narrowed."
 ;; Shell
 (use-package shell-pop
   :ensure t
-  :bind ("C-c 1" . shell-pop)
+  :general
+  (:states '(normal motion)
+           :prefix "SPC o"
+           "s" 'shell-pop)
   :custom
   (shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
+  (shell-pop-full-span t)
   :config
-  (setq shell-pop-universal-key "\C-c1")
-  (setq shell-pop-full-span t)
   (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
   )
-;; (add-to-list 'display-buffer-alist '("^\\*shell\\*$" . (display-buffer-same-window)))
-;; (defun shell-other-window ()
-;;   "Open a `shell' in a new window."
-;;   (interactive)
-;;   (select-window (split-window-below -20))
-;;   (shell)
-;;   )
-;; (define-key global-map (kbd "C-c 1") 'shell-other-window) ; Open shell buffer below
 (setq password-cache t)			; Enable password caching
 (setq password-cache-expiry 3600)	; Enable password caching for one hour
 
 (use-package web-mode
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
-		 ("\\.xml\\'" . web-mode))
+         ("\\.xml\\'" . web-mode))
   :config
   (setq web-mode-engines-alist
-		'(("django"    . "\\.html\\'")))
+        '(("django"    . "\\.html\\'")))
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-auto-expanding t)
   )
 
 ;; mu4e
 (use-package mu4e
-  :load-path "/usr/local/Cellar/mu/1.0_1/share/emacs/site-lisp/mu/mu4e"
-  :bind (("M-m" . mu4e)
-		 :map mu4e-headers-mode-map
-		 ("." . hydra-mu4e-headers/body)
-		 )
+  :load-path "/usr/local/Cellar/mu/1.2.0/share/emacs/site-lisp/mu/mu4e"
+  :general
+  (:states '(normal motion)
+           :prefix "SPC m"
+           "e" 'mu4e)
+  (:keymaps 'mu4e-headers-mode-map
+            "." 'hydra-mu4e-headers/body)
   :config
+  (require 'org)
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
   (setq mu4e-maildir (expand-file-name "~/Maildir"))		; Mail folder set to ~/mail
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a")
@@ -666,27 +700,29 @@ narrowed."
   (setq mu4e-confirm-quit nil)
   (setq mu4e-view-show-images t)
   (when (fboundp 'imagemagick-register-types)
-	(imagemagick-register-types))
+    (imagemagick-register-types))
   (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
   (add-hook 'mu4e-compose-mode-hook 'visual-line-mode)
   (add-hook 'mu4e-compose-mode-hook 'company-mode)
   ;; Dynamically setting the width of the columns so it takes up the whole width
   (add-hook 'mu4e-headers-mode-hook
-			(defun my/mu4e-change-headers ()
-			  (interactive)
-			  (setq mu4e-headers-fields
-					`((:human-date . 12)
-					  (:flags . 4)
-					  (:from-or-to . 25)
-					  (:subject . ,(- (window-body-width) 60))
-					  (:size . 7)))))
+            (defun my/mu4e-change-headers ()
+              (interactive)
+              (setq mu4e-headers-fields
+                    `((:human-date . 12)
+                      (:flags . 4)
+                      (:from-or-to . 25)
+                      (:subject . ,(- (window-body-width) 60))
+                      (:size . 7)))))
   (add-to-list 'mu4e-view-actions
-			   '("browser view" . mu4e-action-view-in-browser) t)
+               '("browser view" . mu4e-action-view-in-browser) t)
   (add-hook 'mu4e-view-mode-hook
-			(lambda()
-			  (local-set-key (kbd "<tab>") 'org-next-link)
-			  (local-set-key (kbd "<backtab>") 'org-previous-link)))
-  
+            (lambda()
+              (local-set-key (kbd "<tab>") 'org-next-link)
+              (local-set-key (kbd "<backtab>") 'org-previous-link)
+              (local-set-key (kbd "<return>") 'mu4e~view-browse-url-from-binding))
+            )
+
   (setq mu4e-sent-folder   "/liushihao-pku/Sent Items")
   (setq mu4e-drafts-folder "/liushihao-pku/Drafts")
   (setq mu4e-trash-folder  "/liushihao-pku/Trash")
@@ -706,7 +742,8 @@ narrowed."
   (setq smtpmail-smtp-service 465)
   (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
 
-  (defhydra hydra-mu4e-headers (:color blue :hint nil)
+  :hydra
+  (hydra-mu4e-headers (:color blue :hint nil)
     "
   ^General^         ^Search^               _!_: read       _#_: deferred    ^Switches^
 
@@ -794,36 +831,110 @@ narrowed."
     ("." nil))
   )
 
-(use-package helm-xref
+(use-package xref
+  :ensure helm-xref
   :ensure t
+  :general
+  (:states '(normal motion)
+           :prefix "SPC"
+           "." 'xref-find-definitions
+           "?" 'xref-find-references
+           "C-." 'xref-find-apropos
+           "," 'xref-pop-marker-stack)
   :config
   (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
   (setq xref-prompt-for-identifier '(not xref-find-definitions
-										 xref-find-definitions-other-window
-										 xref-find-definitions-other-frame
-										 xref-find-references))
+                                         xref-find-definitions-other-window
+                                         xref-find-definitions-other-frame
+                                         xref-find-references))
   )
 
 (setq-default c-basic-offset 4)
 (setq-default tab-width 4)
 
+;; Python
+(use-package company-jedi
+  :ensure t
+  :defer t
+  :general
+  (:states 'normal
+           :keymaps 'python-mode-map
+           :prefix "SPC"
+           "." 'jedi:goto-definition
+           "," 'jedi:goto-definition-pop-marker
+           "j d" 'jedi:show-doc
+           "j r" 'helm-jedi-related-names
+           "c p" 'run-python
+           "c c" 'python-shell-send-buffer
+           "c r" 'python-shell-send-region
+           "c l" 'python-shell-send-file
+           "c s" 'python-shell-send-string
+           "c f" 'python-shell-send-defun
+           "c e" 'python-eldoc-at-point
+           "c d" 'python-describe-at-point
+           "c v" 'python-check
+           "c z" 'python-shell-switch-to-shell
+           "c <" 'python-indent-shift-left
+           "c >" 'python-indent-shift-right
+           )
+  :init
+  (add-hook 'python-mode-hook (lambda ()
+                                (require 'company-jedi)
+                                (add-to-list 'company-backends 'company-jedi)
+                                ))
+  )
+
 ;; lsp mode
 (use-package lsp-mode
   :ensure t
   :ensure helm-lsp
-  :ensure company-jedi
   :commands lsp
-  :hook (python-mode . (lambda ()
-						 (lsp)
-						 (setq-local company-backends '(company-jedi company-files))
-						 ))
+  :general
+  (:states 'normal
+           :keymaps 'lsp-mode-map
+           :prefix "SPC"
+           "l" 'hydra-lsp/body)
+  :hydra (hydra-lsp (:exit t :hint nil)
+                    "
+          Buffer^^               Peek^^                 Symbol^^              Server^^                  Search
+         ----------------------------------------------------------------------------------------------------------
+          [_f_] format           [_d_] declaration      [_o_] documentation   [_M-r_] restart           [_1_] helm-lsp wkspc symbol
+
+          [_m_] imenu            [_D_] definition       [_r_] rename          [_S_]   shutdown          [_2_] all active wkspc symbol
+
+          [_x_] execute action   [_R_] references       [_t_] type defn       [_M-s_] describe session  [_a_] xref-find-apropos
+
+         ^^                      [_i_] implementation
+
+"
+                    ("d" lsp-find-declaration)
+                    ("D" lsp-ui-peek-find-definitions)
+                    ("R" lsp-ui-peek-find-references)
+                    ("i" lsp-ui-peek-find-implementation)
+                    ("t" lsp-find-type-definition)
+                    ;; ("s" lsp-signature-help)
+                    ("o" lsp-describe-thing-at-point)
+                    ("r" lsp-rename)
+
+                    ("f" lsp-format-buffer)
+                    ("m" lsp-ui-imenu)
+                    ("x" lsp-execute-code-action)
+
+                    ("M-s" lsp-describe-session)
+                    ("M-r" lsp-restart-workspace)
+                    ("S" lsp-shutdown-workspace)
+
+                    ("1" helm-lsp-workspace-symbol)
+                    ("2" helm-lsp-global-workspace-symbol)
+                    ("a" xref-find-apropos)
+                    )
   :config
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-completion-at-point nil)
   (setq lsp-enable-folding nil)
   (setq lsp-enable-symbol-highlighting nil)
   (setq lsp-eldoc-enable-signature-help nil)
-  
+
   (setq lsp-pyls-plugins-pylint-enabled nil)
   (setq lsp-pyls-plugins-mccabe-enabled nil)
   (setq lsp-pyls-plugins-pycodestyle-enabled nil)
@@ -832,52 +943,19 @@ narrowed."
   (setq lsp-pyls-plugins-rope-completion-enabled nil)
 
   (setq lsp-prefer-flymake nil)
-  (defhydra hydra-lsp (:exit t :hint nil)
-    "
-          Buffer^^               Peek^^                 Symbol^^              Server^^                  Search
-         ----------------------------------------------------------------------------------------------------------
-          [_f_] format           [_d_] declaration      [_o_] documentation   [_M-r_] restart           [_1_] helm-lsp wkspc symbol
-         
-          [_m_] imenu            [_D_] definition       [_r_] rename          [_S_]   shutdown          [_2_] all active wkspc symbol
-         
-          [_x_] execute action   [_R_] references       [_t_] type defn       [_M-s_] describe session  [_a_] xref-find-apropos
-         
-         ^^                      [_i_] implementation
-         
-"
-    ("d" lsp-find-declaration)
-    ("D" lsp-ui-peek-find-definitions)
-    ("R" lsp-ui-peek-find-references)
-    ("i" lsp-ui-peek-find-implementation)
-    ("t" lsp-find-type-definition)
-    ;; ("s" lsp-signature-help)
-    ("o" lsp-describe-thing-at-point)
-    ("r" lsp-rename)
 
-    ("f" lsp-format-buffer)
-    ("m" lsp-ui-imenu)
-    ("x" lsp-execute-code-action)
-
-    ("M-s" lsp-describe-session)
-    ("M-r" lsp-restart-workspace)
-    ("S" lsp-shutdown-workspace)
-
-    ("1" helm-lsp-workspace-symbol)
-    ("2" helm-lsp-global-workspace-symbol)
-    ("a" xref-find-apropos)
-    )
-  (global-set-key (kbd "C-c l") 'hydra-lsp/body)
   )
 
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
-  :bind (:map lsp-ui-imenu-mode-map
-			  ("b" . lsp-ui-imenu--prev-kind)
-			  ("f" . lsp-ui-imenu--next-kind)
-			  ("p" . previous-line)
-			  ("n" . next-line)
-			  )
+  :general
+  (:keymaps 'lsp-ui-imenu-mode-map
+            "b" 'lsp-ui-imenu--prev-kind
+            "f" 'lsp-ui-imenu--next-kind
+            "p" 'previous-line
+            "n" 'next-line
+            )
   )
 
 (use-package company-lsp
@@ -892,18 +970,20 @@ narrowed."
   :defer t
   :hook ((c-mode c++-mode objc-mode) .
          (lambda ()
-		   (require 'ccls)
-		   (require 'lsp)
-		   (lsp)
-		   (setq-local company-backends '(company-lsp))
-           (abbrev-mode -1)
-           (auto-composition-mode -1)
-           (diff-auto-refine-mode -1)
-           (file-name-shadow-mode -1)
-           (eldoc-mode -1)
-		   ))
+           (require 'ccls)
+           (require 'lsp)
+           (lsp)
+           ))
   :custom
   (ccls-executable "~/.emacs.d/ccls")
+  )
+
+(use-package cmake-mode
+  :load-path "/usr/local/Cellar/cmake/3.14.3/share/emacs/site-lisp/cmake"
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+         ("\\.cmake\\'" . cmake-mode))
+  :custom
+  (cmake-tab-width 4)
   )
 
 ;; Lsp java
@@ -911,16 +991,10 @@ narrowed."
   :ensure t
   :defer t
   :hook (java-mode . (lambda ()
-					   (require 'lsp-java)
-					   (require 'lsp)
-					   (lsp)
-					   (setq-local company-backends '(company-lsp))
-                       (abbrev-mode -1)
-                       (auto-composition-mode -1)
-                       (diff-auto-refine-mode -1)
-                       (file-name-shadow-mode -1)
-                       (eldoc-mode -1)
-					   ))
+                       (require 'lsp-java)
+                       (require 'lsp)
+                       (lsp)
+                       ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
   (setq lsp-java-format-on-type-enabled nil)
@@ -933,19 +1007,24 @@ narrowed."
 ;; gud
 (use-package gud
   :commands gud-gdb
-  :config
-  (defhydra hydra-gud (:hint nil :foreign-keys run)
+  :general
+  (:states '(normal motion)
+           :keymaps 'prog-mode-map
+           :prefix "SPC"
+           "gud" 'hydra-gud/body)
+  :hydra
+  (hydra-gud (:hint nil :foreign-keys run)
     "
           Breakpoint^^               Run^^                 Repl^^              Stack^^          Instruction mode^^
          ----------------------------------------------------------------------------------------------------------
           [_b_] break                [_r_] run             [_p_] print         [_<_] up         [_M-s_] stepi
-         
+
           [_d_] remove               [_s_] step                              [_>_] down       [_M-n_] nexti
-         
+
           [_l_] list breaks          [_n_] next                              [_1_] stack current thread
-         
+
           [_q_] quit                 [_c_] continue                          [_2_] stack all threads
-         
+
                                    [_f_] finish
 "
     ("b" gud-break)
@@ -970,7 +1049,6 @@ narrowed."
 
     ("q" nil)
     )
-  (global-set-key (kbd "C-c g") 'hydra-gud/body)
   )
 
 (use-package gud-lldb
@@ -982,38 +1060,38 @@ narrowed."
 ;;   :ensure t
 ;;   :defer t
 ;;   :hook ((java-mode . (lambda ()
-;; 						(dap-mode t)
-;; 						(dap-ui-mode t)
-;; 						(require 'dap-java)
-;; 						))
-;; 		 ;; (python-mode . (lambda ()
-;; 		 ;; 				  (dap-mode t)
-;; 		 ;; 				  (dap-ui-mode t)
-;; 		 ;; 				  (require 'dap-python)
-;; 		 ;; 				  ))
-;; 		 )
+;;                      (dap-mode t)
+;;                      (dap-ui-mode t)
+;;                      (require 'dap-java)
+;;                      ))
+;;       ;; (python-mode . (lambda ()
+;;       ;;                   (dap-mode t)
+;;       ;;                   (dap-ui-mode t)
+;;       ;;                   (require 'dap-python)
+;;       ;;                   ))
+;;       )
 ;;   :init
 ;;   (defun my/window-visible (b-name)
 ;;     "Return whether B-NAME is visible."
 ;;     (-> (-compose 'buffer-name 'window-buffer)
-;; 		(-map (window-list))
-;; 		(-contains? b-name)))
+;;      (-map (window-list))
+;;      (-contains? b-name)))
 
 ;;   (defun my/show-debug-windows (session)
 ;;     "Show debug windows."
 ;;     (let ((lsp--cur-workspace (dap--debug-session-workspace session)))
 ;;       (save-excursion
-;; 		;; display locals
-;; 		(unless (my/window-visible dap-ui--locals-buffer)
+;;      ;; display locals
+;;      (unless (my/window-visible dap-ui--locals-buffer)
 ;;           (dap-ui-locals))
-;; 		;; display sessions
-;; 		(unless (my/window-visible dap-ui--sessions-buffer)
+;;      ;; display sessions
+;;      (unless (my/window-visible dap-ui--sessions-buffer)
 ;;           (dap-ui-sessions))
-;; 		(unless (my/window-visible "*dap-ui-repl*")
+;;      (unless (my/window-visible "*dap-ui-repl*")
 ;;           (dap-ui-repl))
-;; 		(unless (my/window-visible "*Breakpoints*")
+;;      (unless (my/window-visible "*Breakpoints*")
 ;;           (dap-ui-breakpoints))
-;; 		)))
+;;      )))
 ;;   (add-hook 'dap-stopped-hook 'my/show-debug-windows)
 ;;   (defun my/hide-debug-windows (session)
 ;;     "Hide debug windows when all debug sessions are dead."
@@ -1036,21 +1114,21 @@ narrowed."
 ;;   )
 
 ;; Chinese input method
-(use-package pyim
-  :ensure t
-  :ensure pyim-wbdict
-  :ensure posframe
-  :demand t
-  :config
-  (require 'pyim-wbdict)
-  (pyim-wbdict-v98-enable)
-  (setq default-input-method "pyim")
-  (setq pyim-default-scheme 'wubi)
-  (require 'posframe)
-  (setq pyim-page-tooltip 'posframe)
-  (setq pyim-posframe-border-width 5)
-  (setq pyim-page-length 5)
-  )
-
+;; (use-package pyim
+;;   :ensure t
+;;   :ensure pyim-wbdict
+;;   :ensure posframe
+;;   :demand t
+;;   :config
+;;   (require 'pyim-wbdict)
+;;   (pyim-wbdict-v98-enable)
+;;   (setq default-input-method "pyim")
+;;   (setq pyim-default-scheme 'wubi)
+;;   (require 'posframe)
+;;   (setq pyim-page-tooltip 'posframe)
+;;   (setq pyim-posframe-border-width 5)
+;;   (setq pyim-page-length 5)
+;;   )
+(setq gc-cons-threshold (* 800 1000))
 (provide 'init)
 ;;; init.el ends here
