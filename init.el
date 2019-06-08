@@ -19,6 +19,12 @@
   (require 'use-package))
 (setq use-package-compute-statistics t)
 
+;; (use-package benchmark-init
+;;   :ensure t
+;;   :config
+;;   ;; To disable collection of benchmark data after init is done.
+;;   (add-hook 'after-init-hook 'benchmark-init/deactivate))
+
 (use-package use-package-hydra
   :load-path "~/.emacs.d/packages/use-package-hydra"
   :ensure hydra)
@@ -36,10 +42,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
+ '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
+    ("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
  '(evil-disable-insert-state-bindings t)
@@ -50,12 +57,17 @@
  '(helm-autoresize-mode t)
  '(helm-mode-fuzzy-match t)
  '(indent-tabs-mode nil)
+ '(neo-smart-open t t)
+ '(neo-vc-integration (quote (face)) t)
+ '(neo-window-width 32 t)
  '(package-selected-packages
    (quote
-    (general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme helm-xref company-jedi dap-mode lsp-ui lsp-mode lsp-java ob-ipython hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+    (lsp-python-ms delight solarized-theme ompany-box general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode lsp-ui lsp-mode lsp-java ob-ipython hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
+ '(shell-pop-full-span t t)
+ '(shell-pop-shell-type (quote ("eshell" "*eshell*" (lambda nil (eshell)))) t)
  '(show-paren-mode t)
  '(split-width-threshold 150)
  '(tool-bar-mode nil)
@@ -70,7 +82,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(mode-line ((t (:background "#2B2B2B" :foreground "#8FB28F" :box nil)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
@@ -113,7 +125,13 @@
 (set-face-attribute 'default nil :font "Source Code Pro-13")
 (set-fontset-font t 'han      (font-spec :family "STkaiti"))
 (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
-(global-set-key (kbd "C-c 3") 'whitespace-cleanup)
+
+(use-package delight
+  :ensure t
+  :config
+  (delight '((eldoc-mode nil "eldoc")
+            (emacs-lisp-mode "Elisp" :major)))
+  )
 
 (use-package evil
   :ensure t
@@ -127,8 +145,11 @@
   (evil-set-initial-state 'dashboard-mode 'motion)
   (evil-set-initial-state 'use-package-statistics-mode 'motion)
   (evil-set-initial-state 'rst-mode 'motion)
-  (evil-set-initial-state 'neotree-mode 'motion)
+  (evil-set-initial-state 'neotree-mode 'emacs)
   (evil-set-initial-state 'message-mode 'motion)
+  (evil-set-initial-state 'flycheck-error-list-mode 'motion)
+  (evil-set-initial-state 'fundamental-mode 'motion)
+  (evil-set-initial-state 'TeX-output-mode 'motion)
   (evil-mode 1)
   (define-key evil-motion-state-map " " nil)
   (define-key evil-normal-state-map " " nil)
@@ -136,17 +157,58 @@
   (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
   (evil-define-key '(normal motion) 'global
     (kbd "SPC w") 'evil-window-map)
+  (evil-define-key '(normal) 'global
+    (kbd "SPC TAB") 'evil-motion-state)
   (global-evil-surround-mode 1)
+  )
+
+(defun my/open-external-terminal ()
+  "Open an external Terminal window under current directory."
+  (interactive)
+  (shell-command "open -a Terminal .")
   )
 
 (use-package general
   :ensure t
+  :config
+  (general-define-key
+   :states '(normal visual)
+   "TAB" 'indent-for-tab-command
+   )
+  (general-define-key
+   :states '(normal motion)
+   "=" 'end-of-defun
+   "-" 'beginning-of-defun
+   "_" 'mark-defun
+   )
+  (general-define-key
+   :states '(normal motion)
+   :prefix "SPC"
+   "x c" 'save-buffers-kill-terminal
+   "x s" 'save-buffer
+   "x ;" 'comment-line
+   "x e" 'eval-last-sexp
+   "o t" 'my/open-external-terminal
+   )
+  (general-define-key
+   :states '(normal motion)
+   :prefix "SPC SPC"
+   "w c" 'whitespace-cleanup
+   "w m" 'whitespace-mode
+   "h f" 'describe-function
+   "h v" 'describe-variable
+   "h k" 'describe-key
+   "h m" 'describe-mode
+   "h p" 'describe-package
+   "h l" 'view-lossage
+   )
   )
 
 (use-package helm
   :ensure t
   :ensure helm-ag
   :ensure helm-swoop
+  :delight
   :init
   (helm-mode t)
   :general
@@ -158,10 +220,12 @@
            "k" 'kill-buffer
            "D" 'dired
            "B" 'ibuffer
+           "P" 'list-processes
            )
   (:states '(normal motion)
            :prefix "SPC h"
            "w" 'helm-swoop
+           "r" 'helm-swoop-back-to-last-point
            "/" 'helm-find
            "i" 'helm-semantic-or-imenu
            "I" 'helm-imenu-in-all-buffers
@@ -209,6 +273,7 @@
 
 (use-package projectile
   :ensure t
+  :delight '(:eval (concat " " (projectile-project-name)))
   :init
   (projectile-mode t)
   :custom
@@ -227,6 +292,7 @@
            "F" 'helm-projectile-find-file-in-known-projects
            "g" 'helm-projectile-find-file-dwim
            "d" 'helm-projectile-find-dir
+           "D" 'projectile-dired
            "e" 'helm-projectile-recentf
            "p" 'helm-projectile-switch-project
            "b" 'helm-projectile-switch-to-buffer
@@ -253,6 +319,19 @@
   (doom-themes-neotree-config)
   )
 
+;; (use-package solarized-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'solarized-dark t)
+;;   (setq solarized-use-variable-pitch nil)
+;;   (setq solarized-distinct-fringe-background t)
+;;   (setq solarized-high-contrast-mode-line t)
+;;   (setq solarized-use-less-bold t)
+;;   (setq solarized-use-more-italic t)
+;;   (setq solarized-emphasize-indicators nil)
+;;   (setq solarized-scale-org-headlines nil)
+;;   )
+
 ;; (use-package spacemacs-theme
 ;;   :ensure t
 ;;   :defer t
@@ -274,7 +353,8 @@
            "s" 'flycheck-select-checker
            "d" 'flycheck-disable-checker
            )
-  :hook (prog-mode . flycheck-mode)
+  :hook ((prog-mode . flycheck-mode)
+         (ess-r-mode . (lambda () (flycheck-mode -1))))
   )
 
 (setq initial-frame-alist (quote ((fullscreen . maximized))))
@@ -282,7 +362,8 @@
 
 (use-package dashboard
   :ensure t
-  :ensure all-the-icons
+  ;; :init
+  ;; (require 'all-the-icons)
   :config
   (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title nil)
@@ -292,6 +373,10 @@
                           ))
   (setq dashboard-set-heading-icons t)
   (setq dashboard-center-content t)
+  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+						     :height 1.1
+						     :v-adjust -0.05
+						     :face 'font-lock-keyword-face))
   )
 
 (setq-default bidi-display-reordering nil) ; improve long-line performance
@@ -299,6 +384,7 @@
 ;; Show key bindings on the right
 (use-package which-key
   :ensure t
+  :delight
   :config
   (which-key-mode)
   (which-key-setup-side-window-bottom)
@@ -308,12 +394,8 @@
 (use-package ace-window
   :ensure t
   :general
-  (:states '(insert emacs)
+  (:states '(normal motion insert emacs)
            "M-o" 'ace-window
-           )
-  (:states '(normal motion)
-           :prefix "SPC"
-           "s" 'ace-window
            )
   :config
   (setq aw-keys '(97 115 100 102 103 104 106 107 108))
@@ -321,6 +403,7 @@
 
 (use-package yasnippet
   :ensure t
+  :delight yas-minor-mode
   :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
   :config
   (setq yas/root-directory "~/.emacs.d/snippets/")
@@ -337,13 +420,24 @@
   :ensure t
   :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
   :config
-  ;; (setq company-idle-delay 0.5)
   (setq company-selection-wrap-around t)
   (setq company-dabbrev-downcase nil)
   )
 
+(use-package company-box
+  :ensure t
+  :delight
+  :hook (company-mode . company-box-mode)
+  :config
+  (setq company-box-backends-colors nil
+        company-box-show-single-candidate t
+        company-box-max-candidates 50
+        company-box-icons-alist 'company-box-icons-all-the-icons)
+  )
+
 (use-package undo-tree
   :ensure t
+  :delight
   :general
   (:states 'normal
            :prefix "SPC"
@@ -395,15 +489,12 @@
   )
 
 (defun narrow-or-widen-dwim (p)
-
   "If the buffer is narrowed, it widens.  Otherwise, it narrows intelligently.
 Intelligently means: region, org-src-block, org-subtree, or defun,
 whichever applies first.
 Narrowing to org-src-block actually calls `org-edit-src-code'.
-
   With prefix P, don't widen, just narrow even if buffer is already
 narrowed."
-
   (interactive "P")
   (declare (interactive-only))
   (cond ((and (buffer-narrowed-p) (not p)) (widen))
@@ -411,7 +502,6 @@ narrowed."
          (narrow-to-region (region-beginning) (region-end)))
         (t (narrow-to-defun))))
 (global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
-;; (define-key evil-visual-state-map (kbd "SPC n") 'narrow-or-widen-dwim)
 
 (use-package magit
   :ensure t
@@ -437,25 +527,116 @@ narrowed."
 (use-package tex
   :defer t
   :ensure auctex
-  :ensure helm-bibtex
+  :general
+  (:states '(normal motion)
+           :keymaps 'LaTeX-mode-map
+           :prefix "SPC c"
+           "s" 'LaTeX-section
+           "e" 'LaTeX-environment
+           "j" 'LaTeX-insert-item
+           "m s" 'LaTeX-mark-section
+           "m e" 'LaTeX-mark-environment
+           "]" 'LaTeX-close-environment
+           "." 'reftex-view-crossref
+           "(" 'reftex-label
+           ")" 'reftex-reference
+           "/" 'reftex-index-selection-or-word
+           "<" 'reftex-index
+           "=" 'reftex-toc
+           ">" 'reftex-display-index
+           "[" 'reftex-citation
+           "\\" 'reftex-index-phrase-selection-or-word
+           "|" 'reftex-index-visit-phrases-buffer
+           "?" 'cdlatex-command-help
+           "{" 'cdlatex-environment
+           "RET" 'TeX-insert-macro
+           "TAB" 'TeX-goto-info-page
+           "^" 'TeX-home-buffer
+           "_" 'TeX-master-file-ask
+           "`" 'TeX-next-error
+           "a" 'TeX-command-run-all
+           "c" 'TeX-command-master
+           "b" 'TeX-command-buffer
+           "d" 'TeX-save-document
+           "f" 'TeX-font
+           "k" 'TeX-kill-job
+           "l" 'TeX-recenter-output-buffer
+           "n" 'TeX-normal-mode
+           "r" 'TeX-command-region
+           "v" 'TeX-view
+           "w" 'TeX-toggle-debug-bad-boxes
+           "z" 'LaTeX-command-section
+           "Z" 'LaTeX-command-run-all-section
+           )
+  (:states '(normal motion)
+           :keymaps 'LaTeX-mode-map
+           :prefix "SPC c q"
+           "e" 'LaTeX-fill-environment
+           "s" 'LaTeX-fill-section
+           "r" 'LaTeX-fill-region
+           "p" 'LaTeX-fill-paragraph
+           )
+  (:states '(normal motion)
+           :keymaps 'LaTeX-mode-map
+           :prefix "SPC c o"
+           "f" 'TeX-fold-mode
+           "RET" 'TeX-fold-macro
+           "e" 'TeX-fold-env
+           "b" 'TeX-fold-buffer
+           "c" 'TeX-fold-comment
+           "o" 'TeX-fold-dwim
+           "p" 'TeX-fold-paragraph
+           "r" 'TeX-fold-region
+           "B" 'TeX-fold-clearout-buffer
+           "i" 'TeX-fold-clearout-item
+           "P" 'TeX-fold-clearout-paragraph
+           "R" 'TeX-fold-clearout-region
+           )
+  (:states '(normal motion)
+           :keymaps 'LaTeX-mode-map
+           :prefix "SPC c p"
+           "TAB" 'preview-goto-info-page
+           "b" 'preview-buffer
+           "d" 'preview-document
+           "e" 'preview-environment
+           "f" 'preview-cache-preamble
+           "r" 'preview-region
+           "s" 'preview-section
+           "p" 'preview-at-point
+           "B" 'preview-clearout-buffer
+           "D" 'preview-clearout-document
+           "E" 'preview-clearout-environment
+           "P" 'preview-clearout-at-point
+           "F" 'preview-cache-preamble-off
+           "R" 'preview-clearout
+           "S" 'preview-clearout-section
+           )
   :init
-  ;; (add-hook 'LaTeX-mode-hook 'flyspell-mode) ; Enable spell check in latex mode
-  (add-hook 'LaTeX-mode-hook 'auto-fill-mode) ; Enable auto-fill in latex mode
-  (add-hook 'LaTeX-mode-hook 'reftex-mode)    ; Enable reftex mode in latex mode
-  :config
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (add-hook 'LaTeX-mode-hook (lambda ()
-                               (setq TeX-engine 'xetex)
-                               (setq TeX-command-extra-options "-shell-escape")))
-  (reftex-mode t)
-  (setq TeX-show-compilation t)
-  (setq reftex-plug-into-AUCTeX t)
-  (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
-  (setq bibtex-completion-bibliography ; set up helm-bibtex
+  ;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (TeX-engine 'xetex)
+  (TeX-command-extra-options "-shell-escape")
+  (TeX-show-compilation t)
+  (reftex-plug-into-AUCTeX t)
+  (bibtex-completion-cite-prompt-for-optional-arguments nil)
+  (bibtex-completion-bibliography ; set up helm-bibtex
         '("~/projects/RA/mybib.bib"
           "~/projects/RA/newadded.bib"))
+  :config
   (require 'helm-bibtex)
+  )
+
+(use-package reftex
+  :hook (LaTeX-mode . reftex-mode)
+  )
+
+(use-package helm-bibtex
+  :ensure t
+  :defer t
+  :config
   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
   )
@@ -463,13 +644,6 @@ narrowed."
 (use-package cdlatex
   :ensure t
   :hook (LaTeX-mode . cdlatex-mode))
-
-(use-package auctex-latexmk
-  :ensure t
-  :hook (LaTeX-mode . auctex-latexmk-setup)
-  :config
-  (setq TeX-command-default "LatexMk")
-  )
 
 ;; Matlab mode
 (use-package matlab-mode
@@ -498,38 +672,39 @@ narrowed."
   ;; :ensure org-ref
   :ensure ob-ipython
   :mode ("\\.org\\'" . org-mode)
+  :general
+  (:states '(normal motion)
+           :prefix "SPC"
+           "o c" 'org-capture)
+  :custom
+  (org-capture-templates
+   '(("t" "Todo list item"
+      entry (file+headline "~/notes/tasks.org" "Tasks")
+      "* TODO %?\n %i\n")
+     ;; "* TODO %?\n %i\n %a")
+
+     ("j" "Journal entry"
+      entry (file+olp+datetree "~/notes/journal.org" "Journals")
+      "* %U %^{Title}\n %?")
+
+     ("b" "Tidbit: quote, zinger, one-liner or textlet"
+      entry (file+headline "~/notes/tidbits.org" "Tidbits")
+      "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
+
+     ("n" "Notes"
+      entry (file "~/notes/notes.org" )
+      "* %?")
+     ))
   :init
   (add-hook 'org-mode-hook 'auto-fill-mode)
   ;; (setq org-startup-with-inline-images t) ; Display inline images by default
   (defun add-pcomplete-to-capf ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
+  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
   (add-hook 'org-mode-hook (lambda ()
                              (setq-local company-minimum-prefix-length 1)
-                             (turn-on-org-cdlatex)
-                             (auto-composition-mode -1)
-                             (diff-auto-refine-mode -1)
-                             (file-name-shadow-mode -1)
                              ))
-  (define-key global-map (kbd "C-c 2") 'org-capture) ; Org-capture
-  (setq org-capture-templates
-        '(("t" "Todo list item"
-           entry (file+headline "~/notes/tasks.org" "Tasks")
-           "* TODO %?\n %i\n")
-          ;; "* TODO %?\n %i\n %a")
-
-          ("j" "Journal entry"
-           entry (file+olp+datetree "~/notes/journal.org" "Journals")
-           "* %U %^{Title}\n %?")
-
-          ("b" "Tidbit: quote, zinger, one-liner or textlet"
-           entry (file+headline "~/notes/tidbits.org" "Tidbits")
-           "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
-
-          ("n" "Notes"
-           entry (file "~/notes/notes.org" )
-           "* %?")
-          ))
   :config
   (setq org-startup-indented t)		; Indent the tree structure
   ;; It is slow to require org-ref
@@ -655,6 +830,7 @@ narrowed."
 ;; Shell
 (use-package shell-pop
   :ensure t
+  :defer t
   :general
   (:states '(normal motion)
            :prefix "SPC o"
@@ -832,8 +1008,8 @@ narrowed."
   )
 
 (use-package xref
-  :ensure helm-xref
   :ensure t
+  :defer t
   :general
   (:states '(normal motion)
            :prefix "SPC"
@@ -842,7 +1018,6 @@ narrowed."
            "C-." 'xref-find-apropos
            "," 'xref-pop-marker-stack)
   :config
-  (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
   (setq xref-prompt-for-identifier '(not xref-find-definitions
                                          xref-find-definitions-other-window
                                          xref-find-definitions-other-frame
@@ -851,38 +1026,6 @@ narrowed."
 
 (setq-default c-basic-offset 4)
 (setq-default tab-width 4)
-
-;; Python
-(use-package company-jedi
-  :ensure t
-  :defer t
-  :general
-  (:states 'normal
-           :keymaps 'python-mode-map
-           :prefix "SPC"
-           "." 'jedi:goto-definition
-           "," 'jedi:goto-definition-pop-marker
-           "j d" 'jedi:show-doc
-           "j r" 'helm-jedi-related-names
-           "c p" 'run-python
-           "c c" 'python-shell-send-buffer
-           "c r" 'python-shell-send-region
-           "c l" 'python-shell-send-file
-           "c s" 'python-shell-send-string
-           "c f" 'python-shell-send-defun
-           "c e" 'python-eldoc-at-point
-           "c d" 'python-describe-at-point
-           "c v" 'python-check
-           "c z" 'python-shell-switch-to-shell
-           "c <" 'python-indent-shift-left
-           "c >" 'python-indent-shift-right
-           )
-  :init
-  (add-hook 'python-mode-hook (lambda ()
-                                (require 'company-jedi)
-                                (add-to-list 'company-backends 'company-jedi)
-                                ))
-  )
 
 ;; lsp mode
 (use-package lsp-mode
@@ -943,7 +1086,6 @@ narrowed."
   (setq lsp-pyls-plugins-rope-completion-enabled nil)
 
   (setq lsp-prefer-flymake nil)
-
   )
 
 (use-package lsp-ui
@@ -963,6 +1105,47 @@ narrowed."
   :commands company-lsp
   )
 
+;; Python
+(defun my/autopep8-buffer ()
+  "Open an external Terminal window under current directory."
+  (interactive)
+  (shell-command (concat "autopep8 --in-place " (buffer-name)))
+  (revert-buffer t t)
+  )
+
+(use-package lsp-python-ms
+  :ensure t
+  :defer t
+  :hook (python-mode . (lambda ()
+                         (lsp)
+                         (setq-local flycheck-checker 'python-flake8)))
+  :custom
+  (lsp-python-ms-executable "/usr/local/bin/Microsoft.Python.LanguageServer")
+  )
+
+(use-package python
+  :defer t
+  :general
+  (:states 'normal
+           :keymaps 'python-mode-map
+           :prefix "SPC"
+           "`" 'my/autopep8-buffer
+           "c p" 'run-python
+           "c c" 'python-shell-send-buffer
+           "c r" 'python-shell-send-region
+           "c l" 'python-shell-send-file
+           "c s" 'python-shell-send-string
+           "c f" 'python-shell-send-defun
+           "c e" 'python-eldoc-at-point
+           "c d" 'python-describe-at-point
+           "c v" 'python-check
+           "c z" 'python-shell-switch-to-shell
+           "c <" 'python-indent-shift-left
+           "c >" 'python-indent-shift-right
+           )
+  :config
+  (require 'lsp-python-ms)
+  )
 
 ;; Lsp c++
 (use-package ccls
@@ -971,15 +1154,14 @@ narrowed."
   :hook ((c-mode c++-mode objc-mode) .
          (lambda ()
            (require 'ccls)
-           (require 'lsp)
            (lsp)
            ))
   :custom
-  (ccls-executable "~/.emacs.d/ccls")
+  (ccls-sem-highlight-method 'font-lock)
   )
 
 (use-package cmake-mode
-  :load-path "/usr/local/Cellar/cmake/3.14.3/share/emacs/site-lisp/cmake"
+  :load-path "/usr/local/Cellar/cmake/3.14.5/share/emacs/site-lisp/cmake"
   :mode (("CMakeLists\\.txt\\'" . cmake-mode)
          ("\\.cmake\\'" . cmake-mode))
   :custom
@@ -992,7 +1174,6 @@ narrowed."
   :defer t
   :hook (java-mode . (lambda ()
                        (require 'lsp-java)
-                       (require 'lsp)
                        (lsp)
                        ))
   :config
@@ -1059,17 +1240,22 @@ narrowed."
 ;; (use-package dap-mode
 ;;   :ensure t
 ;;   :defer t
+;;   :custom
+;;   (dap-lldb-debug-program "/usr/local/Cellar/llvm/8.0.0_1/bin/lldb-vscode")
 ;;   :hook ((java-mode . (lambda ()
-;;                      (dap-mode t)
-;;                      (dap-ui-mode t)
-;;                      (require 'dap-java)
-;;                      ))
-;;       ;; (python-mode . (lambda ()
-;;       ;;                   (dap-mode t)
-;;       ;;                   (dap-ui-mode t)
-;;       ;;                   (require 'dap-python)
-;;       ;;                   ))
-;;       )
+;;                         (dap-mode t)
+;;                         (dap-ui-mode t)
+;;                         ))
+;;          ((c-mode c++-mode objc-mode) . (lambda ()
+;;                                           (dap-mode t)
+;;                                           (dap-ui-mode t)
+;;                                           ))
+;;          ;; (python-mode . (lambda ()
+;;          ;;                   (dap-mode t)
+;;          ;;                   (dap-ui-mode t)
+;;          ;;                   (require 'dap-python)
+;;          ;;                   ))
+;;          )
 ;;   :init
 ;;   (defun my/window-visible (b-name)
 ;;     "Return whether B-NAME is visible."
@@ -1111,6 +1297,9 @@ narrowed."
 ;;   :config
 ;;   (global-set-key (kbd "C-c 3") 'dap-debug)
 ;;   (global-set-key (kbd "C-c 4") 'dap-hydra)
+;;   (require 'dap-lldb)
+;;   ;; (require 'dap-gdb-lldb)
+;;   (require 'dap-java)
 ;;   )
 
 ;; Chinese input method
@@ -1130,5 +1319,6 @@ narrowed."
 ;;   (setq pyim-page-length 5)
 ;;   )
 (setq gc-cons-threshold (* 800 1000))
+
 (provide 'init)
 ;;; init.el ends here
