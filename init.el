@@ -8,8 +8,10 @@
 (setq gc-cons-threshold (* 50 1000 1000))
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
+                         ("melpa" . "http://elpa.emacs-china.org/melpa/")
+                         ("melpa-stable" . "http://elpa.emacs-china.org/melpa-stable/")
+                         ))
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -62,7 +64,8 @@
  '(neo-window-width 32 t)
  '(package-selected-packages
    (quote
-    (lsp-python-ms delight solarized-theme ompany-box general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode lsp-ui lsp-mode lsp-java ob-ipython hydra markdown-mode projectile helm-projectile helm-lsp web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets ace-window which-key flycheck doom-themes ccls neotree zenburn-theme htmlize helm-ag dashboard matlab-mode auctex-latexmk cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+    (ag company-box lsp-ui lsp-python-ms delight solarized-theme ompany-box general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode lsp-mode lsp-java ob-ipython hydra markdown-mode projectile web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls neotree zenburn-theme htmlize dashboard matlab-mode cdlatex company-lsp helm-swoop undo-tree yasnippet)))
+ '(projectile-completion-system (quote helm))
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
@@ -135,7 +138,7 @@
 
 (use-package evil
   :ensure t
-  :ensure evil-surround
+  :defer 1
   :custom
   (evil-disable-insert-state-bindings t)
   (evil-insert-state-cursor nil)
@@ -151,6 +154,9 @@
   (evil-set-initial-state 'fundamental-mode 'motion)
   (evil-set-initial-state 'TeX-output-mode 'motion)
   (evil-mode 1)
+  (use-package evil-surround
+    :ensure t
+    )
   (define-key evil-motion-state-map " " nil)
   (define-key evil-normal-state-map " " nil)
   (define-key evil-visual-state-map " " nil)
@@ -161,6 +167,7 @@
     (kbd "SPC TAB") 'evil-motion-state)
   (global-evil-surround-mode 1)
   )
+
 
 (defun my/open-external-terminal ()
   "Open an external Terminal window under current directory."
@@ -176,6 +183,10 @@
    "TAB" 'indent-for-tab-command
    )
   (general-define-key
+   :states 'motion
+   "TAB" 'forward-button
+   )
+  (general-define-key
    :states '(normal motion)
    "=" 'end-of-defun
    "-" 'beginning-of-defun
@@ -189,27 +200,39 @@
    "x ;" 'comment-line
    "x e" 'eval-last-sexp
    "o t" 'my/open-external-terminal
+   "d f" 'describe-function
+   "d v" 'describe-variable
+   "d k" 'describe-key
+   "d m" 'describe-mode
+   "d p" 'describe-package
+   "d l" 'view-lossage
+   "d r" 'info-emacs-manual
+   "d i" 'info
    )
   (general-define-key
    :states '(normal motion)
    :prefix "SPC SPC"
    "w c" 'whitespace-cleanup
    "w m" 'whitespace-mode
-   "h f" 'describe-function
-   "h v" 'describe-variable
-   "h k" 'describe-key
-   "h m" 'describe-mode
-   "h p" 'describe-package
-   "h l" 'view-lossage
    )
   )
 
+(defun find-init-file ()
+  "Find init.el file."
+  (interactive)
+  (find-file "~/.emacs.d/init.el")
+  )
+(general-define-key
+ :states '(normal motion)
+ :prefix "SPC f"
+ "i" 'find-init-file)
+
 (use-package helm
   :ensure t
-  :ensure helm-ag
   :ensure helm-swoop
   :delight
-  :init
+  :defer 0.5
+  :config
   (helm-mode t)
   :general
   ("M-x" 'helm-M-x
@@ -238,6 +261,7 @@
            "c" 'helm-colors
            "8" 'helm-ucs
            "f" 'helm-find-files
+           "l" 'helm-locate-library
            )
   (:states 'visual
            :prefix "SPC r"
@@ -253,7 +277,7 @@
            "h" 'helm-register
 
            "i" 'insert-register
-           
+
            "m" 'bookmark-set
            "M" 'bookmark-set-no-overwrite
            "b" 'bookmark-jump
@@ -267,38 +291,38 @@
   :custom
   (helm-autoresize-mode t)
   (helm-mode-fuzzy-match t)
-  :config
-  (setq helm-autoresize-mode t)
+  (helm-autoresize-mode t)
+  )
+
+(use-package helm-swoop
+  :ensure t
+  :after helm
+  :commands (helm-swoop helm-swoop-back-to-last-point)
   )
 
 (use-package projectile
   :ensure t
+  :defer 1.5
   :delight '(:eval (concat " " (projectile-project-name)))
-  :init
+  :config
   (projectile-mode t)
   :custom
   (projectile-enable-caching t)
-  )
-
-(use-package helm-projectile
-  :ensure t
-  :init
-  (helm-projectile-on)
+  (projectile-completion-system 'helm)
   :general
   (:states '(normal motion)
            :prefix "SPC p"
-           "f" 'helm-projectile-find-file
-           "a" 'helm-projectile-find-other-file
-           "F" 'helm-projectile-find-file-in-known-projects
-           "g" 'helm-projectile-find-file-dwim
-           "d" 'helm-projectile-find-dir
+           "f" 'projectile-find-file
+           "a" 'projectile-find-other-file
+           "F" 'projectile-find-file-in-known-projects
+           "g" 'projectile-find-file-dwim
+           "d" 'projectile-find-dir
            "D" 'projectile-dired
-           "e" 'helm-projectile-recentf
-           "p" 'helm-projectile-switch-project
-           "b" 'helm-projectile-switch-to-buffer
-           "h" 'helm-projectile
-           "s s" 'helm-projectile-ag
-           "s g" 'helm-projectile-grep
+           "e" 'projectile-recentf
+           "p" 'projectile-switch-project
+           "b" 'projectile-switch-to-buffer
+           "s s" 'projectile-ag
+           "s g" 'projectile-grep
            "c" 'projectile-compile-project
            "i" 'projectile-invalidate-cache
            )
@@ -362,8 +386,6 @@
 
 (use-package dashboard
   :ensure t
-  ;; :init
-  ;; (require 'all-the-icons)
   :config
   (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title nil)
@@ -374,31 +396,20 @@
   (setq dashboard-set-heading-icons t)
   (setq dashboard-center-content t)
   (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-						     :height 1.1
-						     :v-adjust -0.05
-						     :face 'font-lock-keyword-face))
+                             :height 1.1
+                             :v-adjust -0.05
+                             :face 'font-lock-keyword-face))
   )
 
 (setq-default bidi-display-reordering nil) ; improve long-line performance
 
-;; Show key bindings on the right
+;; Show key bindings below
 (use-package which-key
   :ensure t
   :delight
   :config
   (which-key-mode)
   (which-key-setup-side-window-bottom)
-  )
-
-;; Quickly switch between windows
-(use-package ace-window
-  :ensure t
-  :general
-  (:states '(normal motion insert emacs)
-           "M-o" 'ace-window
-           )
-  :config
-  (setq aw-keys '(97 115 100 102 103 104 106 107 108))
   )
 
 (use-package yasnippet
@@ -1009,7 +1020,6 @@ narrowed."
 
 (use-package xref
   :ensure t
-  :defer t
   :general
   (:states '(normal motion)
            :prefix "SPC"
@@ -1030,66 +1040,34 @@ narrowed."
 ;; lsp mode
 (use-package lsp-mode
   :ensure t
-  :ensure helm-lsp
   :commands lsp
   :general
   (:states 'normal
            :keymaps 'lsp-mode-map
-           :prefix "SPC"
-           "l" 'hydra-lsp/body)
-  :hydra (hydra-lsp (:exit t :hint nil)
-                    "
-          Buffer^^               Peek^^                 Symbol^^              Server^^                  Search
-         ----------------------------------------------------------------------------------------------------------
-          [_f_] format           [_d_] declaration      [_o_] documentation   [_M-r_] restart           [_1_] helm-lsp wkspc symbol
-
-          [_m_] imenu            [_D_] definition       [_r_] rename          [_S_]   shutdown          [_2_] all active wkspc symbol
-
-          [_x_] execute action   [_R_] references       [_t_] type defn       [_M-s_] describe session  [_a_] xref-find-apropos
-
-         ^^                      [_i_] implementation
-
-"
-                    ("d" lsp-find-declaration)
-                    ("D" lsp-ui-peek-find-definitions)
-                    ("R" lsp-ui-peek-find-references)
-                    ("i" lsp-ui-peek-find-implementation)
-                    ("t" lsp-find-type-definition)
-                    ;; ("s" lsp-signature-help)
-                    ("o" lsp-describe-thing-at-point)
-                    ("r" lsp-rename)
-
-                    ("f" lsp-format-buffer)
-                    ("m" lsp-ui-imenu)
-                    ("x" lsp-execute-code-action)
-
-                    ("M-s" lsp-describe-session)
-                    ("M-r" lsp-restart-workspace)
-                    ("S" lsp-shutdown-workspace)
-
-                    ("1" helm-lsp-workspace-symbol)
-                    ("2" helm-lsp-global-workspace-symbol)
-                    ("a" xref-find-apropos)
-                    )
+           :prefix "SPC l"
+                    "d" 'lsp-find-declaration
+                    "D" 'lsp-ui-peek-find-definitions
+                    "R" 'lsp-ui-peek-find-references
+                    "i" 'lsp-ui-peek-find-implementation
+                    "t" 'lsp-find-type-definition
+                    "o" 'lsp-describe-thing-at-point
+                    "r" 'lsp-rename
+                    "f" 'lsp-format-buffer
+                    "m" 'lsp-ui-imenu
+                    "x" 'lsp-execute-code-action
+                    "M-s" 'lsp-describe-session
+                    "M-r" 'lsp-restart-workspace
+                    "S" 'lsp-shutdown-workspace
+                    "a" 'xref-find-apropos
+           )
   :config
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-completion-at-point nil)
-  (setq lsp-enable-folding nil)
-  (setq lsp-enable-symbol-highlighting nil)
-  (setq lsp-eldoc-enable-signature-help nil)
-
-  (setq lsp-pyls-plugins-pylint-enabled nil)
-  (setq lsp-pyls-plugins-mccabe-enabled nil)
-  (setq lsp-pyls-plugins-pycodestyle-enabled nil)
-  (setq lsp-pyls-plugins-jedi-completion-enabled nil)
-  (setq lsp-pyls-plugins-jedi-signature-help-enabled nil)
-  (setq lsp-pyls-plugins-rope-completion-enabled nil)
-
   (setq lsp-prefer-flymake nil)
   )
 
 (use-package lsp-ui
-  :ensure t
+  :load-path "~/.emacs.d/packages/lsp-ui-20190523.1521"
   :commands lsp-ui-mode
   :general
   (:keymaps 'lsp-ui-imenu-mode-map
@@ -1106,21 +1084,31 @@ narrowed."
   )
 
 ;; Python
-(defun my/autopep8-buffer ()
-  "Open an external Terminal window under current directory."
-  (interactive)
-  (shell-command (concat "autopep8 --in-place " (buffer-name)))
-  (revert-buffer t t)
-  )
-
 (use-package lsp-python-ms
   :ensure t
   :defer t
   :hook (python-mode . (lambda ()
                          (lsp)
-                         (setq-local flycheck-checker 'python-flake8)))
+                         (setq-local flycheck-checker 'python-flake8)
+                         ))
   :custom
   (lsp-python-ms-executable "/usr/local/bin/Microsoft.Python.LanguageServer")
+  :config
+  (defun my/format-buffer ()
+  "Format buffer using yapf."
+  (interactive)
+  (let ((old-point (point)))
+    (erase-buffer)
+    (insert (shell-command-to-string (concat "yapf " (buffer-name))))
+    (goto-char old-point)
+    )
+  )
+  (general-define-key
+   :states '(normal motion)
+   :keymaps 'python-mode-map
+   :prefix "SPC l"
+   "F" 'my/format-buffer
+   )
   )
 
 (use-package python
@@ -1129,7 +1117,6 @@ narrowed."
   (:states 'normal
            :keymaps 'python-mode-map
            :prefix "SPC"
-           "`" 'my/autopep8-buffer
            "c p" 'run-python
            "c c" 'python-shell-send-buffer
            "c r" 'python-shell-send-region
@@ -1153,9 +1140,29 @@ narrowed."
   :defer t
   :hook ((c-mode c++-mode objc-mode) .
          (lambda ()
-           (require 'ccls)
+           (unless (featurep 'ccls)
+             (require 'ccls)
+             )
            (lsp)
            ))
+  :config
+  (defun my/cmake-project-setup-for-ccls ()
+    "ccls typically indexes an entire project. In order for this
+to work properly, ccls needs to be able to obtain the source file
+list and their compilation command lines."
+    (interactive)
+    (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
+      (shell-command
+       (concat "cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+               "\nln -s Debug/compile_commands.json"))
+      )
+    )
+  (general-define-key
+   :states '(normal motion)
+   :keymaps 'lsp-mode-map
+   :prefix "SPC l"
+   "s" 'my/cmake-project-setup-for-ccls
+   )
   :custom
   (ccls-sem-highlight-method 'font-lock)
   )
@@ -1318,7 +1325,7 @@ narrowed."
 ;;   (setq pyim-posframe-border-width 5)
 ;;   (setq pyim-page-length 5)
 ;;   )
-(setq gc-cons-threshold (* 800 1000))
+;; (setq gc-cons-threshold (* 800 1000))
 
 (provide 'init)
 ;;; init.el ends here

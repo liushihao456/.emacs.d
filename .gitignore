@@ -26,3 +26,4 @@ pyim/
 games/
 anaconda-mode/
 python-language-server/
+/ccls/
