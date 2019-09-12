@@ -16,8 +16,8 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 (eval-when-compile
-  (add-to-list 'load-path "~/.emacs.d/packages/use-package")
-  (add-to-list 'load-path "~/.emacs.d/packages/bind-key")
+  (add-to-list 'load-path "~/.config/emacs/packages/use-package")
+  (add-to-list 'load-path "~/.config/emacs/packages/bind-key")
   (require 'use-package))
 (setq use-package-compute-statistics t)
 
@@ -28,7 +28,7 @@
 ;;   (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
 (use-package use-package-hydra
-  :load-path "~/.emacs.d/packages/use-package-hydra"
+  :load-path "~/.config/emacs/packages/use-package-hydra"
   :ensure hydra)
 
 ;; BASIC CUSTOMIZATION
@@ -47,30 +47,28 @@
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(custom-safe-themes
-   (quote
-    ("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default)))
+   '("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
- '(evil-disable-insert-state-bindings t)
+ '(evil-disable-insert-state-bindings t t)
  '(evil-insert-state-cursor nil t)
  '(evil-operator-state-cursor nil t)
  '(evil-replace-state-cursor nil t)
  '(global-hl-line-mode t)
- '(helm-autoresize-mode t)
- '(helm-mode-fuzzy-match t)
+ '(helm-autoresize-mode t t)
+ '(helm-mode-fuzzy-match t t)
  '(indent-tabs-mode nil)
  '(neo-smart-open t t)
- '(neo-vc-integration (quote (face)) t)
+ '(neo-vc-integration '(face) t)
  '(neo-window-width 32 t)
  '(package-selected-packages
-   (quote
-    (ag company-box lsp-ui lsp-python-ms delight solarized-theme ompany-box general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode lsp-mode lsp-java ob-ipython hydra markdown-mode projectile web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls neotree zenburn-theme htmlize dashboard matlab-mode cdlatex company-lsp helm-swoop undo-tree yasnippet)))
- '(projectile-completion-system (quote helm))
+   '(lsp-mode company-box lsp-java company-lsp lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls neotree zenburn-theme htmlize dashboard matlab-mode cdlatex helm-swoop undo-tree yasnippet))
+ '(projectile-completion-system 'helm)
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(shell-pop-full-span t t)
- '(shell-pop-shell-type (quote ("eshell" "*eshell*" (lambda nil (eshell)))) t)
+ '(shell-pop-shell-type '("eshell" "*eshell*" (lambda nil (eshell))) t)
  '(show-paren-mode t)
  '(split-width-threshold 150)
  '(tool-bar-mode nil)
@@ -98,7 +96,7 @@
  )
 ;; change all prompts to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
 
@@ -220,12 +218,44 @@
 (defun find-init-file ()
   "Find init.el file."
   (interactive)
-  (find-file "~/.emacs.d/init.el")
+  (find-file "~/.config/emacs/init.el")
   )
 (general-define-key
  :states '(normal motion)
  :prefix "SPC f"
  "i" 'find-init-file)
+
+(defun toggle-window-split ()
+  "Toggle window split.  Works only when there are exactly two windows open.
+If the windows are vertically split, turn them into positinos horizontally
+split; vice versa."
+  (interactive)
+  (unless (= (count-windows) 2) (error "Can only toggle a frame split in two"))
+  (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-is-2nd (not (and (<= (car this-win-edges)
+                                        (car next-win-edges))
+                                    (<= (cadr this-win-edges)
+                                        (cadr next-win-edges)))))
+         (splitter (if (= (car this-win-edges)
+                          (car next-win-edges))
+                       'split-window-horizontally
+                     'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-is-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-is-2nd (other-window 1)))))
+(general-define-key
+ :states '(normal motion)
+ :prefix "SPC w"
+ "|" 'toggle-window-split)
+
 
 (use-package helm
   :ensure t
@@ -302,6 +332,7 @@
 
 (use-package projectile
   :ensure t
+  :ensure ripgrep
   :defer 1.5
   :delight '(:eval (concat " " (projectile-project-name)))
   :config
@@ -322,9 +353,12 @@
            "p" 'projectile-switch-project
            "b" 'projectile-switch-to-buffer
            "s s" 'projectile-ag
+           "s r" 'projectile-ripgrep
            "s g" 'projectile-grep
            "c" 'projectile-compile-project
            "i" 'projectile-invalidate-cache
+           "r" 'projectile-replace
+           "R" 'projectile-replace-regexp
            )
   )
 
@@ -368,7 +402,7 @@
   :ensure t
   :general
   (:states '(normal motion)
-           :prefix "SPC f c"
+           :prefix "SPC f"
            "p" 'flycheck-previous-error
            "n" 'flycheck-next-error
            "l" 'flycheck-list-errors
@@ -395,10 +429,7 @@
                           ))
   (setq dashboard-set-heading-icons t)
   (setq dashboard-center-content t)
-  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-                             :height 1.1
-                             :v-adjust -0.05
-                             :face 'font-lock-keyword-face))
+  (setq dashboard-set-footer nil)
   )
 
 (setq-default bidi-display-reordering nil) ; improve long-line performance
@@ -417,7 +448,7 @@
   :delight yas-minor-mode
   :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
   :config
-  (setq yas/root-directory "~/.emacs.d/snippets/")
+  (setq yas/root-directory "~/.config/emacs/snippets/")
   (yas-load-directory yas/root-directory)
   )
 
@@ -868,7 +899,7 @@ narrowed."
 
 ;; mu4e
 (use-package mu4e
-  :load-path "/usr/local/Cellar/mu/1.2.0/share/emacs/site-lisp/mu/mu4e"
+  :load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e"
   :general
   (:states '(normal motion)
            :prefix "SPC m"
@@ -1040,6 +1071,7 @@ narrowed."
 ;; lsp mode
 (use-package lsp-mode
   :ensure t
+  :pin melpa-stable
   :commands lsp
   :general
   (:states 'normal
@@ -1056,7 +1088,7 @@ narrowed."
                     "m" 'lsp-ui-imenu
                     "x" 'lsp-execute-code-action
                     "M-s" 'lsp-describe-session
-                    "M-r" 'lsp-restart-workspace
+                    "M-r" 'lsp-workspace-restart
                     "S" 'lsp-shutdown-workspace
                     "a" 'xref-find-apropos
            )
@@ -1067,7 +1099,8 @@ narrowed."
   )
 
 (use-package lsp-ui
-  :load-path "~/.emacs.d/packages/lsp-ui-20190523.1521"
+  :pin melpa-stable
+  :ensure t
   :commands lsp-ui-mode
   :general
   (:keymaps 'lsp-ui-imenu-mode-map
@@ -1081,6 +1114,8 @@ narrowed."
 (use-package company-lsp
   :ensure t
   :commands company-lsp
+  :custom
+  (company-lsp-cache-candidates t)
   )
 
 ;; Python
@@ -1089,20 +1124,21 @@ narrowed."
   :defer t
   :hook (python-mode . (lambda ()
                          (lsp)
-                         (setq-local flycheck-checker 'python-flake8)
+                         ;; (setq-local flycheck-checker 'python-flake8)
                          ))
-  :custom
-  (lsp-python-ms-executable "/usr/local/bin/Microsoft.Python.LanguageServer")
+  ;; :custom
+  ;; (lsp-python-ms-executable "~/.config/emacs/python-language-server/output/bin/Release/Microsoft.Python.LanguageServer")
+  ;; (lsp-python-ms-executable "/usr/local/bin/Microsoft.Python.LanguageServer")
   :config
   (defun my/format-buffer ()
-  "Format buffer using yapf."
-  (interactive)
-  (let ((old-point (point)))
-    (erase-buffer)
-    (insert (shell-command-to-string (concat "yapf " (buffer-name))))
-    (goto-char old-point)
+    "Format buffer using yapf."
+    (interactive)
+    (let ((old-point (point)))
+      (erase-buffer)
+      (insert (shell-command-to-string (concat "yapf " (buffer-name))))
+      (goto-char old-point)
+      )
     )
-  )
   (general-define-key
    :states '(normal motion)
    :keymaps 'python-mode-map
@@ -1187,9 +1223,8 @@ list and their compilation command lines."
   (setq lsp-java-save-action-organize-imports nil)
   (setq lsp-java-format-on-type-enabled nil)
   (setq lsp-java-autobuild-enabled nil)
+  (setq lsp-java-code-generation-generate-comments t)
   (setq lsp-java-signature-help-enabled nil)
-  (setq lsp-java-progress-reports-enabled nil)
-  (setq lsp-java-folding-range-enabled nil)
   )
 
 ;; gud
@@ -1240,7 +1275,7 @@ list and their compilation command lines."
   )
 
 (use-package gud-lldb
-  :load-path "~/.emacs.d/packages/gud-lldb"
+  :load-path "~/.config/emacs/packages/gud-lldb"
   :commands (lldb)
   )
 
