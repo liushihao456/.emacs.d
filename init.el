@@ -50,20 +50,17 @@
    '("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
- '(evil-disable-insert-state-bindings t t)
+ '(evil-disable-insert-state-bindings t)
  '(evil-insert-state-cursor nil t)
  '(evil-operator-state-cursor nil t)
  '(evil-replace-state-cursor nil t)
  '(global-hl-line-mode t)
- '(helm-autoresize-mode t t)
- '(helm-mode-fuzzy-match t t)
  '(indent-tabs-mode nil)
- '(neo-smart-open t t)
- '(neo-vc-integration '(face) t)
- '(neo-window-width 32 t)
+ '(neo-smart-open t)
+ '(neo-vc-integration '(face))
+ '(neo-window-width 32)
  '(package-selected-packages
-   '(lsp-mode company-box lsp-java company-lsp lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode org-ref ess helm-bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls neotree zenburn-theme htmlize dashboard matlab-mode cdlatex helm-swoop undo-tree yasnippet))
- '(projectile-completion-system 'helm)
+   '(ripgrep company-tabnine lsp-mode company-box lsp-java company-lsp lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls neotree zenburn-theme htmlize dashboard matlab-mode cdlatex swoop undo-tree yasnippet))
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
@@ -193,10 +190,11 @@
   (general-define-key
    :states '(normal motion)
    :prefix "SPC"
-   "x c" 'save-buffers-kill-terminal
-   "x s" 'save-buffer
-   "x ;" 'comment-line
-   "x e" 'eval-last-sexp
+   "q" 'save-buffers-kill-terminal
+   ";" 'comment-line
+   "s" 'save-buffer
+   "e" 'eval-last-sexp
+   "SPC" 'execute-extended-command
    "o t" 'my/open-external-terminal
    "d f" 'describe-function
    "d v" 'describe-variable
@@ -209,9 +207,33 @@
    )
   (general-define-key
    :states '(normal motion)
-   :prefix "SPC SPC"
-   "w c" 'whitespace-cleanup
-   "w m" 'whitespace-mode
+   :prefix "SPC"
+   "k" 'kill-buffer
+   "D" 'dired
+   "b" 'switch-to-buffer
+   "B" 'ibuffer
+   "P" 'list-processes
+   )
+  (general-define-key
+   :states 'visual
+   :prefix "SPC r"
+   "s" 'copy-to-register
+   "r" 'copy-rectangle-to-register
+   )
+  (general-define-key
+   :states '(normal motion)
+   :prefix "SPC r"
+   "w" 'window-configuration-to-register
+   "f" 'frameset-to-register
+   "SPC" 'point-to-register
+   "j" 'jump-to-register
+
+   "i" 'insert-register
+
+   "m" 'bookmark-set
+   "M" 'bookmark-set-no-overwrite
+   "b" 'bookmark-jump
+   "l" 'list-bookmarks
    )
   )
 
@@ -257,77 +279,13 @@ split; vice versa."
  "|" 'toggle-window-split)
 
 
-(use-package helm
+(use-package ivy
   :ensure t
-  :ensure helm-swoop
-  :delight
-  :defer 0.5
+  :defer 1
   :config
-  (helm-mode t)
-  :general
-  ("M-x" 'helm-M-x
-   "M-y" 'helm-show-kill-ring)
-  (:states '(normal motion)
-           :prefix "SPC"
-           "b" 'helm-mini
-           "k" 'kill-buffer
-           "D" 'dired
-           "B" 'ibuffer
-           "P" 'list-processes
-           )
-  (:states '(normal motion)
-           :prefix "SPC h"
-           "w" 'helm-swoop
-           "r" 'helm-swoop-back-to-last-point
-           "/" 'helm-find
-           "i" 'helm-semantic-or-imenu
-           "I" 'helm-imenu-in-all-buffers
-           "b" 'helm-resume
-           "a" 'helm-apropos
-           "m" 'helm-man-woman
-           "s" 'helm-do-grep-ag
-           "p" 'helm-list-emacs-process
-           "t" 'helm-bibtex
-           "c" 'helm-colors
-           "8" 'helm-ucs
-           "f" 'helm-find-files
-           "l" 'helm-locate-library
-           )
-  (:states 'visual
-           :prefix "SPC r"
-           "s" 'copy-to-register
-           "r" 'copy-rectangle-to-register
-           )
-  (:states '(normal motion)
-           :prefix "SPC r"
-           "w" 'window-configuration-to-register
-           "f" 'frameset-to-register
-           "SPC" 'point-to-register
-           "j" 'jump-to-register
-           "h" 'helm-register
-
-           "i" 'insert-register
-
-           "m" 'bookmark-set
-           "M" 'bookmark-set-no-overwrite
-           "b" 'bookmark-jump
-           "l" 'list-bookmarks
-           "B" 'helm-filtered-bookmarks
-           )
-  (:states '(emacs insert)
-           "C-s" 'helm-swoop
-           "C-r" 'helm-swoop-back-to-last-point
-           )
-  :custom
-  (helm-autoresize-mode t)
-  (helm-mode-fuzzy-match t)
-  (helm-autoresize-mode t)
-  )
-
-(use-package helm-swoop
-  :ensure t
-  :after helm
-  :commands (helm-swoop helm-swoop-back-to-last-point)
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
   )
 
 (use-package projectile
@@ -339,7 +297,7 @@ split; vice versa."
   (projectile-mode t)
   :custom
   (projectile-enable-caching t)
-  (projectile-completion-system 'helm)
+  (projectile-completion-system 'ivy)
   :general
   (:states '(normal motion)
            :prefix "SPC p"
@@ -663,25 +621,25 @@ narrowed."
   (TeX-command-extra-options "-shell-escape")
   (TeX-show-compilation t)
   (reftex-plug-into-AUCTeX t)
-  (bibtex-completion-cite-prompt-for-optional-arguments nil)
-  (bibtex-completion-bibliography ; set up helm-bibtex
-        '("~/projects/RA/mybib.bib"
-          "~/projects/RA/newadded.bib"))
-  :config
-  (require 'helm-bibtex)
+  ;; (bibtex-completion-cite-prompt-for-optional-arguments nil)
+  ;; (bibtex-completion-bibliography ; set up helm-bibtex
+  ;;       '("~/projects/RA/mybib.bib"
+  ;;         "~/projects/RA/newadded.bib"))
+  ;; :config
+  ;; (require 'helm-bibtex)
   )
 
 (use-package reftex
   :hook (LaTeX-mode . reftex-mode)
   )
 
-(use-package helm-bibtex
-  :ensure t
-  :defer t
-  :config
-  (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
-  (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
-  )
+;; (use-package helm-bibtex
+;;   :ensure t
+;;   :defer t
+;;   :config
+;;   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
+;;   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
+;;   )
 
 (use-package cdlatex
   :ensure t
@@ -711,7 +669,6 @@ narrowed."
 ;; Org mode
 (use-package org
   :ensure t
-  ;; :ensure org-ref
   :ensure ob-ipython
   :mode ("\\.org\\'" . org-mode)
   :general
@@ -749,10 +706,6 @@ narrowed."
                              ))
   :config
   (setq org-startup-indented t)		; Indent the tree structure
-  ;; It is slow to require org-ref
-  ;; (require 'org-ref)
-  ;; (setq reftex-default-bibliography '("~/RA/mybib.bib"))
-  ;; (setq org-ref-default-bibliography '("~/RA/mybib.bib"))
 
   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 
@@ -1211,6 +1164,27 @@ list and their compilation command lines."
   (cmake-tab-width 4)
   )
 
+(defun company//sort-by-tabnine (candidates)
+  (if (or (functionp company-backend)
+          (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+      candidates
+    (let ((candidates-table (make-hash-table :test #'equal))
+          candidates-1
+          candidates-2)
+      (dolist (candidate candidates)
+        (if (eq (get-text-property 0 'company-backend candidate)
+                'company-tabnine)
+            (unless (gethash candidate candidates-table)
+              (push candidate candidates-2))
+          (push candidate candidates-1)
+          (puthash candidate t candidates-table)))
+      (setq candidates-1 (nreverse candidates-1))
+      (setq candidates-2 (nreverse candidates-2))
+      (nconc (seq-take candidates-1 2)
+             (seq-take candidates-2 2)
+             (seq-drop candidates-1 2)
+             (seq-drop candidates-2 2)))))
+
 ;; Lsp java
 (use-package lsp-java
   :ensure t
@@ -1218,6 +1192,9 @@ list and their compilation command lines."
   :hook (java-mode . (lambda ()
                        (require 'lsp-java)
                        (lsp)
+                       (delete 'company-lsp company-backends)
+                       (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+                       (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))
                        ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
@@ -1225,6 +1202,12 @@ list and their compilation command lines."
   (setq lsp-java-autobuild-enabled nil)
   (setq lsp-java-code-generation-generate-comments t)
   (setq lsp-java-signature-help-enabled nil)
+  )
+
+(use-package company-tabnine
+  :ensure t
+  :config
+  (add-to-list 'company-backends #'company-tabnine)
   )
 
 ;; gud
