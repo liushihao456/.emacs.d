@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: functiondoc
+# key: doc
+# --
+/**
+ * $0
+ */

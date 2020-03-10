@@ -5,7 +5,8 @@
 ;; --------------------------------------
 
 ;;; Code:
-(setq gc-cons-threshold (* 50 1000 1000))
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024))
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
@@ -56,11 +57,12 @@
  '(evil-replace-state-cursor nil t)
  '(global-hl-line-mode t)
  '(indent-tabs-mode nil)
- '(neo-smart-open t)
- '(neo-vc-integration '(face))
- '(neo-window-width 32)
+ '(neo-smart-open t t)
+ '(neo-vc-integration '(face) t)
+ '(neo-window-width 32 t)
  '(package-selected-packages
-   '(ripgrep company-tabnine lsp-mode company-box lsp-java company-lsp lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot posframe pyim-wbdict pyim shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls neotree zenburn-theme htmlize dashboard matlab-mode cdlatex swoop undo-tree yasnippet))
+   '(company-lsp parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard matlab-mode cdlatex undo-tree yasnippet))
+ '(projectile-completion-system 'ivy)
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
@@ -96,6 +98,8 @@
 (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
+(setq comment-style 'indent)
+
 
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
@@ -143,11 +147,12 @@
   (evil-set-initial-state 'dashboard-mode 'motion)
   (evil-set-initial-state 'use-package-statistics-mode 'motion)
   (evil-set-initial-state 'rst-mode 'motion)
-  (evil-set-initial-state 'neotree-mode 'emacs)
   (evil-set-initial-state 'message-mode 'motion)
   (evil-set-initial-state 'flycheck-error-list-mode 'motion)
   (evil-set-initial-state 'fundamental-mode 'motion)
   (evil-set-initial-state 'TeX-output-mode 'motion)
+  (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
+  (evil-set-initial-state 'lsp-ui-imenu-mode 'emacs)
   (evil-mode 1)
   (use-package evil-surround
     :ensure t
@@ -162,7 +167,6 @@
     (kbd "SPC TAB") 'evil-motion-state)
   (global-evil-surround-mode 1)
   )
-
 
 (defun my/open-external-terminal ()
   "Open an external Terminal window under current directory."
@@ -180,6 +184,23 @@
   (general-define-key
    :states 'motion
    "TAB" 'forward-button
+   )
+  (general-define-key
+   :states '(normal insert)
+   "<up>" 'copy-from-above-command
+   "<right>" '(lambda ()
+               (interactive)
+               (copy-from-above-command 1))
+   "<down>" '(lambda ()
+               (interactive)
+               (forward-line 1)
+               (open-line 1)
+               (copy-from-above-command))
+   "<left>" '(lambda ()
+               (interactive)
+               (copy-from-above-command -1)
+               (forward-char -1)
+               (delete-char -1))
    )
   (general-define-key
    :states '(normal motion)
@@ -201,6 +222,7 @@
    "d k" 'describe-key
    "d m" 'describe-mode
    "d p" 'describe-package
+   "d b" 'describe-bindings
    "d l" 'view-lossage
    "d r" 'info-emacs-manual
    "d i" 'info
@@ -245,7 +267,8 @@
 (general-define-key
  :states '(normal motion)
  :prefix "SPC f"
- "i" 'find-init-file)
+ "i" 'find-init-file
+ "f" 'find-file)
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -326,14 +349,18 @@ split; vice versa."
   (load-theme 'zenburn t)
   )
 
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; (load-theme 'doom-one t)
-  ;; (load-theme 'doom-one-light t)
-  ;; (load-theme 'doom-solarized-light t)
-  (doom-themes-neotree-config)
-  )
+;; (use-package parchment-theme
+;;   :ensure t
+;;   :config (load-theme 'parchment t)
+;;   )
+
+;; (use-package doom-themes
+;;   :ensure t
+;;   :config
+;;   ;; (load-theme 'doom-one t)
+;;   ;; (load-theme 'doom-one-light t)
+;;   ;; (load-theme 'doom-solarized-light t)
+;;   )
 
 ;; (use-package solarized-theme
 ;;   :ensure t
@@ -511,18 +538,6 @@ narrowed."
            "g" 'magit-status)
   )
 
-(use-package neotree
-  :ensure t
-  :general
-  (:states '(normal motion)
-           :prefix "SPC"
-           "a" 'neotree-toggle)
-  :custom
-  (neo-smart-open t)
-  (neo-window-width 32)
-  (neo-vc-integration (quote (face)))
-  )
-
 ;; LaTeX
 (use-package tex
   :defer t
@@ -672,6 +687,10 @@ narrowed."
   :ensure ob-ipython
   :mode ("\\.org\\'" . org-mode)
   :general
+  (:states 'normal
+           :keymaps 'org-mode-map
+           :prefix "SPC"
+           "c e" 'org-export-dispatch)
   (:states '(normal motion)
            :prefix "SPC"
            "o c" 'org-capture)
@@ -1008,7 +1027,7 @@ narrowed."
   (:states '(normal motion)
            :prefix "SPC"
            "." 'xref-find-definitions
-           "?" 'xref-find-references
+           "/" 'xref-find-references
            "C-." 'xref-find-apropos
            "," 'xref-pop-marker-stack)
   :config
@@ -1024,35 +1043,41 @@ narrowed."
 ;; lsp mode
 (use-package lsp-mode
   :ensure t
-  :pin melpa-stable
+  ;; :pin melpa-stable
   :commands lsp
   :general
   (:states 'normal
            :keymaps 'lsp-mode-map
            :prefix "SPC l"
-                    "d" 'lsp-find-declaration
-                    "D" 'lsp-ui-peek-find-definitions
-                    "R" 'lsp-ui-peek-find-references
-                    "i" 'lsp-ui-peek-find-implementation
-                    "t" 'lsp-find-type-definition
-                    "o" 'lsp-describe-thing-at-point
-                    "r" 'lsp-rename
-                    "f" 'lsp-format-buffer
-                    "m" 'lsp-ui-imenu
-                    "x" 'lsp-execute-code-action
-                    "M-s" 'lsp-describe-session
-                    "M-r" 'lsp-workspace-restart
-                    "S" 'lsp-shutdown-workspace
-                    "a" 'xref-find-apropos
+           "d" 'lsp-find-declaration
+           ;; "D" 'lsp-ui-peek-find-definitions
+           ;; "R" 'lsp-ui-peek-find-references
+           ;; "i" 'lsp-ui-peek-find-implementation
+           "t" 'lsp-find-type-definition
+           "o" 'lsp-describe-thing-at-point
+           "r" 'lsp-rename
+           "f" 'lsp-format-buffer
+           "m" 'lsp-ui-imenu
+           "x" 'lsp-execute-code-action
+           "M-s" 'lsp-describe-session
+           "M-r" 'lsp-workspace-restart
+           "S" 'lsp-shutdown-workspace
+           "a" 'xref-find-apropos
            )
   :config
+  (require 'lsp-mode)
   (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-completion-at-point nil)
+  (setq lsp-enable-file-watchers nil)
   (setq lsp-prefer-flymake nil)
+  (setq lsp-idle-delay 0.5)
+  (setq lsp-enable-indentation nil)
+  (setq lsp-before-save-edits nil)
+
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
   )
 
 (use-package lsp-ui
-  :pin melpa-stable
+  ;; :pin melpa-stable
   :ensure t
   :commands lsp-ui-mode
   :general
@@ -1062,27 +1087,31 @@ narrowed."
             "p" 'previous-line
             "n" 'next-line
             )
+  :config
+  (setq lsp-ui-sideline-show-hover t)
   )
 
-(use-package company-lsp
-  :ensure t
-  :commands company-lsp
-  :custom
-  (company-lsp-cache-candidates t)
-  )
+;; (use-package company-lsp
+;;   :ensure t
+;;   :commands company-lsp
+;;   :custom
+;;   (company-lsp-cache-candidates t)
+;;   )
 
 ;; Python
 (use-package lsp-python-ms
   :ensure t
   :defer t
   :hook (python-mode . (lambda ()
+                         (unless (featurep 'lsp-python-ms)
+                           (require 'lsp-python-ms)
+                           )
                          (lsp)
-                         ;; (setq-local flycheck-checker 'python-flake8)
                          ))
-  ;; :custom
-  ;; (lsp-python-ms-executable "~/.config/emacs/python-language-server/output/bin/Release/Microsoft.Python.LanguageServer")
-  ;; (lsp-python-ms-executable "/usr/local/bin/Microsoft.Python.LanguageServer")
+  :custom
+  (lsp-python-ms-executable "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
   :config
+  (setq lsp-python-ms-cache "Library")
   (defun my/format-buffer ()
     "Format buffer using yapf."
     (interactive)
@@ -1093,7 +1122,7 @@ narrowed."
       )
     )
   (general-define-key
-   :states '(normal motion)
+   :states 'normal
    :keymaps 'python-mode-map
    :prefix "SPC l"
    "F" 'my/format-buffer
@@ -1133,6 +1162,9 @@ narrowed."
              (require 'ccls)
              )
            (lsp)
+           (delete 'company-clang company-backends)
+           (setq comment-start "/* "
+                 comment-end " */")
            ))
   :config
   (defun my/cmake-project-setup-for-ccls ()
@@ -1147,13 +1179,16 @@ list and their compilation command lines."
       )
     )
   (general-define-key
-   :states '(normal motion)
-   :keymaps 'lsp-mode-map
+   :states 'normal
+   :keymaps '(c-mode-map c++-mode-map)
    :prefix "SPC l"
    "s" 'my/cmake-project-setup-for-ccls
+   "l" 'ccls-code-lens-mode
+   "R" 'ccls-reload
    )
   :custom
   (ccls-sem-highlight-method 'font-lock)
+  (ccls-executable "~/.config/emacs/.cache/lsp/ccls/ccls")
   )
 
 (use-package cmake-mode
@@ -1164,26 +1199,28 @@ list and their compilation command lines."
   (cmake-tab-width 4)
   )
 
-(defun company//sort-by-tabnine (candidates)
-  (if (or (functionp company-backend)
-          (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-      candidates
-    (let ((candidates-table (make-hash-table :test #'equal))
-          candidates-1
-          candidates-2)
-      (dolist (candidate candidates)
-        (if (eq (get-text-property 0 'company-backend candidate)
-                'company-tabnine)
-            (unless (gethash candidate candidates-table)
-              (push candidate candidates-2))
-          (push candidate candidates-1)
-          (puthash candidate t candidates-table)))
-      (setq candidates-1 (nreverse candidates-1))
-      (setq candidates-2 (nreverse candidates-2))
-      (nconc (seq-take candidates-1 2)
-             (seq-take candidates-2 2)
-             (seq-drop candidates-1 2)
-             (seq-drop candidates-2 2)))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (defun company//sort-by-tabnine (candidates)                                           ;;
+;;   (if (or (functionp company-backend)                                                  ;;
+;;           (not (and (listp company-backend) (memq 'company-tabnine company-backend)))) ;;
+;;       candidates                                                                       ;;
+;;     (let ((candidates-table (make-hash-table :test #'equal))                           ;;
+;;           candidates-1                                                                 ;;
+;;           candidates-2)                                                                ;;
+;;       (dolist (candidate candidates)                                                   ;;
+;;         (if (eq (get-text-property 0 'company-backend candidate)                       ;;
+;;                 'company-tabnine)                                                      ;;
+;;             (unless (gethash candidate candidates-table)                               ;;
+;;               (push candidate candidates-2))                                           ;;
+;;           (push candidate candidates-1)                                                ;;
+;;           (puthash candidate t candidates-table)))                                     ;;
+;;       (setq candidates-1 (nreverse candidates-1))                                      ;;
+;;       (setq candidates-2 (nreverse candidates-2))                                      ;;
+;;       (nconc (seq-take candidates-1 2)                                                 ;;
+;;              (seq-take candidates-2 2)                                                 ;;
+;;              (seq-drop candidates-1 2)                                                 ;;
+;;              (seq-drop candidates-2 2)))))                                             ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Lsp java
 (use-package lsp-java
@@ -1192,9 +1229,13 @@ list and their compilation command lines."
   :hook (java-mode . (lambda ()
                        (require 'lsp-java)
                        (lsp)
-                       (delete 'company-lsp company-backends)
-                       (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-                       (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate))
+                       (setq comment-start "/* "
+                             comment-end " */")
+                       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                       ;; (delete 'company-lsp company-backends)                                         ;;
+                       ;; (add-to-list 'company-transformers 'company//sort-by-tabnine t)                ;;
+                       ;; (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate)) ;;
+                       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                        ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
@@ -1204,11 +1245,13 @@ list and their compilation command lines."
   (setq lsp-java-signature-help-enabled nil)
   )
 
-(use-package company-tabnine
-  :ensure t
-  :config
-  (add-to-list 'company-backends #'company-tabnine)
-  )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (use-package company-tabnine                        ;;
+;;   :ensure t                                         ;;
+;;   :config                                           ;;
+;;   (add-to-list 'company-backends #'company-tabnine) ;;
+;;   )                                                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; gud
 (use-package gud
@@ -1327,22 +1370,6 @@ list and their compilation command lines."
 ;;   (require 'dap-java)
 ;;   )
 
-;; Chinese input method
-;; (use-package pyim
-;;   :ensure t
-;;   :ensure pyim-wbdict
-;;   :ensure posframe
-;;   :demand t
-;;   :config
-;;   (require 'pyim-wbdict)
-;;   (pyim-wbdict-v98-enable)
-;;   (setq default-input-method "pyim")
-;;   (setq pyim-default-scheme 'wubi)
-;;   (require 'posframe)
-;;   (setq pyim-page-tooltip 'posframe)
-;;   (setq pyim-posframe-border-width 5)
-;;   (setq pyim-page-length 5)
-;;   )
 ;; (setq gc-cons-threshold (* 800 1000))
 
 (provide 'init)
