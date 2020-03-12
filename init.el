@@ -437,6 +437,11 @@ split; vice versa."
 (use-package company
   :ensure t
   :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
+  :general
+  (:keymaps 'company-active-map
+            "C-n" 'company-select-next
+            "C-p" 'company-select-previous
+           )
   :config
   (setq company-selection-wrap-around t)
   (setq company-dabbrev-downcase nil)
