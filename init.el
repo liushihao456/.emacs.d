@@ -162,11 +162,12 @@
   (define-key evil-motion-state-map " " nil)
   (define-key evil-normal-state-map " " nil)
   (define-key evil-visual-state-map " " nil)
-  (define-key evil-normal-state-map (kbd "C-w") 'kill-region)
   (evil-define-key '(normal motion) 'global
     (kbd "SPC w") 'evil-window-map)
-  (evil-define-key '(normal) 'global
+  (evil-define-key 'normal 'global
     (kbd "SPC TAB") 'evil-motion-state)
+  (evil-define-key 'motion 'global
+    (kbd "SPC TAB") 'evil-normal-state)
   (global-evil-surround-mode 1)
   )
 
@@ -184,31 +185,20 @@
    "TAB" 'indent-for-tab-command
    )
   (general-define-key
-   :states 'motion
-   "TAB" 'forward-button
-   )
+   :states 'normal
+   :keymaps 'org-mode-map
+   "TAB" 'org-cycle)
   (general-define-key
-   :states '(normal insert)
-   "<up>" 'copy-from-above-command
-   "<right>" '(lambda ()
-               (interactive)
-               (copy-from-above-command 1))
-   "<down>" '(lambda ()
-               (interactive)
-               (forward-line 1)
-               (open-line 1)
-               (copy-from-above-command))
-   "<left>" '(lambda ()
-               (interactive)
-               (copy-from-above-command -1)
-               (forward-char -1)
-               (delete-char -1))
+   :states 'motion
+   :keymaps 'help-mode-map
+   "TAB" 'forward-button
    )
   (general-define-key
    :states '(normal motion)
    "=" 'end-of-defun
    "-" 'beginning-of-defun
    "_" 'mark-defun
+   "C-u" 'evil-scroll-up
    )
   (general-define-key
    :states '(normal motion)
@@ -889,7 +879,7 @@ narrowed."
                '("browser view" . mu4e-action-view-in-browser) t)
   (add-hook 'mu4e-view-mode-hook
             (lambda()
-              (local-set-key (kbd "<tab>") 'org-next-link)
+              (local-set-key (kbd "TAB") 'org-next-link)
               (local-set-key (kbd "<backtab>") 'org-previous-link)
               (local-set-key (kbd "<return>") 'mu4e~view-browse-url-from-binding))
             )
@@ -1031,8 +1021,8 @@ narrowed."
            :keymaps 'lsp-mode-map
            :prefix "SPC l"
            "d" 'lsp-find-declaration
-           ;; "D" 'lsp-ui-peek-find-definitions
-           ;; "R" 'lsp-ui-peek-find-references
+           "D" 'lsp-ui-peek-find-definitions
+           "R" 'lsp-ui-peek-find-references
            ;; "i" 'lsp-ui-peek-find-implementation
            "t" 'lsp-find-type-definition
            "o" 'lsp-describe-thing-at-point
