@@ -55,12 +55,9 @@
  '(evil-insert-state-cursor nil t)
  '(evil-operator-state-cursor nil t)
  '(evil-replace-state-cursor nil t)
- '(global-hl-line-mode t)
+ ;; '(global-hl-line-mode t)
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
- '(neo-smart-open t t)
- '(neo-vc-integration '(face) t)
- '(neo-window-width 32 t)
  '(package-selected-packages
    '(ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
  '(projectile-completion-system 'ivy t)
@@ -83,7 +80,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(mode-line ((t (:background "#2B2B2B" :foreground "#8FB28F" :box nil)))))
+ )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
@@ -118,16 +115,15 @@
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
-(require 'ansi-color)
-(defun my/colorize-compilation-buffer ()
-  "Apply ansi-color to compilation output."
-  (ansi-color-apply-on-region compilation-filter-start (point)))
-(add-hook 'compilation-filter-hook 'my/colorize-compilation-buffer)
 
-(setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
-(set-face-attribute 'default nil :font "Source Code Pro-13")
-(set-fontset-font t 'han      (font-spec :family "STkaiti"))
-(set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
+(if (display-graphic-p)
+    (progn
+      (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
+      (set-face-attribute 'default nil :font "Source Code Pro-13")
+      (set-fontset-font t 'han      (font-spec :family "STkaiti"))
+      (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
+      )
+)
 
 (use-package delight
   :ensure t
@@ -445,6 +441,7 @@ split; vice versa."
   :config
   (setq company-selection-wrap-around t)
   (setq company-dabbrev-downcase nil)
+  (setq company-idle-delay 0)
   )
 
 (use-package company-box
@@ -704,45 +701,45 @@ narrowed."
 
   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 
-  ;; Continuous numbering of org mode equations
-  (defun org-renumber-environment (orig-func &rest args)
-    (let ((results '())
-          (counter -1)
-          (numberp))
-      (setq results (loop for (begin .  env) in
-                          (org-element-map (org-element-parse-buffer) 'latex-environment
-                                           (lambda (env)
-                                             (cons
-                                              (org-element-property :begin env)
-                                              (org-element-property :value env))))
-                          collect
-                          (cond
-                           ((and (string-match "\\\\begin{equation}" env)
-                                 (not (string-match "\\\\tag{" env)))
-                            (incf counter)
-                            (cons begin counter))
-                           ((string-match "\\\\begin{align}" env)
-                            (prog2
-                                (incf counter)
-                                (cons begin counter)
-                              (with-temp-buffer
-                                (insert env)
-                                (goto-char (point-min))
-                                ;; \\ is used for a new line. Each one leads to a number
-                                (incf counter (count-matches "\\\\$"))
-                                ;; unless there are nonumbers.
-                                (goto-char (point-min))
-                                (decf counter (count-matches "\\nonumber")))))
-                           (t
-                            (cons begin nil)))))
+  ;; ;; Continuous numbering of org mode equations
+  ;; (defun org-renumber-environment (orig-func &rest args)
+  ;;   (let ((results '())
+  ;;         (counter -1)
+  ;;         (numberp))
+  ;;     (setq results (loop for (begin .  env) in
+  ;;                         (org-element-map (org-element-parse-buffer) 'latex-environment
+  ;;                                          (lambda (env)
+  ;;                                            (cons
+  ;;                                             (org-element-property :begin env)
+  ;;                                             (org-element-property :value env))))
+  ;;                         collect
+  ;;                         (cond
+  ;;                          ((and (string-match "\\\\begin{equation}" env)
+  ;;                                (not (string-match "\\\\tag{" env)))
+  ;;                           (incf counter)
+  ;;                           (cons begin counter))
+  ;;                          ((string-match "\\\\begin{align}" env)
+  ;;                           (prog2
+  ;;                               (incf counter)
+  ;;                               (cons begin counter)
+  ;;                             (with-temp-buffer
+  ;;                               (insert env)
+  ;;                               (goto-char (point-min))
+  ;;                               ;; \\ is used for a new line. Each one leads to a number
+  ;;                               (incf counter (count-matches "\\\\$"))
+  ;;                               ;; unless there are nonumbers.
+  ;;                               (goto-char (point-min))
+  ;;                               (decf counter (count-matches "\\nonumber")))))
+  ;;                          (t
+  ;;                           (cons begin nil)))))
 
-      (when (setq numberp (cdr (assoc (point) results)))
-        (setf (car args)
-              (concat
-               (format "\\setcounter{equation}{%s}\n" numberp)
-               (car args)))))
-    (apply orig-func args))
-  (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+  ;;     (when (setq numberp (cdr (assoc (point) results)))
+  ;;       (setf (car args)
+  ;;             (concat
+  ;;              (format "\\setcounter{equation}{%s}\n" numberp)
+  ;;              (car args)))))
+  ;;   (apply orig-func args))
+  ;; (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 
   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
   (add-to-list 'image-file-name-extensions "eps")
