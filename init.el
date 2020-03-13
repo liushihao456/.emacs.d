@@ -20,7 +20,7 @@
   (add-to-list 'load-path "~/.config/emacs/packages/use-package")
   (add-to-list 'load-path "~/.config/emacs/packages/bind-key")
   (require 'use-package))
-(setq use-package-compute-statistics t)
+;; (setq use-package-compute-statistics t)
 
 ;; (use-package benchmark-init
 ;;   :ensure t
@@ -55,13 +55,12 @@
  '(evil-insert-state-cursor nil t)
  '(evil-operator-state-cursor nil t)
  '(evil-replace-state-cursor nil t)
- ;; '(global-hl-line-mode t)
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil gnuplot shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
- '(projectile-completion-system 'ivy t)
- '(projectile-enable-caching t t)
+   '(ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
+ '(projectile-completion-system 'ivy)
+ '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(shell-pop-full-span t t)
@@ -86,13 +85,8 @@
 ;;                            Basic customizations                           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq inhibit-startup-message t) ; hide the startup message
-(setq
- mac-command-modifier 'meta
- mac-option-modifier 'none
- )
-;; change all prompts to y or n
-(fset 'yes-or-no-p 'y-or-n-p)
+(setq inhibit-startup-message t)        ; hide the startup message
+(fset 'yes-or-no-p 'y-or-n-p)           ; change all prompts to y or n
 (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
@@ -118,6 +112,12 @@
 
 (if (display-graphic-p)
     (progn
+      (setq initial-frame-alist (quote ((fullscreen . maximized))))
+      (setq
+       mac-command-modifier 'meta
+       mac-option-modifier 'none
+       )
+
       (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
       (set-face-attribute 'default nil :font "Source Code Pro-13")
       (set-fontset-font t 'han      (font-spec :family "STkaiti"))
@@ -252,11 +252,14 @@
   (interactive)
   (find-file "~/.config/emacs/init.el")
   )
+
 (general-define-key
  :states '(normal motion)
  :prefix "SPC f"
  "i" 'find-init-file
- "f" 'find-file)
+ "f" 'find-file
+ "r" 'recentf-open-files
+ )
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -387,9 +390,6 @@ split; vice versa."
          (ess-r-mode . (lambda () (flycheck-mode -1))))
   )
 
-(setq initial-frame-alist (quote ((fullscreen . maximized))))
-;; (add-hook 'after-init-hook 'toggle-frame-fullscreen) ; start emacs in fullscreen
-
 (use-package dashboard
   :ensure t
   :config
@@ -403,8 +403,6 @@ split; vice versa."
   (setq dashboard-center-content t)
   (setq dashboard-set-footer nil)
   )
-
-(setq-default bidi-display-reordering nil) ; improve long-line performance
 
 ;; Show key bindings below
 (use-package which-key
@@ -615,36 +613,22 @@ narrowed."
   (TeX-command-extra-options "-shell-escape")
   (TeX-show-compilation t)
   (reftex-plug-into-AUCTeX t)
-  ;; (bibtex-completion-cite-prompt-for-optional-arguments nil)
-  ;; (bibtex-completion-bibliography ; set up helm-bibtex
-  ;;       '("~/projects/RA/mybib.bib"
-  ;;         "~/projects/RA/newadded.bib"))
-  ;; :config
-  ;; (require 'helm-bibtex)
   )
 
 (use-package reftex
   :hook (LaTeX-mode . reftex-mode)
   )
 
-;; (use-package helm-bibtex
-;;   :ensure t
-;;   :defer t
-;;   :config
-;;   (helm-delete-action-from-source "Insert citation" helm-source-bibtex)
-;;   (helm-add-action-to-source "Insert Citation" 'helm-bibtex-insert-citation helm-source-bibtex 0) ; Set the default action to insert citation
-;;   )
-
 (use-package cdlatex
   :ensure t
   :hook (LaTeX-mode . cdlatex-mode))
 
-;; Gnuplot mode
-(use-package gnuplot
-  :ensure t
-  :mode (("\\.gnuplot\\'" . gnuplot-mode)
-         ("\\.gp\\'" . gnuplot-mode))
-  )
+;; ;; Gnuplot mode
+;; (use-package gnuplot
+;;   :ensure t
+;;   :mode (("\\.gnuplot\\'" . gnuplot-mode)
+;;          ("\\.gp\\'" . gnuplot-mode))
+;;   )
 
 ;; ESS and R
 (use-package ess
@@ -748,8 +732,7 @@ narrowed."
   (require 'ox-md)
   (require 'ox-beamer)
   (require 'ox-latex)
-  (setq org-highlight-latex-and-related '(latex script entities))
-  (set-face-foreground 'org-latex-and-related "orange")
+  (setq org-highlight-latex-and-related '(native))
   (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
@@ -803,7 +786,7 @@ narrowed."
   (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
                                                ("begin" "$1" "$" "$$" "\\(" "\\[")))
   (setq org-src-window-setup 'current-window)
-  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks to speed up exports
+  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
   )
