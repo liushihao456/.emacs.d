@@ -51,14 +51,14 @@
    '("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
- '(evil-disable-insert-state-bindings t t)
+ '(evil-disable-insert-state-bindings t)
  '(evil-insert-state-cursor nil t)
  '(evil-operator-state-cursor nil t)
  '(evil-replace-state-cursor nil t)
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
+   '(gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
  '(projectile-completion-system 'ivy)
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
@@ -623,12 +623,12 @@ narrowed."
   :ensure t
   :hook (LaTeX-mode . cdlatex-mode))
 
-;; ;; Gnuplot mode
-;; (use-package gnuplot
-;;   :ensure t
-;;   :mode (("\\.gnuplot\\'" . gnuplot-mode)
-;;          ("\\.gp\\'" . gnuplot-mode))
-;;   )
+;; Gnuplot mode
+(use-package gnuplot-mode
+  :ensure t
+  :mode (("\\.gnuplot\\'" . gnuplot-mode)
+         ("\\.gp\\'" . gnuplot-mode))
+  )
 
 ;; ESS and R
 (use-package ess
@@ -1053,9 +1053,6 @@ narrowed."
   :ensure t
   :defer t
   :hook (python-mode . (lambda ()
-                         (unless (featurep 'lsp-python-ms)
-                           (require 'lsp-python-ms)
-                           )
                          (lsp)
                          ))
   :custom
