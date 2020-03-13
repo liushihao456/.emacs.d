@@ -442,15 +442,19 @@ split; vice versa."
   (setq company-idle-delay 0)
   )
 
-(use-package company-box
-  :ensure t
-  :delight
-  :hook (company-mode . company-box-mode)
-  :config
-  (setq company-box-backends-colors nil
-        company-box-show-single-candidate t
-        company-box-max-candidates 50
-        company-box-icons-alist 'company-box-icons-all-the-icons)
+(if (display-graphic-p)
+    (progn
+      (use-package company-box
+        :ensure t
+        :delight
+        :hook (company-mode . company-box-mode)
+        :config
+        (setq company-box-backends-colors nil
+              company-box-show-single-candidate t
+              company-box-max-candidates 50
+              company-box-icons-alist 'company-box-icons-all-the-icons)
+        )
+      )
   )
 
 (use-package multiple-cursors
@@ -1005,7 +1009,7 @@ narrowed."
   (:states 'normal
            :keymaps 'lsp-mode-map
            :prefix "SPC l"
-           "d" 'lsp-find-declaration
+           "d" 'lsp-describe-thing-at-point
            "D" 'lsp-ui-peek-find-definitions
            "R" 'lsp-ui-peek-find-references
            ;; "i" 'lsp-ui-peek-find-implementation
