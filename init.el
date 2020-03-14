@@ -58,7 +58,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
+   '(benchmark-init popup pos-tip gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
  '(projectile-completion-system 'ivy)
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
@@ -113,10 +113,10 @@
 (if (display-graphic-p)
     (progn
       (setq initial-frame-alist (quote ((fullscreen . maximized))))
-      (setq
-       mac-command-modifier 'meta
-       mac-option-modifier 'none
-       )
+      ;; (setq
+      ;;  mac-command-modifier 'meta
+      ;;  mac-option-modifier 'none
+      ;;  )
 
       (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
       (set-face-attribute 'default nil :font "Source Code Pro-13")
@@ -135,7 +135,7 @@
 
 (use-package evil
   :ensure t
-  :defer 1
+  ;; :defer 1
   :custom
   (evil-disable-insert-state-bindings t)
   (evil-insert-state-cursor nil)
@@ -203,6 +203,7 @@
    ";" 'comment-line
    "s" 'save-buffer
    "e" 'eval-last-sexp
+   "i" 'imenu
    "SPC" 'execute-extended-command
    "o t" 'my/open-external-terminal
    "d f" 'describe-function
@@ -294,7 +295,7 @@ split; vice versa."
 
 (use-package ivy
   :ensure t
-  :defer 1
+  ;; :defer 1
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
@@ -430,6 +431,7 @@ split; vice versa."
 
 (use-package company
   :ensure t
+  :ensure pos-tip
   :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
   :general
   (:keymaps 'company-active-map
@@ -452,9 +454,10 @@ split; vice versa."
         (setq company-box-backends-colors nil
               company-box-show-single-candidate t
               company-box-max-candidates 50
-              company-box-icons-alist 'company-box-icons-all-the-icons)
-        )
-      )
+              company-box-icons-alist 'company-box-icons-all-the-icons)))
+    (add-to-list 'load-path "~/.config/emacs/packages/company-quickdoc")
+    (require 'company-quickdoc)
+    (company-quickdoc-mode t)
   )
 
 (use-package multiple-cursors
@@ -1033,6 +1036,8 @@ narrowed."
   (setq lsp-enable-indentation nil)
   (setq lsp-before-save-edits nil)
   (setq lsp-signature-render-documentation nil)
+
+  ;; (setq lsp-log-io t)
 
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
   )
