@@ -92,6 +92,9 @@
  '(font-lock-function-name-face ((t (:foreground "color-27"))))
  '(font-lock-keyword-face ((t (:foreground "yellow" :weight semi-bold))))
  '(font-lock-string-face ((t (:foreground "color-78"))))
+ '(hi-green ((t (:background "color-30" :foreground "black"))))
+ '(hi-pink ((t (:background "color-24" :foreground "black"))))
+ '(hi-yellow ((t (:background "cyan" :foreground "black"))))
  '(highlight ((t (:background "yellow" :foreground "black"))))
  '(isearch-fail ((t (:background "color-125"))))
  '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
@@ -166,6 +169,7 @@
   (evil-insert-state-cursor nil)
   (evil-replace-state-cursor nil)
   (evil-operator-state-cursor nil)
+  (evil-symbol-word-search t)
   :config
   (evil-set-initial-state 'dashboard-mode 'motion)
   (evil-set-initial-state 'use-package-statistics-mode 'motion)
@@ -213,6 +217,12 @@
    :states 'motion
    :keymaps 'help-mode-map
    "TAB" 'forward-button
+   )
+  (general-define-key
+   :states 'normal
+   :prefix "SPC"
+   "[" 'highlight-symbol-at-point
+   "]" 'unhighlight-regexp
    )
   (general-define-key
    :states '(normal motion)
