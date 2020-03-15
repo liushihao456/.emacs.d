@@ -199,7 +199,7 @@ currently active `company' completion candidate."
     (while-no-input
       (let* ((selected (nth company-selection company-candidates))
              (doc (let ((inhibit-message t))
-                    (company-quickdoc--doc selected)))
+                    (ignore-errors (company-quickdoc--doc selected))))
              (width 80)
              (timeout 300)
              (ovl company-pseudo-tooltip-overlay)
@@ -233,6 +233,7 @@ currently active `company' completion candidate."
                                                                 :width (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
                                                                 :height (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
                                                                 :nowait t
+                                                                :scroll-bar nil
                                                                 :nostrip nil))))
               (if company-quickdoc-use-pos-tip
                   (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
@@ -240,6 +241,7 @@ currently active `company' completion candidate."
                 (setq company-quickdoc-popup-tip (popup-tip doc :point (overlay-start ovl)
                                                             :width width
                                                             :nowait t
+                                                            :scroll-bar nil
                                                             :nostrip t))))))))))
 
 (defun company-quickdoc--set-timer ()

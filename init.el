@@ -58,7 +58,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(benchmark-init popup pos-tip gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag lsp-python-ms delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
+   '(benchmark-init popup pos-tip gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
  '(projectile-completion-system 'ivy)
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
@@ -73,14 +73,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -207,6 +199,7 @@
    "SPC" 'execute-extended-command
    "o t" 'my/open-external-terminal
    "d f" 'describe-function
+   "d F" 'describe-face
    "d v" 'describe-variable
    "d k" 'describe-key
    "d m" 'describe-mode
@@ -334,11 +327,11 @@ split; vice versa."
            )
   )
 
-(use-package zenburn-theme
-  :ensure t
-  :config
-  (load-theme 'zenburn t)
-  )
+;; (use-package zenburn-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'zenburn t)
+;;   )
 
 ;; (use-package parchment-theme
 ;;   :ensure t
@@ -364,14 +357,6 @@ split; vice versa."
 ;;   (setq solarized-use-more-italic t)
 ;;   (setq solarized-emphasize-indicators nil)
 ;;   (setq solarized-scale-org-headlines nil)
-;;   )
-
-;; (use-package spacemacs-theme
-;;   :ensure t
-;;   :defer t
-;;   :init
-;;   (load-theme 'spacemacs-dark t)
-;;   (setq spacemacs-theme-underline-parens t)
 ;;   )
 
 (use-package flycheck
@@ -1060,6 +1045,7 @@ narrowed."
 ;; Python
 (use-package lsp-python-ms
   :ensure t
+  :load-path "~/.config/emacs/packages/lsp-python-ms"
   :defer t
   :hook (python-mode . (lambda ()
                          (lsp)
@@ -1067,7 +1053,7 @@ narrowed."
   :custom
   (lsp-python-ms-executable "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
   :config
-  (setq lsp-python-ms-cache "Library")
+  ;; (setq lsp-python-ms-cache "Library")
   (defun my/format-buffer ()
     "Format buffer using yapf."
     (interactive)
@@ -1329,4 +1315,38 @@ list and their compilation command lines."
 ;; (setq gc-cons-threshold (* 800 1000))
 
 (provide 'init)
-;;; init.el ends here
+;
+(if (display-graphic-p)
+    (use-package spacemacs-theme
+      :ensure t
+      :defer t
+      :init
+      (load-theme 'spacemacs-dark t)
+      (setq spacemacs-theme-underline-parens t)
+      )
+
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(default ((t (:inherit nil :extend nil :stipple nil :background "unspecified-bg" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 1 :width normal :foundry "default" :family "default"))))
+   '(font-lock-builtin-face ((t (:foreground "color-76"))))
+   '(font-lock-comment-face ((t (:foreground "cyan" :slant italic))))
+   '(font-lock-constant-face ((t (:foreground "brightblue"))))
+   '(font-lock-function-name-face ((t (:foreground "color-27"))))
+   '(font-lock-keyword-face ((t (:foreground "yellow" :weight semi-bold))))
+   '(font-lock-string-face ((t (:foreground "color-78"))))
+   '(isearch-fail ((t (:background "color-125"))))
+   '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
+   '(ivy-minibuffer-match-face-2 ((t (:background "color-29" :weight bold))))
+   '(ivy-minibuffer-match-face-3 ((t (:background "color-30" :weight bold))))
+   '(ivy-minibuffer-match-face-4 ((t (:background "color-31" :weight bold))))
+   '(lazy-highlight ((t (:background "red"))))
+   '(magit-section-highlight ((t (:extend t :background "color-239"))))
+   '(match ((t (:background "color-118"))))
+   '(minibuffer-prompt ((t (:foreground "color-171"))))
+   '(region ((t (:extend t :background "color-237"))))
+   '(show-paren-match ((t (:underline "brightyellow" :weight bold)))))
+  )
+;; init.el ends here
