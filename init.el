@@ -73,6 +73,39 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "unspecified-bg" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 1 :width normal :foundry "default" :family "default"))))
+ '(company-scrollbar-bg ((t (:background "color-242"))))
+ '(company-scrollbar-fg ((t (:background "color-240"))))
+ '(company-tooltip ((t (:background "color-244"))))
+ '(company-tooltip-annotation ((t (:foreground "color-83"))))
+ '(company-tooltip-common ((t (:foreground "brightwhite" :slant italic :weight bold))))
+ '(company-tooltip-selection ((t (:background "color-242" :weight bold))))
+ '(font-lock-builtin-face ((t (:foreground "color-76"))))
+ '(font-lock-comment-face ((t (:foreground "cyan" :slant italic))))
+ '(font-lock-constant-face ((t (:foreground "brightblue"))))
+ '(font-lock-function-name-face ((t (:foreground "color-27"))))
+ '(font-lock-keyword-face ((t (:foreground "yellow" :weight semi-bold))))
+ '(font-lock-string-face ((t (:foreground "color-78"))))
+ '(highlight ((t (:background "yellow" :foreground "black"))))
+ '(isearch-fail ((t (:background "color-125"))))
+ '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
+ '(ivy-minibuffer-match-face-2 ((t (:background "color-29" :weight bold))))
+ '(ivy-minibuffer-match-face-3 ((t (:background "color-30" :weight bold))))
+ '(ivy-minibuffer-match-face-4 ((t (:background "color-31" :weight bold))))
+ '(lazy-highlight ((t (:background "red"))))
+ '(lsp-ui-doc-background ((t (:background "brightblack"))))
+ '(magit-section-highlight ((t (:extend t :background "color-239"))))
+ '(match ((t (:background "color-118"))))
+ '(minibuffer-prompt ((t (:foreground "color-171"))))
+ '(region ((t (:extend t :background "color-237"))))
+ '(show-paren-match ((t (:underline "brightyellow" :weight bold)))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -331,6 +364,16 @@ split; vice versa."
 ;;   :ensure t
 ;;   :config
 ;;   (load-theme 'zenburn t)
+;;   )
+
+;; (if (display-graphic-p)
+;;     (use-package spacemacs-theme
+;;       :ensure t
+;;       :defer t
+;;       :init
+;;       (load-theme 'spacemacs-dark t)
+;;       (setq spacemacs-theme-underline-parens t)
+;;       )
 ;;   )
 
 ;; (use-package parchment-theme
@@ -1315,38 +1358,4 @@ list and their compilation command lines."
 ;; (setq gc-cons-threshold (* 800 1000))
 
 (provide 'init)
-;
-(if (display-graphic-p)
-    (use-package spacemacs-theme
-      :ensure t
-      :defer t
-      :init
-      (load-theme 'spacemacs-dark t)
-      (setq spacemacs-theme-underline-parens t)
-      )
-
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(default ((t (:inherit nil :extend nil :stipple nil :background "unspecified-bg" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 1 :width normal :foundry "default" :family "default"))))
-   '(font-lock-builtin-face ((t (:foreground "color-76"))))
-   '(font-lock-comment-face ((t (:foreground "cyan" :slant italic))))
-   '(font-lock-constant-face ((t (:foreground "brightblue"))))
-   '(font-lock-function-name-face ((t (:foreground "color-27"))))
-   '(font-lock-keyword-face ((t (:foreground "yellow" :weight semi-bold))))
-   '(font-lock-string-face ((t (:foreground "color-78"))))
-   '(isearch-fail ((t (:background "color-125"))))
-   '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
-   '(ivy-minibuffer-match-face-2 ((t (:background "color-29" :weight bold))))
-   '(ivy-minibuffer-match-face-3 ((t (:background "color-30" :weight bold))))
-   '(ivy-minibuffer-match-face-4 ((t (:background "color-31" :weight bold))))
-   '(lazy-highlight ((t (:background "red"))))
-   '(magit-section-highlight ((t (:extend t :background "color-239"))))
-   '(match ((t (:background "color-118"))))
-   '(minibuffer-prompt ((t (:foreground "color-171"))))
-   '(region ((t (:extend t :background "color-237"))))
-   '(show-paren-match ((t (:underline "brightyellow" :weight bold)))))
-  )
-;; init.el ends here
+;;; init.el ends here
