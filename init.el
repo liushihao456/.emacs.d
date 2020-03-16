@@ -58,7 +58,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(benchmark-init popup pos-tip gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
+   '(benchmark-init popup gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
  '(projectile-completion-system 'ivy)
  '(projectile-enable-caching t)
  '(python-shell-interpreter "python3")
@@ -106,6 +106,7 @@
  '(magit-section-highlight ((t (:extend t :background "color-239"))))
  '(match ((t (:background "color-118"))))
  '(minibuffer-prompt ((t (:foreground "color-171"))))
+ '(popup-tip-face ((t (:background "color-238"))))
  '(region ((t (:extend t :background "color-237"))))
  '(show-paren-match ((t (:underline "brightyellow" :weight bold)))))
 
@@ -469,7 +470,6 @@ split; vice versa."
 
 (use-package company
   :ensure t
-  :ensure pos-tip
   :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
   :general
   (:keymaps 'company-active-map

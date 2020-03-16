@@ -7,7 +7,7 @@
 ;; Package-Version: 20180525.1003
 ;; Keywords: company popup documentation quickdoc
 ;; Version: 2.2.0
-;; Package-Requires: ((emacs "24.3") (company "0.8.9") (pos-tip "0.4.6"))
+;; Package-Requires: ((emacs "24.3") (company "0.8.9") (popup "0.5.3"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -38,18 +38,12 @@
 
 ;;; Code:
 (require 'company)
-(require 'pos-tip)
 (require 'popup)
 (require 'cl-lib)
 
 (defgroup company-quickdoc nil
   "Documentation popups for `company-mode'"
   :group 'company)
-
-(defcustom company-quickdoc-use-propertized-text nil
-  "Allow the text to have properties like color, font size, etc."
-  :type '(choice (boolean :tag "Allow"))
-  :group 'company-quickdoc)
 
 (defcustom company-quickdoc-delay 0.5
   "Delay, in seconds, before the quickdoc popup appears.
@@ -60,44 +54,24 @@ be triggered manually using `company-quickdoc-manual-begin'."
                  (const :tag "Don't popup help automatically" nil))
   :group 'company-quickdoc)
 
+(defcustom company-quickdoc-default-tip-width 80
+  "Default popup tip width.
+
+If not suitable, the tip width will adapt according to current window."
+  :type 'integer
+  :group 'company-quickdoc)
+
 (defcustom company-quickdoc-max-lines nil
   "When not NIL, limits the number of lines in the popup."
   :type '(choice (integer :tag "Max lines to show in popup")
                  (const :tag "Don't limit the number of lines shown" nil))
   :group 'company-quickdoc)
 
-(defcustom company-quickdoc-color-foreground nil
-  "Popup text foreground color."
-  :type '(choice (color)
-                 (const :tag "Default" nil))
-  :group 'company-quickdoc)
-
-(defcustom company-quickdoc-color-background nil
-  "Popup text background color."
-  :type '(choice (color)
-                 (const :tag "Default" nil))
-  :group 'company-quickdoc)
-
-(defvar-local company-quickdoc-pos-tip-available (featurep 'pos-tip)
-  "Whether popup-tip is available.")
-
-(defvar-local company-quickdoc-popup-available (featurep 'popup)
-  "Whether popup-tip is available.")
-
-(defvar-local company-quickdoc-use-pos-tip (and (display-graphic-p) company-quickdoc-pos-tip-available)
-  "Whether use pos-tip to render documentation tip.")
-
 (defvar-local company-quickdoc-popup-tip nil
   "Quickhelp popup-tip instance")
 
 (defvar-local company-quickdoc--timer nil
   "Quickhelp idle timer.")
-
-(defvar-local company-quickdoc--original-tooltip-width company-tooltip-minimum-width
-  "The documentation popup breaks inexplicably when we transition
-  from a large pseudo-tooltip to a small one.  We solve this by
-  overriding `company-tooltip-minimum-width' and save the
-  original value here so we can restore it.")
 
 (defun company-quickdoc-frontend (command)
   "`company-mode' front-end showing documentation in a popup."
@@ -185,64 +159,26 @@ currently active `company' completion candidate."
 
 (defun company-quickdoc--hide ()
   "Hide the current quickdoc tip."
-  (when company-quickdoc-use-pos-tip
-    (with-no-warnings
-      (pos-tip-hide)))
   (when company-quickdoc-popup-tip
     (popup-delete company-quickdoc-popup-tip)
     (setq company-quickdoc-popup-tip nil)))
 
 (defun company-quickdoc--show ()
   "Override `company-quickdoc--show' function from `company-quickdoc'."
-  (when company-quickdoc-pos-tip-available
     (company-quickdoc--cancel-timer)
     (while-no-input
       (let* ((selected (nth company-selection company-candidates))
              (doc (let ((inhibit-message t))
                     (ignore-errors (company-quickdoc--doc selected))))
-             (width 80)
-             (timeout 300)
-             (ovl company-pseudo-tooltip-overlay)
-             (overlay-width (* (frame-char-width)
-                               (if ovl (overlay-get ovl 'company-width) 0)))
-             (overlay-position (* (frame-char-width)
-                                  (- (if ovl (overlay-get ovl 'company-column) 1) 1)))
-             (fg-bg `(,company-quickdoc-color-foreground
-                      . ,company-quickdoc-color-background)))
+             (ovl company-pseudo-tooltip-overlay))
         (when (and ovl doc)
           (with-no-warnings
-            (if company-quickdoc-use-propertized-text
-                (let* ((frame (window-frame (selected-window)))
-                       (max-width (pos-tip-x-display-width frame))
-                       (max-height (pos-tip-x-display-height frame))
-                       (w-h (pos-tip-string-width-height doc)))
-                  (cond
-                   ((> (car w-h) width)
-                    (setq doc (pos-tip-fill-string doc width nil 'none nil max-height)
-                          w-h (pos-tip-string-width-height doc)))
-                   ((or (> (car w-h) max-width)
-                        (> (cdr w-h) max-height))
-                    (setq doc (pos-tip-truncate-string doc max-width max-height)
-                          w-h (pos-tip-string-width-height doc))))
-                  (if company-quickdoc-use-pos-tip
-                      (pos-tip-show-no-propertize doc fg-bg (overlay-start ovl) nil timeout
-                                                  (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
-                                                  (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
-                                                  nil (+ overlay-width overlay-position) 1)
-                    (setq company-quickdoc-popup-tip (popup-tip doc :point (overlay-start ovl)
-                                                                :width (pos-tip-tooltip-width (car w-h) (frame-char-width frame))
-                                                                :height (pos-tip-tooltip-height (cdr w-h) (frame-char-height frame) frame)
-                                                                :nowait t
-                                                                :scroll-bar nil
-                                                                :nostrip nil))))
-              (if company-quickdoc-use-pos-tip
-                  (pos-tip-show doc fg-bg (overlay-start ovl) nil timeout width nil
-                                (+ overlay-width overlay-position) 1)
-                (setq company-quickdoc-popup-tip (popup-tip doc :point (overlay-start ovl)
-                                                            :width width
-                                                            :nowait t
-                                                            :scroll-bar nil
-                                                            :nostrip t))))))))))
+            (setq company-quickdoc-popup-tip (popup-tip doc :point (overlay-start ovl)
+                                                        :width company-quickdoc-default-tip-width
+                                                        :max-width (company--window-width)
+                                                        :nowait t
+                                                        :scroll-bar nil
+                                                        :nostrip t)))))))
 
 (defun company-quickdoc--set-timer ()
   (when (or (null company-quickdoc--timer)
@@ -259,16 +195,14 @@ currently active `company' completion candidate."
 ;; (defun company-quickdoc--popup-tip-scroll-up ()
 ;;   "Scroll up 3 lines of the popup tip."
 ;;   (interactive)
-;;   (when (and (not company-quickdoc-use-pos-tip)
-;;              company-quickdoc-popup-tip)
+;;   (when company-quickdoc-popup-tip
 ;;     (popup-scroll-up company-quickdoc-popup-tip 3))
 ;;   )
 
 ;; (defun company-quickdoc--popup-tip-scroll-down ()
 ;;   "Scroll up 3 lines of the popup down."
 ;;   (interactive)
-;;   (when (and (not company-quickdoc-use-pos-tip)
-;;              company-quickdoc-popup-tip)
+;;   (when company-quickdoc-popup-tip
 ;;     (popup-scroll-down company-quickdoc-popup-tip 3))
 ;;   )
 
@@ -278,19 +212,17 @@ currently active `company' completion candidate."
 (defun company-quickdoc--enable ()
   (add-hook 'focus-out-hook #'company-cancel nil t)
   (setq-local company-quickdoc--original-tooltip-width company-tooltip-minimum-width)
-  (setq-local company-tooltip-minimum-width (max company-tooltip-minimum-width 40))
   (make-local-variable 'company-frontends)
   (add-to-list 'company-frontends 'company-quickdoc-frontend :append))
 
 (defun company-quickdoc--disable ()
   (remove-hook 'focus-out-hook #'company-cancel t)
   (company-quickdoc--cancel-timer)
-  (setq-local company-tooltip-minimum-width company-quickdoc--original-tooltip-width)
   (setq-local company-frontends (delq 'company-quickdoc-frontend company-frontends)))
 
 ;;;###autoload
 (define-minor-mode company-quickdoc-local-mode
-  "Provides documentation popups for `company-mode' using `pos-tip'."
+  "Provides documentation popups for `company-mode' using `popup-tip'."
   :global nil
   (if company-quickdoc-local-mode
       (company-quickdoc--enable)
