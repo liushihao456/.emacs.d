@@ -58,7 +58,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(benchmark-init popup gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons delight solarized-theme general evil-surround evil spacemacs-theme dap-mode ob-ipython hydra markdown-mode web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize cdlatex yasnippet))
+   '(benchmark-init popup gnuplot-mode ivy parchment-theme ripgrep lsp-mode company-box lsp-java lsp-ui all-the-icons delight solarized-theme general evil spacemacs-theme ob-ipython hydra markdown-mode web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes zenburn-theme htmlize cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
@@ -107,7 +107,8 @@
  '(popup-tip-face ((t (:background "color-238"))))
  '(region ((t (:extend t :background "color-237"))))
  '(show-paren-match ((t (:underline "brightyellow" :weight bold))))
- '(warning ((t (:foreground "color-22" :weight bold)))))
+ '(warning ((t (:foreground "color-22" :weight bold))))
+ '(web-mode-html-tag-bracket-face ((t (:foreground "color-28")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
@@ -180,10 +181,8 @@
   (evil-set-initial-state 'TeX-output-mode 'motion)
   (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
   (evil-set-initial-state 'lsp-ui-imenu-mode 'emacs)
+  (evil-set-initial-state 'ripgrep-search-mode 'emacs)
   (evil-mode 1)
-  (use-package evil-surround
-    :ensure t
-    )
   (define-key evil-motion-state-map " " nil)
   (define-key evil-normal-state-map " " nil)
   (define-key evil-visual-state-map " " nil)
@@ -193,7 +192,6 @@
     (kbd "SPC TAB") 'evil-motion-state)
   (evil-define-key 'motion 'global
     (kbd "SPC TAB") 'evil-normal-state)
-  (global-evil-surround-mode 1)
   )
 
 (defun my/open-external-terminal ()
@@ -237,6 +235,7 @@ split; vice versa."
 
 (use-package general
   :ensure t
+  :ensure ripgrep
   :config
   (general-define-key
    :states '(normal visual)
@@ -258,6 +257,8 @@ split; vice versa."
    "_" 'mark-defun
    "C-u" 'evil-scroll-up
 
+   "SPC R" 'ripgrep-regexp
+   "SPC O" 'occur
    "SPC [" 'highlight-symbol-at-point
    "SPC ]" 'unhighlight-regexp
    "SPC q" 'save-buffers-kill-terminal
@@ -1024,7 +1025,6 @@ narrowed."
 
 ;; Python
 (use-package lsp-python-ms
-  :ensure t
   :load-path "~/.config/emacs/packages/lsp-python-ms"
   :defer t
   :hook (python-mode . (lambda ()
@@ -1076,8 +1076,7 @@ narrowed."
 
 ;; Lsp c++
 (use-package ccls
-  :ensure t
-  :defer t
+  :load-path "~/.config/emacs/packages/ccls"
   :hook ((c-mode c++-mode objc-mode) .
          (lambda ()
            (unless (featurep 'ccls)
@@ -1121,29 +1120,6 @@ list and their compilation command lines."
   (cmake-tab-width 4)
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (defun company//sort-by-tabnine (candidates)                                           ;;
-;;   (if (or (functionp company-backend)                                                  ;;
-;;           (not (and (listp company-backend) (memq 'company-tabnine company-backend)))) ;;
-;;       candidates                                                                       ;;
-;;     (let ((candidates-table (make-hash-table :test #'equal))                           ;;
-;;           candidates-1                                                                 ;;
-;;           candidates-2)                                                                ;;
-;;       (dolist (candidate candidates)                                                   ;;
-;;         (if (eq (get-text-property 0 'company-backend candidate)                       ;;
-;;                 'company-tabnine)                                                      ;;
-;;             (unless (gethash candidate candidates-table)                               ;;
-;;               (push candidate candidates-2))                                           ;;
-;;           (push candidate candidates-1)                                                ;;
-;;           (puthash candidate t candidates-table)))                                     ;;
-;;       (setq candidates-1 (nreverse candidates-1))                                      ;;
-;;       (setq candidates-2 (nreverse candidates-2))                                      ;;
-;;       (nconc (seq-take candidates-1 2)                                                 ;;
-;;              (seq-take candidates-2 2)                                                 ;;
-;;              (seq-drop candidates-1 2)                                                 ;;
-;;              (seq-drop candidates-2 2)))))                                             ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; Lsp java
 (use-package lsp-java
   :ensure t
@@ -1153,11 +1129,6 @@ list and their compilation command lines."
                        (lsp)
                        (setq comment-start "/* "
                              comment-end " */")
-                       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                       ;; (delete 'company-lsp company-backends)                                         ;;
-                       ;; (add-to-list 'company-transformers 'company//sort-by-tabnine t)                ;;
-                       ;; (add-to-list 'company-backends '(company-lsp :with company-tabnine :separate)) ;;
-                       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                        ))
   :config
   (setq lsp-java-save-action-organize-imports nil)
@@ -1166,14 +1137,6 @@ list and their compilation command lines."
   (setq lsp-java-code-generation-generate-comments t)
   (setq lsp-java-signature-help-enabled nil)
   )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (use-package company-tabnine                        ;;
-;;   :ensure t                                         ;;
-;;   :config                                           ;;
-;;   (add-to-list 'company-backends #'company-tabnine) ;;
-;;   )                                                 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; gud
 (use-package gud
@@ -1226,71 +1189,6 @@ list and their compilation command lines."
   :load-path "~/.config/emacs/packages/gud-lldb"
   :commands (lldb)
   )
-
-;; (use-package dap-mode
-;;   :ensure t
-;;   :defer t
-;;   :custom
-;;   (dap-lldb-debug-program "/usr/local/Cellar/llvm/8.0.0_1/bin/lldb-vscode")
-;;   :hook ((java-mode . (lambda ()
-;;                         (dap-mode t)
-;;                         (dap-ui-mode t)
-;;                         ))
-;;          ((c-mode c++-mode objc-mode) . (lambda ()
-;;                                           (dap-mode t)
-;;                                           (dap-ui-mode t)
-;;                                           ))
-;;          ;; (python-mode . (lambda ()
-;;          ;;                   (dap-mode t)
-;;          ;;                   (dap-ui-mode t)
-;;          ;;                   (require 'dap-python)
-;;          ;;                   ))
-;;          )
-;;   :init
-;;   (defun my/window-visible (b-name)
-;;     "Return whether B-NAME is visible."
-;;     (-> (-compose 'buffer-name 'window-buffer)
-;;      (-map (window-list))
-;;      (-contains? b-name)))
-
-;;   (defun my/show-debug-windows (session)
-;;     "Show debug windows."
-;;     (let ((lsp--cur-workspace (dap--debug-session-workspace session)))
-;;       (save-excursion
-;;      ;; display locals
-;;      (unless (my/window-visible dap-ui--locals-buffer)
-;;           (dap-ui-locals))
-;;      ;; display sessions
-;;      (unless (my/window-visible dap-ui--sessions-buffer)
-;;           (dap-ui-sessions))
-;;      (unless (my/window-visible "*dap-ui-repl*")
-;;           (dap-ui-repl))
-;;      (unless (my/window-visible "*Breakpoints*")
-;;           (dap-ui-breakpoints))
-;;      )))
-;;   (add-hook 'dap-stopped-hook 'my/show-debug-windows)
-;;   (defun my/hide-debug-windows (session)
-;;     "Hide debug windows when all debug sessions are dead."
-;;     (unless (-filter 'dap--session-running (dap--get-sessions))
-;;       (and (get-buffer dap-ui--sessions-buffer)
-;;            (kill-buffer dap-ui--sessions-buffer))
-;;       (and (get-buffer dap-ui--locals-buffer)
-;;            (kill-buffer dap-ui--locals-buffer))
-;;       (and (get-buffer "*Breakpoints*")
-;;            (kill-buffer "*Breakpoints*"))
-;;       (and (get-buffer "*dap-ui-repl*")
-;;            (kill-buffer "*dap-ui-repl*"))
-;;       (delete-other-windows)
-;;       ))
-;;   (add-hook 'dap-terminated-hook 'my/hide-debug-windows)
-
-;;   :config
-;;   (global-set-key (kbd "C-c 3") 'dap-debug)
-;;   (global-set-key (kbd "C-c 4") 'dap-hydra)
-;;   (require 'dap-lldb)
-;;   ;; (require 'dap-gdb-lldb)
-;;   (require 'dap-java)
-;;   )
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
