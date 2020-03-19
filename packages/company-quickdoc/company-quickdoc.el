@@ -120,10 +120,10 @@ just grab the first candidate and press forward."
 
 (defun company-quickdoc--fetch-docstring (backend)
   "Fetch docstring from BACKEND."
-  (let ((quickdoc-str (company-call-backend 'quickdoc-string backend)))
-    (if (stringp quickdoc-str)
+  (let ((quickhelp-str (company-call-backend 'quickhelp-string backend)))
+    (if (stringp quickhelp-str)
         (with-temp-buffer
-          (insert quickdoc-str)
+          (insert quickhelp-str)
           (company-quickdoc--docstring-from-buffer (point-min)))
       (let ((doc (company-call-backend 'doc-buffer backend)))
         (when doc

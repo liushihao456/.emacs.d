@@ -58,13 +58,9 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(benchmark-init popup gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons ag delight solarized-theme general evil-surround evil shell-pop spacemacs-theme dap-mode ob-ipython hydra markdown-mode projectile web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize dashboard cdlatex yasnippet))
- '(projectile-completion-system 'ivy)
- '(projectile-enable-caching t)
+   '(benchmark-init popup gnuplot-mode ivy parchment-theme ripgrep company-tabnine lsp-mode company-box lsp-java lsp-ui all-the-icons delight solarized-theme general evil-surround evil spacemacs-theme dap-mode ob-ipython hydra markdown-mode web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes ccls zenburn-theme htmlize cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
- '(shell-pop-full-span t t)
- '(shell-pop-shell-type '("eshell" "*eshell*" (lambda nil (eshell))) t)
  '(show-paren-mode t)
  '(split-width-threshold 150)
  '(tool-bar-mode nil)
@@ -95,7 +91,7 @@
  '(hi-green ((t (:background "color-30" :foreground "black"))))
  '(hi-pink ((t (:background "color-24" :foreground "black"))))
  '(hi-yellow ((t (:background "cyan" :foreground "black"))))
- '(highlight ((t (:background "yellow" :foreground "black"))))
+ '(highlight ((t (:background "color-234"))))
  '(isearch-fail ((t (:background "color-125"))))
  '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
  '(ivy-minibuffer-match-face-2 ((t (:background "color-29" :weight bold))))
@@ -104,11 +100,14 @@
  '(lazy-highlight ((t (:background "red"))))
  '(lsp-ui-doc-background ((t (:background "brightblack"))))
  '(magit-section-highlight ((t (:extend t :background "color-239"))))
- '(match ((t (:background "color-118"))))
+ '(match ((t (:background "color-102"))))
  '(minibuffer-prompt ((t (:foreground "color-171"))))
+ '(mode-line ((t (:background "color-236" :box (:line-width -1 :style released-button)))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "color-236" :foreground "brightcyan" :box (:line-width -1 :color "grey75") :weight light))))
  '(popup-tip-face ((t (:background "color-238"))))
  '(region ((t (:extend t :background "color-237"))))
- '(show-paren-match ((t (:underline "brightyellow" :weight bold)))))
+ '(show-paren-match ((t (:underline "brightyellow" :weight bold))))
+ '(warning ((t (:foreground "color-22" :weight bold)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
@@ -120,6 +119,7 @@
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
 (setq comment-style 'indent)
+;; (global-hl-line-mode t)
 
 
 ;; Kill currnet line and copy current line
@@ -172,12 +172,11 @@
   (evil-operator-state-cursor nil)
   (evil-symbol-word-search t)
   :config
-  (evil-set-initial-state 'dashboard-mode 'motion)
   (evil-set-initial-state 'use-package-statistics-mode 'motion)
   (evil-set-initial-state 'rst-mode 'motion)
   (evil-set-initial-state 'message-mode 'motion)
   (evil-set-initial-state 'flycheck-error-list-mode 'motion)
-  (evil-set-initial-state 'fundamental-mode 'motion)
+  ;; (evil-set-initial-state 'fundamental-mode 'motion)
   (evil-set-initial-state 'TeX-output-mode 'motion)
   (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
   (evil-set-initial-state 'lsp-ui-imenu-mode 'emacs)
@@ -203,101 +202,11 @@
   (shell-command "open -a Terminal .")
   )
 
-(use-package general
-  :ensure t
-  :config
-  (general-define-key
-   :states '(normal visual)
-   "TAB" 'indent-for-tab-command
-   )
-  (general-define-key
-   :states 'normal
-   :keymaps 'org-mode-map
-   "TAB" 'org-cycle)
-  (general-define-key
-   :states 'motion
-   :keymaps 'help-mode-map
-   "TAB" 'forward-button
-   )
-  (general-define-key
-   :states 'normal
-   :prefix "SPC"
-   "[" 'highlight-symbol-at-point
-   "]" 'unhighlight-regexp
-   )
-  (general-define-key
-   :states '(normal motion)
-   "=" 'end-of-defun
-   "-" 'beginning-of-defun
-   "_" 'mark-defun
-   "C-u" 'evil-scroll-up
-   )
-  (general-define-key
-   :states '(normal motion)
-   :prefix "SPC"
-   "q" 'save-buffers-kill-terminal
-   ";" 'comment-line
-   "s" 'save-buffer
-   "e" 'eval-last-sexp
-   "i" 'imenu
-   "SPC" 'execute-extended-command
-   "o t" 'my/open-external-terminal
-   "d f" 'describe-function
-   "d F" 'describe-face
-   "d v" 'describe-variable
-   "d k" 'describe-key
-   "d m" 'describe-mode
-   "d p" 'describe-package
-   "d b" 'describe-bindings
-   "d l" 'view-lossage
-   "d r" 'info-emacs-manual
-   "d i" 'info
-   )
-  (general-define-key
-   :states '(normal motion)
-   :prefix "SPC"
-   "k" 'kill-buffer
-   "D" 'dired
-   "b" 'switch-to-buffer
-   "B" 'ibuffer
-   "P" 'list-processes
-   )
-  (general-define-key
-   :states 'visual
-   :prefix "SPC r"
-   "s" 'copy-to-register
-   "r" 'copy-rectangle-to-register
-   )
-  (general-define-key
-   :states '(normal motion)
-   :prefix "SPC r"
-   "w" 'window-configuration-to-register
-   "f" 'frameset-to-register
-   "SPC" 'point-to-register
-   "j" 'jump-to-register
-
-   "i" 'insert-register
-
-   "m" 'bookmark-set
-   "M" 'bookmark-set-no-overwrite
-   "b" 'bookmark-jump
-   "l" 'list-bookmarks
-   )
-  )
-
 (defun find-init-file ()
   "Find init.el file."
   (interactive)
   (find-file "~/.config/emacs/init.el")
   )
-
-(general-define-key
- :states '(normal motion)
- :prefix "SPC f"
- "i" 'find-init-file
- "f" 'find-file
- "r" 'recentf-open-files
- )
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -325,10 +234,89 @@ split; vice versa."
       (set-window-buffer (next-window) next-win-buffer)
       (select-window first-win)
       (if this-win-is-2nd (other-window 1)))))
-(general-define-key
- :states '(normal motion)
- :prefix "SPC w"
- "|" 'toggle-window-split)
+
+(use-package general
+  :ensure t
+  :config
+  (general-define-key
+   :states '(normal visual)
+   "TAB" 'indent-for-tab-command
+   )
+  (general-define-key
+   :states 'normal
+   :keymaps 'org-mode-map
+   "TAB" 'org-cycle)
+  (general-define-key
+   :states 'motion
+   :keymaps 'help-mode-map
+   "TAB" 'forward-button
+   )
+  (general-define-key
+   :states '(normal motion)
+   "=" 'end-of-defun
+   "-" 'beginning-of-defun
+   "_" 'mark-defun
+   "C-u" 'evil-scroll-up
+
+   "SPC [" 'highlight-symbol-at-point
+   "SPC ]" 'unhighlight-regexp
+   "SPC q" 'save-buffers-kill-terminal
+   "SPC ;" 'comment-line
+   "SPC s" 'save-buffer
+   "SPC e" 'eval-last-sexp
+   "SPC i" 'imenu
+   "SPC k" 'kill-buffer
+   "SPC D" 'dired
+   "SPC b" 'switch-to-buffer
+   "SPC B" 'ibuffer
+   "SPC P" 'list-processes
+   "SPC SPC" 'execute-extended-command
+
+   "SPC w |" 'toggle-window-split
+
+   "SPC p f" 'project-find-file
+   "SPC p s" 'project-search
+   "SPC p r" 'project-find-regexp
+   "SPC p q" 'project-query-replace-regexp
+   "SPC `" 'fileloop-continue
+
+   "SPC f i" 'find-init-file
+   "SPC f f" 'find-file
+   "SPC f r" 'recentf-open-files
+
+   "SPC t t" 'todo-show
+   "SPC t j" 'todo-jump-to-category
+   "SPC t i" 'todo-insert-item
+
+   "SPC r w" 'window-configuration-to-register
+   "SPC r f" 'frameset-to-register
+   "SPC r SPC" 'point-to-register
+   "SPC r j" 'jump-to-register
+   "SPC r i" 'insert-register
+   "SPC r m" 'bookmark-set
+   "SPC r M" 'bookmark-set-no-overwrite
+   "SPC r b" 'bookmark-jump
+   "SPC r l" 'list-bookmarks
+
+   "SPC o t" 'my/open-external-terminal
+   "SPC d f" 'describe-function
+   "SPC d F" 'describe-face
+   "SPC d v" 'describe-variable
+   "SPC d k" 'describe-key
+   "SPC d m" 'describe-mode
+   "SPC d p" 'describe-package
+   "SPC d b" 'describe-bindings
+   "SPC d l" 'view-lossage
+   "SPC d r" 'info-emacs-manual
+   "SPC d i" 'info
+   )
+  (general-define-key
+   :states 'visual
+   :prefix "SPC r"
+   "s" 'copy-to-register
+   "r" 'copy-rectangle-to-register
+   )
+  )
 
 (use-package ivy
   :ensure t
@@ -337,38 +325,6 @@ split; vice versa."
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
-  )
-
-(use-package projectile
-  :ensure t
-  :ensure ripgrep
-  :defer 1.5
-  :delight '(:eval (concat " Proj:" (projectile-project-name)))
-  :config
-  (projectile-mode t)
-  :custom
-  (projectile-enable-caching t)
-  (projectile-completion-system 'ivy)
-  :general
-  (:states '(normal motion)
-           :prefix "SPC p"
-           "f" 'projectile-find-file
-           "a" 'projectile-find-other-file
-           "F" 'projectile-find-file-in-known-projects
-           "g" 'projectile-find-file-dwim
-           "d" 'projectile-find-dir
-           "D" 'projectile-dired
-           "e" 'projectile-recentf
-           "p" 'projectile-switch-project
-           "b" 'projectile-switch-to-buffer
-           "s s" 'projectile-ag
-           "s r" 'projectile-ripgrep
-           "s g" 'projectile-grep
-           "c" 'projectile-compile-project
-           "i" 'projectile-invalidate-cache
-           "r" 'projectile-replace
-           "R" 'projectile-replace-regexp
-           )
   )
 
 ;; (use-package zenburn-theme
@@ -430,20 +386,6 @@ split; vice versa."
          (ess-r-mode . (lambda () (flycheck-mode -1))))
   )
 
-(use-package dashboard
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook)
-  (setq dashboard-banner-logo-title nil)
-  (setq dashboard-items '((recents  . 5)
-                          (projects . 5)
-                          (bookmarks . 5)
-                          ))
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-center-content t)
-  (setq dashboard-set-footer nil)
-  )
-
 ;; Show key bindings below
 (use-package which-key
   :ensure t
@@ -482,21 +424,24 @@ split; vice versa."
   (setq company-idle-delay 0)
   )
 
-(if (display-graphic-p)
-    (progn
-      (use-package company-box
-        :ensure t
-        :delight
-        :hook (company-mode . company-box-mode)
-        :config
-        (setq company-box-backends-colors nil
-              company-box-show-single-candidate t
-              company-box-max-candidates 50
-              company-box-icons-alist 'company-box-icons-all-the-icons)))
-    (add-to-list 'load-path "~/.config/emacs/packages/company-quickdoc")
-    (require 'company-quickdoc)
-    (company-quickdoc-mode t)
-  )
+;; (if (display-graphic-p)
+;;     (progn
+;;       (use-package company-box
+;;         :ensure t
+;;         :delight
+;;         :hook (company-mode . company-box-mode)
+;;         :config
+;;         (setq company-box-backends-colors nil
+;;               company-box-show-single-candidate t
+;;               company-box-max-candidates 50
+;;               company-box-icons-alist 'company-box-icons-all-the-icons)))
+;;     (add-to-list 'load-path "~/.config/emacs/packages/company-quickdoc")
+;;     (require 'company-quickdoc)
+;;     (company-quickdoc-mode t)
+;;     ;; (add-to-list 'load-path "~/.config/emacs/packages/company-doc")
+;;     ;; (require 'company-doc)
+;;     ;; (company-doc-enable)
+;;   )
 
 (use-package multiple-cursors
   :ensure t
@@ -842,23 +787,6 @@ narrowed."
   :config (setq org-html-postamble nil)		; Don't include a footer with my contact and publishing information at the bottom of every exported HTML document
   )
 
-;; Shell
-(use-package shell-pop
-  :ensure t
-  :defer t
-  :general
-  (:states '(normal motion)
-           :prefix "SPC o"
-           "s" 'shell-pop)
-  :custom
-  (shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
-  (shell-pop-full-span t)
-  :config
-  (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
-  )
-(setq password-cache t)			; Enable password caching
-(setq password-cache-expiry 3600)	; Enable password caching for one hour
-
 (use-package web-mode
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
@@ -1069,7 +997,6 @@ narrowed."
   (require 'lsp-mode)
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-enable-file-watchers nil)
-  (setq lsp-prefer-flymake nil)
   (setq lsp-idle-delay 0.5)
   (setq lsp-enable-indentation nil)
   (setq lsp-before-save-edits nil)
@@ -1167,11 +1094,11 @@ narrowed."
 to work properly, ccls needs to be able to obtain the source file
 list and their compilation command lines."
     (interactive)
-    (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
+    (let ((project-root (cdr (project-current))))
       (shell-command
-       (concat "cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
-               "\nln -s Debug/compile_commands.json"))
-      )
+       (concat (format "cd %s" project-root)
+               "\ncmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+               "\nln -s Debug/compile_commands.json")))
     )
   (general-define-key
    :states 'normal
@@ -1187,7 +1114,7 @@ list and their compilation command lines."
   )
 
 (use-package cmake-mode
-  :load-path "/usr/local/Cellar/cmake/3.14.5/share/emacs/site-lisp/cmake"
+  :load-path "/usr/local/Cellar/cmake/3.15.4/share/emacs/site-lisp/cmake"
   :mode (("CMakeLists\\.txt\\'" . cmake-mode)
          ("\\.cmake\\'" . cmake-mode))
   :custom
