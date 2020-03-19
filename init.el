@@ -45,7 +45,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
- '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(custom-safe-themes
    '("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
@@ -115,6 +114,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq inhibit-startup-message t)        ; hide the startup message
+(recentf-mode t)
+(setq initial-buffer-choice 'recentf-open-files)
 (fset 'yes-or-no-p 'y-or-n-p)           ; change all prompts to y or n
 (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
@@ -1077,6 +1078,7 @@ narrowed."
 ;; Lsp c++
 (use-package ccls
   :load-path "~/.config/emacs/packages/ccls"
+  :defer t
   :hook ((c-mode c++-mode objc-mode) .
          (lambda ()
            (unless (featurep 'ccls)
@@ -1093,10 +1095,9 @@ narrowed."
 to work properly, ccls needs to be able to obtain the source file
 list and their compilation command lines."
     (interactive)
-    (let ((project-root (cdr (project-current))))
+    (let ((default-directory (cdr (project-current))))
       (shell-command
-       (concat (format "cd %s" project-root)
-               "\ncmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+       (concat "\ncmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
                "\nln -s Debug/compile_commands.json")))
     )
   (general-define-key
@@ -1116,8 +1117,8 @@ list and their compilation command lines."
   :load-path "/usr/local/Cellar/cmake/3.15.4/share/emacs/site-lisp/cmake"
   :mode (("CMakeLists\\.txt\\'" . cmake-mode)
          ("\\.cmake\\'" . cmake-mode))
-  :custom
-  (cmake-tab-width 4)
+  :config
+  (setq cmake-tab-width 4)
   )
 
 ;; Lsp java
