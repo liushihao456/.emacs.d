@@ -326,6 +326,9 @@ split; vice versa."
    )
   )
 
+(define-key occur-mode-map "n" 'occur-next)
+(define-key occur-mode-map "p" 'occur-prev)
+
 (defun show-bookmark-list ()
   "Show bookmark list after calling 'list-bookmars'."
   (switch-to-buffer "*Bookmark List*"))
