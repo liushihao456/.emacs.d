@@ -16,17 +16,8 @@
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
-(eval-when-compile
-  (add-to-list 'load-path "~/.config/emacs/packages/use-package")
-  (add-to-list 'load-path "~/.config/emacs/packages/bind-key")
-  (require 'use-package))
-;; (setq use-package-compute-statistics t)
 
-;; (use-package benchmark-init
-;;   :ensure t
-;;   :config
-;;   ;; To disable collection of benchmark data after init is done.
-;;   (add-hook 'after-init-hook 'benchmark-init/deactivate))
+;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
@@ -41,25 +32,49 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
+ '(ccls-sem-highlight-method 'font-lock)
+ '(ccls-executable "~/.config/emacs/.cache/lsp/ccls/ccls" t)
+ '(cmake-tab-width 4 t)
  '(column-number-mode t)
- '(custom-safe-themes
-   '("a8c210aa94c4eae642a34aaf1c5c0552855dfca2153fa6dd23f3031ce19453d4" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "e39ff005e524c331b08d613109bff0b55fc21c64914c4a243faa70f330015389" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "08ef1356470a9d3bf363ffab0705d90f8a492796e9db489936de4bde6a4fdb19" "a3fa4abaf08cc169b61dea8f6df1bbe4123ec1d2afeb01c17e11fdc31fc66379" "b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "4697a2d4afca3f5ed4fdf5f715e36a6cac5c6154e105f3596b44a4874ae52c45" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d2e9c7e31e574bf38f4b0fb927aaff20c1e5f92f72001102758005e53d77b8c9" "7e78a1030293619094ea6ae80a7579a562068087080e01c2b8b503b27900165c" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" default))
+ '(company-selection-wrap-around t)
+ '(company-dabbrev-downcase nil)
+ '(company-idle-delay 0)
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
- '(evil-disable-insert-state-bindings t)
- '(evil-insert-state-cursor nil t)
- '(evil-operator-state-cursor nil t)
- '(evil-replace-state-cursor nil t)
  '(indent-tabs-mode nil)
+ '(ivy-use-virtual-buffers t)
+ '(enable-recursive-minibuffers t)
+ '(lsp-java-save-action-organize-imports nil)
+ '(lsp-java-format-on-type-enabled nil)
+ '(lsp-java-autobuild-enabled nil)
+ '(lsp-java-code-generation-generate-comments t)
+ '(lsp-java-signature-help-enabled nil)
+ '(lsp-enable-on-type-formatting nil)
+ '(lsp-enable-file-watchers nil)
+ '(lsp-idle-delay 0.5)
+ '(lsp-enable-indentation nil)
+ '(lsp-before-save-edits nil)
+ '(lsp-signature-render-documentation nil)
+ '(read-process-output-max (* 1024 1024))
+ '(lsp-python-ms-executable "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
+ '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(ess benchmark-init gnuplot-mode ivy parchment-theme ripgrep lsp-mode lsp-java lsp-ui delight solarized-theme general evil spacemacs-theme web-mode auctex magit company yasnippet-snippets which-key flycheck doom-themes zenburn-theme cdlatex yasnippet))
+   '(ess benchmark-init gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(split-width-threshold 150)
+ '(TeX-auto-save t)
+ '(TeX-parse-self t)
+ '(TeX-engine 'xetex)
+ '(TeX-command-extra-options "-shell-escape")
+ '(TeX-show-compilation t)
+ '(reftex-plug-into-AUCTeX t)
  '(tool-bar-mode nil)
- '(truncate-lines t))
+ '(truncate-lines t)
+ '(yas/root-directory "~/.config/emacs/snippets/")
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -115,7 +130,7 @@
 (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
-(setq comment-style 'indent)
+;; (setq comment-style 'indent)
 ;; (global-hl-line-mode t)
 
 
@@ -138,7 +153,7 @@
 
 (if (display-graphic-p)
     (progn
-      (setq initial-frame-alist (quote ((fullscreen . maximized))))
+      (setq initial-frame-alist ('((fullscreen . maximized))))
       ;; (setq
       ;;  mac-command-modifier 'meta
       ;;  mac-option-modifier 'none
@@ -151,48 +166,10 @@
       )
 )
 
-(use-package delight
-  :ensure t
-  :config
-  (delight '((eldoc-mode nil "eldoc")
-             (emacs-lisp-mode "Elisp" :major)
-             (undo-tree-mode nil "Undo-Tree")))
-  )
+(delight '((eldoc-mode nil "eldoc")
+           (emacs-lisp-mode "Elisp" :major)
+           (undo-tree-mode nil "Undo-Tree")))
 
-(use-package evil
-  :ensure t
-  ;; :defer 1
-  :custom
-  (evil-disable-insert-state-bindings t)
-  (evil-insert-state-cursor nil)
-  (evil-replace-state-cursor nil)
-  (evil-operator-state-cursor nil)
-  (evil-symbol-word-search t)
-  :config
-  (evil-set-initial-state 'recentf-dialog-mode 'motion)
-  (evil-set-initial-state 'use-package-statistics-mode 'motion)
-  (evil-set-initial-state 'rst-mode 'motion)
-  (evil-set-initial-state 'message-mode 'motion)
-  (evil-set-initial-state 'flycheck-error-list-mode 'motion)
-  (evil-set-initial-state 'fundamental-mode 'motion)
-  (evil-set-initial-state 'TeX-output-mode 'motion)
-  (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
-  (evil-set-initial-state 'lsp-ui-imenu-mode 'emacs)
-  (evil-set-initial-state 'ripgrep-search-mode 'emacs)
-  (evil-mode 1)
-  (define-key evil-motion-state-map " " nil)
-  (define-key evil-normal-state-map " " nil)
-  (define-key evil-visual-state-map " " nil)
-  (evil-define-key '(normal motion) 'global
-    (kbd "SPC w") 'evil-window-map)
-  (evil-define-key 'normal 'global
-    (kbd "SPC TAB") 'evil-motion-state)
-  (evil-define-key 'motion 'global
-    (kbd "SPC TAB") 'evil-normal-state)
-  )
-
-(with-current-buffer "*Messages*"
-  (evil-motion-state))
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
 
@@ -201,12 +178,14 @@
   (interactive)
   (shell-command "open -a Terminal .")
   )
+(global-set-key (kbd "C-c T") 'my/open-external-terminal)
 
 (defun find-init-file ()
   "Find init.el file."
   (interactive)
   (find-file "~/.config/emacs/init.el")
   )
+(global-set-key (kbd "C-c f i") 'find-init-file)
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -234,93 +213,29 @@ split; vice versa."
       (set-window-buffer (next-window) next-win-buffer)
       (select-window first-win)
       (if this-win-is-2nd (other-window 1)))))
+(global-set-key (kbd "C-c |") 'toggle-window-split)
 
-(use-package general
-  :ensure t
-  :ensure ripgrep
-  :config
-  (general-define-key
-   :states '(normal visual)
-   "TAB" 'indent-for-tab-command
-   )
-  (general-define-key
-   :states 'normal
-   :keymaps 'org-mode-map
-   "TAB" 'org-cycle)
-  (general-define-key
-   :states 'motion
-   :keymaps 'help-mode-map
-   "TAB" 'forward-button
-   )
-  (general-define-key
-   :states '(normal motion)
-   "=" 'end-of-defun
-   "-" 'beginning-of-defun
-   "_" 'mark-defun
-   "C-u" 'evil-scroll-up
+(global-set-key (kbd "C-c s") 'ripgrep-regexp)
+(global-set-key (kbd "C-c f r") 'recentf-open-files)
+(global-set-key (kbd "C-c p f") 'project-find-file)
+(global-set-key (kbd "C-c p s") 'project-search)
+(global-set-key (kbd "C-c p r") 'project-find-regexp)
+(global-set-key (kbd "C-c p q") 'project-query-replace-regexp)
+(global-set-key (kbd "C-c `") 'fileloop-continue)
+(global-set-key (kbd "C-c i") 'imenu)
+(global-set-key (kbd "C-x B") 'ibuffer)
+(global-set-key (kbd "C-x P") 'list-processes)
+(global-set-key (kbd "C-x ;") 'comment-line)
+(global-set-key (kbd "C-c t t") 'todo-show)
+(global-set-key (kbd "C-c t j") 'todo-jump-to-category)
+(global-set-key (kbd "C-c t i") 'todo-insert-item)
 
-   "SPC R" 'query-replace
-   "SPC S" 'ripgrep-regexp
-   "SPC O" 'occur
-   "SPC [" 'highlight-symbol-at-point
-   "SPC ]" 'unhighlight-regexp
-   "SPC q" 'save-buffers-kill-terminal
-   "SPC ;" 'comment-line
-   "SPC s" 'save-buffer
-   "SPC e" 'eval-last-sexp
-   "SPC i" 'imenu
-   "SPC k" 'kill-buffer
-   "SPC D" 'dired
-   "SPC b" 'switch-to-buffer
-   "SPC B" 'ibuffer
-   "SPC P" 'list-processes
-   "SPC SPC" 'execute-extended-command
-
-   "SPC w |" 'toggle-window-split
-
-   "SPC p f" 'project-find-file
-   "SPC p s" 'project-search
-   "SPC p r" 'project-find-regexp
-   "SPC p q" 'project-query-replace-regexp
-   "SPC `" 'fileloop-continue
-
-   "SPC f i" 'find-init-file
-   "SPC f f" 'find-file
-   "SPC f r" 'recentf-open-files
-
-   "SPC t t" 'todo-show
-   "SPC t j" 'todo-jump-to-category
-   "SPC t i" 'todo-insert-item
-
-   "SPC r w" 'window-configuration-to-register
-   "SPC r f" 'frameset-to-register
-   "SPC r SPC" 'point-to-register
-   "SPC r j" 'jump-to-register
-   "SPC r i" 'insert-register
-   "SPC r m" 'bookmark-set
-   "SPC r M" 'bookmark-set-no-overwrite
-   "SPC r b" 'bookmark-jump
-   "SPC r l" 'list-bookmarks
-
-   "SPC o t" 'my/open-external-terminal
-   "SPC d f" 'describe-function
-   "SPC d F" 'describe-face
-   "SPC d v" 'describe-variable
-   "SPC d k" 'describe-key
-   "SPC d m" 'describe-mode
-   "SPC d p" 'describe-package
-   "SPC d b" 'describe-bindings
-   "SPC d l" 'view-lossage
-   "SPC d r" 'info-emacs-manual
-   "SPC d i" 'info
-   )
-  (general-define-key
-   :states 'visual
-   :prefix "SPC r"
-   "s" 'copy-to-register
-   "r" 'copy-rectangle-to-register
-   )
-  )
+;; query-replace M-%
+;; occur M-s o
+;; tmm-menubar M-`
+;; dired C-x d
+;; highlight-symbol-at-point C-x w . / M-s h .
+;; unhighlight-regexp C-x w r / M-s h u
 
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
@@ -328,414 +243,209 @@ split; vice versa."
 (defun show-bookmark-list ()
   "Show bookmark list after calling 'list-bookmars'."
   (switch-to-buffer "*Bookmark List*"))
-(advice-add #'list-bookmarks :after #'show-bookmark-list)
+(advice-add #'bookmark-bmenu-list :after #'show-bookmark-list)
 
-(use-package ivy
-  :ensure t
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  )
+(ivy-mode 1)
 
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'zenburn t)
-;;   )
+;; (load-theme 'zenburn t)
 
-;; (if (display-graphic-p)
-;;     (use-package spacemacs-theme
-;;       :ensure t
-;;       :defer t
-;;       :init
-;;       (load-theme 'spacemacs-dark t)
-;;       (setq spacemacs-theme-underline-parens t)
-;;       )
-;;   )
-
-;; (use-package parchment-theme
-;;   :ensure t
-;;   :config (load-theme 'parchment t)
-;;   )
-
-;; (use-package doom-themes
-;;   :ensure t
-;;   :config
-;;   ;; (load-theme 'doom-one t)
-;;   ;; (load-theme 'doom-one-light t)
-;;   ;; (load-theme 'doom-solarized-light t)
-;;   )
-
-;; (use-package solarized-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'solarized-dark t)
-;;   (setq solarized-use-variable-pitch nil)
-;;   (setq solarized-distinct-fringe-background t)
-;;   (setq solarized-high-contrast-mode-line t)
-;;   (setq solarized-use-less-bold t)
-;;   (setq solarized-use-more-italic t)
-;;   (setq solarized-emphasize-indicators nil)
-;;   (setq solarized-scale-org-headlines nil)
-;;   )
-
-(use-package flycheck
-  :ensure t
-  :general
-  (:states '(normal motion)
-           :prefix "SPC f"
-           "p" 'flycheck-previous-error
-           "n" 'flycheck-next-error
-           "l" 'flycheck-list-errors
-           "c" 'flycheck-buffer
-           "v" 'flycheck-verify-setup
-           "s" 'flycheck-select-checker
-           "d" 'flycheck-disable-checker
-           )
-  :hook ((prog-mode . flycheck-mode))
-  )
-
-;; Show key bindings below
-(use-package which-key
-  :ensure t
-  :delight
-  :config
-  (which-key-mode)
-  (which-key-setup-side-window-bottom)
-  )
-
-(use-package yasnippet
-  :ensure t
-  :delight yas-minor-mode
-  :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
-  :config
-  (setq yas/root-directory "~/.config/emacs/snippets/")
-  (yas-load-directory yas/root-directory)
-  )
-
-(use-package yasnippet-snippets
-  :ensure t
-  :after yasnippet
-  :pin manual
+(add-hook 'prog-mode-hook 'flycheck-mode)
+(with-eval-after-load 'flycheck
+  (define-key flycheck-mode-map (kbd "C-c f p") 'flycheck-previous-error)
+  (define-key flycheck-mode-map (kbd "C-c f n") 'flycheck-next-error)
+  (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
 )
 
-(use-package company
-  :ensure t
-  :hook ((prog-mode LaTeX-mode org-mode eshell-mode shell-mode inferior-python-mode) . company-mode)
-  :general
-  (:keymaps 'company-active-map
-            "C-n" 'company-select-next
-            "C-p" 'company-select-previous
-           )
-  :config
-  (setq company-selection-wrap-around t)
-  (setq company-dabbrev-downcase nil)
-  (setq company-idle-delay 0)
-  )
+ ;; Show key bindings below
+(which-key-mode)
+(which-key-setup-side-window-bottom)
 
-(use-package magit
-  :ensure t
-  :general
-  (:states '(normal motion)
-           :prefix "SPC m"
-           "g" 'magit-status)
-  )
+;; Yasnippet mode
+(add-hook 'prog-mode-hook 'yas-minor-mode)
+(add-hook 'LaTeX-mode-hook 'yas-minor-mode)
+(add-hook 'org-mode-hook 'yas-minor-mode)
+
+;; Company mode
+(add-hook 'prog-mode-hook 'company-mode)
+(add-hook 'LaTeX-mode-hook 'company-mode)
+(add-hook 'org-mode-hook 'company-mode)
+(add-hook 'inferior-python-mode-hook 'company-mode)
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous))
+
+;; Magit
+(global-set-key (kbd "C-c g") 'magit-status)
 
 ;; LaTeX
-(use-package tex
-  :defer t
-  :ensure auctex
-  :general
-  (:states '(normal motion)
-           :keymaps 'LaTeX-mode-map
-           :prefix "SPC c"
-           "s" 'LaTeX-section
-           "e" 'LaTeX-environment
-           "j" 'LaTeX-insert-item
-           "m s" 'LaTeX-mark-section
-           "m e" 'LaTeX-mark-environment
-           "]" 'LaTeX-close-environment
-           "." 'reftex-view-crossref
-           "(" 'reftex-label
-           ")" 'reftex-reference
-           "/" 'reftex-index-selection-or-word
-           "<" 'reftex-index
-           "=" 'reftex-toc
-           ">" 'reftex-display-index
-           "[" 'reftex-citation
-           "\\" 'reftex-index-phrase-selection-or-word
-           "|" 'reftex-index-visit-phrases-buffer
-           "?" 'cdlatex-command-help
-           "{" 'cdlatex-environment
-           "RET" 'TeX-insert-macro
-           "TAB" 'TeX-goto-info-page
-           "^" 'TeX-home-buffer
-           "_" 'TeX-master-file-ask
-           "`" 'TeX-next-error
-           "a" 'TeX-command-run-all
-           "c" 'TeX-command-master
-           "b" 'TeX-command-buffer
-           "d" 'TeX-save-document
-           "f" 'TeX-font
-           "k" 'TeX-kill-job
-           "l" 'TeX-recenter-output-buffer
-           "n" 'TeX-normal-mode
-           "r" 'TeX-command-region
-           "v" 'TeX-view
-           "w" 'TeX-toggle-debug-bad-boxes
-           "z" 'LaTeX-command-section
-           "Z" 'LaTeX-command-run-all-section
-           )
-  (:states '(normal motion)
-           :keymaps 'LaTeX-mode-map
-           :prefix "SPC c q"
-           "e" 'LaTeX-fill-environment
-           "s" 'LaTeX-fill-section
-           "r" 'LaTeX-fill-region
-           "p" 'LaTeX-fill-paragraph
-           )
-  (:states '(normal motion)
-           :keymaps 'LaTeX-mode-map
-           :prefix "SPC c o"
-           "f" 'TeX-fold-mode
-           "RET" 'TeX-fold-macro
-           "e" 'TeX-fold-env
-           "b" 'TeX-fold-buffer
-           "c" 'TeX-fold-comment
-           "o" 'TeX-fold-dwim
-           "p" 'TeX-fold-paragraph
-           "r" 'TeX-fold-region
-           "B" 'TeX-fold-clearout-buffer
-           "i" 'TeX-fold-clearout-item
-           "P" 'TeX-fold-clearout-paragraph
-           "R" 'TeX-fold-clearout-region
-           )
-  (:states '(normal motion)
-           :keymaps 'LaTeX-mode-map
-           :prefix "SPC c p"
-           "TAB" 'preview-goto-info-page
-           "b" 'preview-buffer
-           "d" 'preview-document
-           "e" 'preview-environment
-           "f" 'preview-cache-preamble
-           "r" 'preview-region
-           "s" 'preview-section
-           "p" 'preview-at-point
-           "B" 'preview-clearout-buffer
-           "D" 'preview-clearout-document
-           "E" 'preview-clearout-environment
-           "P" 'preview-clearout-at-point
-           "F" 'preview-cache-preamble-off
-           "R" 'preview-clearout
-           "S" 'preview-clearout-section
-           )
-  :init
-  ;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-  (add-hook 'LaTeX-mode-hook 'lsp)
-  :custom
-  (TeX-auto-save t)
-  (TeX-parse-self t)
-  (TeX-engine 'xetex)
-  (TeX-command-extra-options "-shell-escape")
-  (TeX-show-compilation t)
-  (reftex-plug-into-AUCTeX t)
-  )
-
-(use-package reftex
-  :hook (LaTeX-mode . reftex-mode)
-  )
-
-;; (use-package cdlatex
-;;   :ensure t
-;;   :hook (LaTeX-mode . cdlatex-mode))
+(add-hook 'LaTeX-mode-hook 'reftex-mode)
+;; (add-hook 'LaTeX-mode-hook 'cdlatex-mode)
+(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+(add-hook 'LaTeX-mode-hook 'lsp)
 
 ;; Gnuplot mode
-(use-package gnuplot-mode
-  :ensure t
-  :mode (("\\.gnuplot\\'" . gnuplot-mode)
-         ("\\.gp\\'" . gnuplot-mode))
-  )
+(add-to-list 'auto-mode-alist '("\\.gnuplot\\'" . gnuplot-mode))
+(add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot-mode))
 
 ;; ESS and R
-(use-package ess
-  :ensure t
-  :commands R
-  :config
-  (setq ess-eval-visibly 'nowait)	; Allow asynchronous executing
+(with-eval-after-load 'ess
+  (setq ess-eval-visibly 'nowait) ; Allow asynchronous executing
   )
 
 ;; Org mode
-(use-package org
-  :ensure t
-  :mode ("\\.org\\'" . org-mode)
-  :general
-  (:states 'normal
-           :keymaps 'org-mode-map
-           :prefix "SPC"
-           "c e" 'org-export-dispatch)
-  (:states '(normal motion)
-           :prefix "SPC"
-           "o c" 'org-capture)
-  :custom
-  (org-capture-templates
-   '(("t" "Todo list item"
-      entry (file+headline "~/notes/tasks.org" "Tasks")
-      "* TODO %?\n %i\n")
-     ;; "* TODO %?\n %i\n %a")
+;; (use-package org
+;;   :ensure t
+;;   :mode ("\\.org\\'" . org-mode)
+;;   :custom
+;;   (org-capture-templates
+;;    '(("t" "Todo list item"
+;;       entry (file+headline "~/notes/tasks.org" "Tasks")
+;;       "* TODO %?\n %i\n")
+;;      ;; "* TODO %?\n %i\n %a")
 
-     ("j" "Journal entry"
-      entry (file+olp+datetree "~/notes/journal.org" "Journals")
-      "* %U %^{Title}\n %?")
+;;      ("j" "Journal entry"
+;;       entry (file+olp+datetree "~/notes/journal.org" "Journals")
+;;       "* %U %^{Title}\n %?")
 
-     ("b" "Tidbit: quote, zinger, one-liner or textlet"
-      entry (file+headline "~/notes/tidbits.org" "Tidbits")
-      "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
+;;      ("b" "Tidbit: quote, zinger, one-liner or textlet"
+;;       entry (file+headline "~/notes/tidbits.org" "Tidbits")
+;;       "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
 
-     ("n" "Notes"
-      entry (file "~/notes/notes.org" )
-      "* %?")
-     ))
-  :init
-  (add-hook 'org-mode-hook 'auto-fill-mode)
-  ;; (setq org-startup-with-inline-images t) ; Display inline images by default
-  (defun add-pcomplete-to-capf ()
-    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-  (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
-  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-  (add-hook 'org-mode-hook (lambda ()
-                             (setq-local company-minimum-prefix-length 1)
-                             ))
-  :config
-  (setq org-startup-indented t)		; Indent the tree structure
+;;      ("n" "Notes"
+;;       entry (file "~/notes/notes.org" )
+;;       "* %?")
+;;      ))
+;;   :init
+;;   (add-hook 'org-mode-hook 'auto-fill-mode)
+;;   ;; (setq org-startup-with-inline-images t) ; Display inline images by default
+;;   (defun add-pcomplete-to-capf ()
+;;     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+;;   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
+;;   (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+;;   (add-hook 'org-mode-hook (lambda ()
+;;                              (setq-local company-minimum-prefix-length 1)
+;;                              ))
+;;   :config
+;;   (setq org-startup-indented t)		; Indent the tree structure
 
-  (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
+;;   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 
-  ;; ;; Continuous numbering of org mode equations
-  ;; (defun org-renumber-environment (orig-func &rest args)
-  ;;   (let ((results '())
-  ;;         (counter -1)
-  ;;         (numberp))
-  ;;     (setq results (loop for (begin .  env) in
-  ;;                         (org-element-map (org-element-parse-buffer) 'latex-environment
-  ;;                                          (lambda (env)
-  ;;                                            (cons
-  ;;                                             (org-element-property :begin env)
-  ;;                                             (org-element-property :value env))))
-  ;;                         collect
-  ;;                         (cond
-  ;;                          ((and (string-match "\\\\begin{equation}" env)
-  ;;                                (not (string-match "\\\\tag{" env)))
-  ;;                           (incf counter)
-  ;;                           (cons begin counter))
-  ;;                          ((string-match "\\\\begin{align}" env)
-  ;;                           (prog2
-  ;;                               (incf counter)
-  ;;                               (cons begin counter)
-  ;;                             (with-temp-buffer
-  ;;                               (insert env)
-  ;;                               (goto-char (point-min))
-  ;;                               ;; \\ is used for a new line. Each one leads to a number
-  ;;                               (incf counter (count-matches "\\\\$"))
-  ;;                               ;; unless there are nonumbers.
-  ;;                               (goto-char (point-min))
-  ;;                               (decf counter (count-matches "\\nonumber")))))
-  ;;                          (t
-  ;;                           (cons begin nil)))))
+;;   ;; ;; Continuous numbering of org mode equations
+;;   ;; (defun org-renumber-environment (orig-func &rest args)
+;;   ;;   (let ((results '())
+;;   ;;         (counter -1)
+;;   ;;         (numberp))
+;;   ;;     (setq results (loop for (begin .  env) in
+;;   ;;                         (org-element-map (org-element-parse-buffer) 'latex-environment
+;;   ;;                                          (lambda (env)
+;;   ;;                                            (cons
+;;   ;;                                             (org-element-property :begin env)
+;;   ;;                                             (org-element-property :value env))))
+;;   ;;                         collect
+;;   ;;                         (cond
+;;   ;;                          ((and (string-match "\\\\begin{equation}" env)
+;;   ;;                                (not (string-match "\\\\tag{" env)))
+;;   ;;                           (incf counter)
+;;   ;;                           (cons begin counter))
+;;   ;;                          ((string-match "\\\\begin{align}" env)
+;;   ;;                           (prog2
+;;   ;;                               (incf counter)
+;;   ;;                               (cons begin counter)
+;;   ;;                             (with-temp-buffer
+;;   ;;                               (insert env)
+;;   ;;                               (goto-char (point-min))
+;;   ;;                               ;; \\ is used for a new line. Each one leads to a number
+;;   ;;                               (incf counter (count-matches "\\\\$"))
+;;   ;;                               ;; unless there are nonumbers.
+;;   ;;                               (goto-char (point-min))
+;;   ;;                               (decf counter (count-matches "\\nonumber")))))
+;;   ;;                          (t
+;;   ;;                           (cons begin nil)))))
 
-  ;;     (when (setq numberp (cdr (assoc (point) results)))
-  ;;       (setf (car args)
-  ;;             (concat
-  ;;              (format "\\setcounter{equation}{%s}\n" numberp)
-  ;;              (car args)))))
-  ;;   (apply orig-func args))
-  ;; (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+;;   ;;     (when (setq numberp (cdr (assoc (point) results)))
+;;   ;;       (setf (car args)
+;;   ;;             (concat
+;;   ;;              (format "\\setcounter{equation}{%s}\n" numberp)
+;;   ;;              (car args)))))
+;;   ;;   (apply orig-func args))
+;;   ;; (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 
-  (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
-  (add-to-list 'image-file-name-extensions "eps")
-  (setq org-image-actual-width '(400)) ; Prevent inline images being too big
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
-  (require 'ox-md)
-  (require 'ox-beamer)
-  (require 'ox-latex)
-  (setq org-highlight-latex-and-related '(native))
-  (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
-  (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
-  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-  (setq org-latex-listings 'listings)
-  (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
-\\ctexset{section/format=\\Large\\bfseries}"
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
-\\ctexset{section/format=\\Large\\bfseries}"
-                                    ("\\part{%s}" . "\\part*{%s}")
-                                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-  (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
-                                    ("\\part{%s}" . "\\part*{%s}")
-                                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-  (setq org-latex-compiler "xelatex")
-  (setq org-latex-pdf-process
-        '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          ))
-  (setq org-latex-caption-above '(table)) ; Set the caption in exported pdf above
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (emacs-lisp . t)
-     (C . t)
-     (js . t)
-     (ditaa . t)
-     (dot . t)
-     (org . t)
-     (shell . t)
-     (latex . t)
-     (R . t)
-     (gnuplot . t)
-     ))
-  (setq org-src-fontify-natively t)
-  ;; (setq org-preview-latex-default-process 'imagemagick)
-  (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-                                               ("begin" "$1" "$" "$$" "\\(" "\\[")))
-  (setq org-src-window-setup 'current-window)
-  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
-  (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
-  (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-  )
+;;   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
+;;   (add-to-list 'image-file-name-extensions "eps")
+;;   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
+;;   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
+;;   (require 'ox-md)
+;;   (require 'ox-beamer)
+;;   (require 'ox-latex)
+;;   (setq org-highlight-latex-and-related '(native))
+;;   (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
+;;   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
+;;   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
+;;   (setq org-latex-listings 'listings)
+;;   (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
+;; \\ctexset{section/format=\\Large\\bfseries}"
+;;                                     ("\\section{%s}" . "\\section*{%s}")
+;;                                     ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;;   (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
+;; \\ctexset{section/format=\\Large\\bfseries}"
+;;                                     ("\\part{%s}" . "\\part*{%s}")
+;;                                     ("\\chapter{%s}" . "\\chapter*{%s}")
+;;                                     ("\\section{%s}" . "\\section*{%s}")
+;;                                     ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+;;   (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
+;;                                     ("\\part{%s}" . "\\part*{%s}")
+;;                                     ("\\chapter{%s}" . "\\chapter*{%s}")
+;;                                     ("\\section{%s}" . "\\section*{%s}")
+;;                                     ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+;;   (setq org-latex-compiler "xelatex")
+;;   (setq org-latex-pdf-process
+;;         '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
+;;           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+;;           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+;;           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+;;           ))
+;;   (setq org-latex-caption-above '(table)) ; Set the caption in exported pdf above
+;;   (org-babel-do-load-languages
+;;    'org-babel-load-languages
+;;    '((python . t)
+;;      (emacs-lisp . t)
+;;      (C . t)
+;;      (js . t)
+;;      (ditaa . t)
+;;      (dot . t)
+;;      (org . t)
+;;      (shell . t)
+;;      (latex . t)
+;;      (R . t)
+;;      (gnuplot . t)
+;;      ))
+;;   (setq org-src-fontify-natively t)
+;;   ;; (setq org-preview-latex-default-process 'imagemagick)
+;;   (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+;;                                                ("begin" "$1" "$" "$$" "\\(" "\\[")))
+;;   (setq org-src-window-setup 'current-window)
+;;   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
+;;   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
+;;   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
+;;   )
 
-(use-package web-mode
-  :ensure t
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.xml\\'" . web-mode))
-  :config
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
+(with-eval-after-load 'web-mode
   (setq web-mode-engines-alist
-        '(("django"    . "\\.html\\'")))
+        '(("django" . "\\.html\\'")))
   (setq web-mode-enable-auto-pairing t)
-  (setq web-mode-enable-auto-expanding t)
-  )
+  (setq web-mode-enable-auto-expanding t))
 
 ;; mu4e
-(use-package mu4e
-  :load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e"
-  :general
-  (:states '(normal motion)
-           :prefix "SPC m"
-           "e" 'mu4e)
-  :config
-  (require 'org)
+(add-to-list 'load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e")
+(with-eval-after-load 'mu4e
+    (require 'org)
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
   (setq mu4e-maildir (expand-file-name "~/Maildir"))		; Mail folder set to ~/mail
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a")
@@ -786,148 +496,62 @@ split; vice versa."
   (setq smtpmail-smtp-server "mail.pku.edu.cn")
   (setq smtpmail-default-smtp-server "mail.pku.edu.cn")
   (setq smtpmail-smtp-service 465)
-  (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
+  (setq smtpmail-smtp-user "liushihao@pku.edu.cn"))
 
-  )
-
-(use-package xref
-  :ensure t
-  :general
-  (:states '(normal motion)
-           :prefix "SPC"
-           "." 'xref-find-definitions
-           "/" 'xref-find-references
-           "C-." 'xref-find-apropos
-           "," 'xref-pop-marker-stack)
-  :config
+(with-eval-after-load 'xref
   (setq xref-prompt-for-identifier '(not xref-find-definitions
                                          xref-find-definitions-other-window
                                          xref-find-definitions-other-frame
-                                         xref-find-references))
-  )
+                                         xref-find-references)))
 
-(setq-default c-basic-offset 4)
-(setq-default tab-width 4)
+;; (setq-default c-basic-offset 4)
+;; (setq-default tab-width 4)
 
-;; lsp mode
-(use-package lsp-mode
-  :ensure t
-  ;; :pin melpa-stable
-  :commands lsp
-  :general
-  (:states 'normal
-           :keymaps 'lsp-mode-map
-           :prefix "SPC l"
-           "d" 'lsp-describe-thing-at-point
-           "D" 'lsp-ui-peek-find-definitions
-           "R" 'lsp-ui-peek-find-references
-           ;; "i" 'lsp-ui-peek-find-implementation
-           "t" 'lsp-find-type-definition
-           "o" 'lsp-describe-thing-at-point
-           "r" 'lsp-rename
-           "f" 'lsp-format-buffer
-           "m" 'lsp-ui-imenu
-           "x" 'lsp-execute-code-action
-           "M-s" 'lsp-describe-session
-           "M-r" 'lsp-workspace-restart
-           "S" 'lsp-shutdown-workspace
-           "a" 'xref-find-apropos
-           )
-  :config
-  (require 'lsp-mode)
-  (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-file-watchers nil)
-  (setq lsp-idle-delay 0.5)
-  (setq lsp-enable-indentation nil)
-  (setq lsp-before-save-edits nil)
-  (setq lsp-signature-render-documentation nil)
+(with-eval-after-load 'lsp-mode
+  (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
+  (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
+  (define-key lsp-mode-map (kbd "C-c l R") 'lsp-ui-peek-find-references)
+  (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)
+  (define-key lsp-mode-map (kbd "C-c l o") 'lsp-describe-thing-at-point)
+  (define-key lsp-mode-map (kbd "C-c l r") 'lsp-rename)
+  (define-key lsp-mode-map (kbd "C-c l f") 'lsp-format-buffer)
+  (define-key lsp-mode-map (kbd "C-c l m") 'lsp-ui-imenu)
+  (define-key lsp-mode-map (kbd "C-c l x") 'lsp-execute-code-action)
+  (define-key lsp-mode-map (kbd "C-c l M-s") 'lsp-describe-session)
+  (define-key lsp-mode-map (kbd "C-c l M-r") 'lsp-workspace-restart)
+  (define-key lsp-mode-map (kbd "C-c l S") 'lsp-shutdown-workspace)
+  (define-key lsp-mode-map (kbd "C-c l a") 'xref-find-apropos)
+
   ;; (setq lsp-clients-texlab-executable "~/.config/emacs/.cache/lsp/texlab/target/release/texlab")
   ;; (setq lsp-log-io t)
-  
-  (setq read-process-output-max (* 1024 1024)) ;; 1mb
   )
 
-(use-package lsp-ui
-  ;; :pin melpa-stable
-  :ensure t
-  :commands lsp-ui-mode
-  :general
-  (:keymaps 'lsp-ui-imenu-mode-map
-            "b" 'lsp-ui-imenu--prev-kind
-            "f" 'lsp-ui-imenu--next-kind
-            "p" 'previous-line
-            "n" 'next-line
-            )
-  :config
-  (setq lsp-ui-sideline-show-hover t)
-  )
-
-;; Python
-(use-package lsp-python-ms
-  :load-path "~/.config/emacs/packages/lsp-python-ms"
-  :defer t
-  :hook (python-mode . (lambda ()
-                         (lsp)
-                         ))
-  :custom
-  (lsp-python-ms-executable "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
-  :config
-  ;; (setq lsp-python-ms-cache "Library")
+;; Lsp Python
+(add-to-list 'load-path "~/.config/emacs/packages/lsp-python-ms")
+(add-hook 'python-mode-hook 'lsp)
+(with-eval-after-load 'python
+  (require 'lsp-python-ms)
   (defun my/format-buffer ()
     "Format buffer using yapf."
     (interactive)
     (let ((old-point (point)))
       (erase-buffer)
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
-      (goto-char old-point)
-      )
-    )
-  (general-define-key
-   :states 'normal
-   :keymaps 'python-mode-map
-   :prefix "SPC l"
-   "F" 'my/format-buffer
-   )
-  )
+      (goto-char old-point)))
+  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer))
 
-(use-package python
-  :defer t
-  :general
-  (:states 'normal
-           :keymaps 'python-mode-map
-           :prefix "SPC"
-           "c p" 'run-python
-           "c c" 'python-shell-send-buffer
-           "c r" 'python-shell-send-region
-           "c l" 'python-shell-send-file
-           "c s" 'python-shell-send-string
-           "c f" 'python-shell-send-defun
-           "c e" 'python-eldoc-at-point
-           "c d" 'python-describe-at-point
-           "c v" 'python-check
-           "c z" 'python-shell-switch-to-shell
-           "c <" 'python-indent-shift-left
-           "c >" 'python-indent-shift-right
-           )
-  :config
-  (require 'lsp-python-ms)
+;; Lsp C++
+(add-to-list 'load-path "~/.config/emacs/packages/ccls")
+(with-eval-after-load 'cc-mode
+  (require 'ccls))
+(dolist (m (list 'c-mode-hook 'c++mode-hook 'objc-mode-hook))
+  (add-hook m (lambda ()
+                (lsp)
+                (setq-local company-backends (delete 'company-clang company-backends))
+                (setq comment-start "/* "
+                      comment-end " */")))
   )
-
-;; Lsp c++
-(use-package ccls
-  :load-path "~/.config/emacs/packages/ccls"
-  :defer t
-  :hook ((c-mode c++-mode objc-mode) .
-         (lambda ()
-           (unless (featurep 'ccls)
-             (require 'ccls)
-             )
-           (lsp)
-           (delete 'company-clang company-backends)
-           (setq comment-start "/* "
-                 comment-end " */")
-           ))
-  :config
+(with-eval-after-load 'ccls
   (defun my/cmake-project-setup-for-ccls ()
     "ccls typically indexes an entire project. In order for this
 to work properly, ccls needs to be able to obtain the source file
@@ -938,49 +562,24 @@ list and their compilation command lines."
        (concat "\ncmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
                "\nln -s Debug/compile_commands.json")))
     )
-  (general-define-key
-   :states 'normal
-   :keymaps '(c-mode-map c++-mode-map)
-   :prefix "SPC l"
-   "s" 'my/cmake-project-setup-for-ccls
-   "l" 'ccls-code-lens-mode
-   "R" 'ccls-reload
-   )
-  :custom
-  (ccls-sem-highlight-method 'font-lock)
-  (ccls-executable "~/.config/emacs/.cache/lsp/ccls/ccls")
-  )
+  (dolist (m (list c-mode-map c++-mode-map objc-mode-map))
+    (define-key m "C-c l s" 'my/cmake-project-setup-for-ccls)
+    (define-key m "C-c l l" 'ccls-code-lens-mode)
+    (define-key m "C-c l R" 'ccls-reload)))
 
-(use-package cmake-mode
-  :load-path "/usr/local/Cellar/cmake/3.15.4/share/emacs/site-lisp/cmake"
-  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
-         ("\\.cmake\\'" . cmake-mode))
-  :config
-  (setq cmake-tab-width 4)
-  )
+(add-to-list 'load-path "/usr/local/Cellar/cmake/3.15.4/share/emacs/site-lisp/cmake")
+(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 
 ;; Lsp java
-(use-package lsp-java
-  :ensure t
-  :defer t
-  :hook (java-mode . (lambda ()
-                       (require 'lsp-java)
-                       (lsp)
-                       (setq comment-start "/* "
-                             comment-end " */")
-                       ))
-  :config
-  (setq lsp-java-save-action-organize-imports nil)
-  (setq lsp-java-format-on-type-enabled nil)
-  (setq lsp-java-autobuild-enabled nil)
-  (setq lsp-java-code-generation-generate-comments t)
-  (setq lsp-java-signature-help-enabled nil)
-  )
+(with-eval-after-load 'cc-mode
+  (require 'lsp-java))
+(add-hook 'java-mode-hook (lambda ()
+                           (lsp)
+                           (setq comment-start "/* "
+                                 comment-end " */")))
 
-(use-package gud-lldb
-  :load-path "~/.config/emacs/packages/gud-lldb"
-  :commands (lldb)
-  )
+(add-to-list 'load-path "~/.config/emacs/packages/gud-lldb")
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
