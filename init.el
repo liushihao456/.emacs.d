@@ -28,10 +28,6 @@
 ;;   ;; To disable collection of benchmark data after init is done.
 ;;   (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
-(use-package use-package-hydra
-  :load-path "~/.config/emacs/packages/use-package-hydra"
-  :ensure hydra)
-
 ;; BASIC CUSTOMIZATION
 ;; --------------------------------------
 
@@ -57,7 +53,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(ess benchmark-init gnuplot-mode ivy parchment-theme ripgrep lsp-mode lsp-java lsp-ui delight solarized-theme general evil spacemacs-theme hydra web-mode auctex magit company yasnippet-snippets which-key flycheck doom-themes zenburn-theme cdlatex yasnippet))
+   '(ess benchmark-init gnuplot-mode ivy parchment-theme ripgrep lsp-mode lsp-java lsp-ui delight solarized-theme general evil spacemacs-theme web-mode auctex magit company yasnippet-snippets which-key flycheck doom-themes zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
