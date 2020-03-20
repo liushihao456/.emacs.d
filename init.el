@@ -57,7 +57,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(benchmark-init gnuplot-mode ivy parchment-theme ripgrep lsp-mode lsp-java lsp-ui delight solarized-theme general evil spacemacs-theme hydra web-mode auctex magit company yasnippet-snippets which-key flycheck doom-themes zenburn-theme cdlatex yasnippet))
+   '(ess benchmark-init gnuplot-mode ivy parchment-theme ripgrep lsp-mode lsp-java lsp-ui delight solarized-theme general evil spacemacs-theme hydra web-mode auctex magit company yasnippet-snippets which-key flycheck doom-themes zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
@@ -325,6 +325,11 @@ split; vice versa."
    "r" 'copy-rectangle-to-register
    )
   )
+
+(defun show-bookmark-list ()
+  "Show bookmark list after calling 'list-bookmars'."
+  (switch-to-buffer "*Bookmark List*"))
+(advice-add #'list-bookmarks :after #'show-bookmark-list)
 
 (use-package ivy
   :ensure t
@@ -730,8 +735,6 @@ split; vice versa."
   (:states '(normal motion)
            :prefix "SPC m"
            "e" 'mu4e)
-  (:keymaps 'mu4e-headers-mode-map
-            "." 'hydra-mu4e-headers/body)
   :config
   (require 'org)
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
@@ -786,93 +789,6 @@ split; vice versa."
   (setq smtpmail-smtp-service 465)
   (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
 
-  :hydra
-  (hydra-mu4e-headers (:color blue :hint nil)
-    "
-  ^General^         ^Search^               _!_: read       _#_: deferred    ^Switches^
-
-  -^^-----------------^^-----------------  _?_: unread     _%_: pattern    -^^------------------
-
-  _n_: next          _s_: search           _r_: refile     _&_: custom      _O_: sorting
-
-  _p_: prev          _S_: edit prev qry    _u_: unmk       _+_: flag        _P_: threading
-
-  _]_: n unred       _/_: narrow search    _U_: unmk *     _-_: unflag      _Q_: full-search
-
-  _[_: p unred       _b_: search bkmk      _d_: trash      _T_: thr         _V_: skip dups
-
-  _y_: sw view       _B_: edit bkmk        _D_: delete     _t_: subthr      _W_: include-related
-
-  _R_: reply         _{_: previous qry     _m_: move      -^^----------------^^------------------
-
-  _C_: compose       _}_: next query       _a_: action     _|_: thru shl    _`_: update, reindex
-
-  _F_: forward       _C-+_: show more      _A_: mk4actn    _H_: help        _;_: context-switch
-
-  --------------   _C--_: show less      _*_: *thing     _q_: quit hdrs   _j_: jump2maildir
-"
-
-    ;; general
-    ("n" mu4e-headers-next)
-    ("p" mu4e-headers-previous)
-    ("[" mu4e-select-next-unread)
-    ("]" mu4e-select-previous-unread)
-    ("y" mu4e-select-other-view)
-    ("R" mu4e-compose-reply)
-    ("C" mu4e-compose-new)
-    ("F" mu4e-compose-forward)
-    ;; ("o" my/org-capture-mu4e)                  ; differs from built-in
-
-    ;; search
-    ("s" mu4e-headers-search)
-    ("S" mu4e-headers-search-edit)
-    ("/" mu4e-headers-search-narrow)
-    ("b" mu4e-headers-search-bookmark)
-    ("B" mu4e-headers-search-bookmark-edit)
-    ("{" mu4e-headers-query-prev)              ; differs from built-in
-    ("}" mu4e-headers-query-next)              ; differs from built-in
-    ("C-+" mu4e-headers-split-view-grow)
-    ("C--" mu4e-headers-split-view-shrink)
-
-    ;; mark stuff
-    ("!" mu4e-headers-mark-for-read)
-    ("?" mu4e-headers-mark-for-unread)
-    ("r" mu4e-headers-mark-for-refile)
-    ("u" mu4e-headers-mark-for-unmark)
-    ("U" mu4e-mark-unmark-all)
-    ("d" mu4e-headers-mark-for-trash)
-    ("D" mu4e-headers-mark-for-delete)
-    ("m" mu4e-headers-mark-for-move)
-    ("a" mu4e-headers-action)                  ; not really a mark per-se
-    ("A" mu4e-headers-mark-for-action)         ; differs from built-in
-    ("*" mu4e-headers-mark-for-something)
-
-    ("#" mu4e-mark-resolve-deferred-marks)
-    ("%" mu4e-headers-mark-pattern)
-    ("&" mu4e-headers-mark-custom)
-    ("+" mu4e-headers-mark-for-flag)
-    ("-" mu4e-headers-mark-for-unflag)
-    ("t" mu4e-headers-mark-subthread)
-    ("T" mu4e-headers-mark-thread)
-
-    ;; miscellany
-    ("q" mu4e~headers-quit-buffer)
-    ("H" mu4e-display-manual)
-    ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
-
-    ;; switches
-    ("O" mu4e-headers-change-sorting)
-    ("P" mu4e-headers-toggle-threading)
-    ("Q" mu4e-headers-toggle-full-search)
-    ("V" mu4e-headers-toggle-skip-duplicates)
-    ("W" mu4e-headers-toggle-include-related)
-
-    ;; more miscellany
-    ("`" mu4e-update-mail-and-index)           ; differs from built-in
-    (";" mu4e-context-switch)
-    ("j" mu4e~headers-jump-to-maildir)
-
-    ("." nil))
   )
 
 (use-package xref
@@ -928,7 +844,7 @@ split; vice versa."
   (setq lsp-signature-render-documentation nil)
   ;; (setq lsp-clients-texlab-executable "~/.config/emacs/.cache/lsp/texlab/target/release/texlab")
   ;; (setq lsp-log-io t)
-
+  
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
   )
 
@@ -1060,53 +976,6 @@ list and their compilation command lines."
   (setq lsp-java-autobuild-enabled nil)
   (setq lsp-java-code-generation-generate-comments t)
   (setq lsp-java-signature-help-enabled nil)
-  )
-
-;; gud
-(use-package gud
-  :commands gud-gdb
-  :general
-  (:states '(normal motion)
-           :keymaps 'prog-mode-map
-           :prefix "SPC"
-           "gud" 'hydra-gud/body)
-  :hydra
-  (hydra-gud (:hint nil :foreign-keys run)
-    "
-          Breakpoint^^               Run^^                 Repl^^              Stack^^          Instruction mode^^
-         ----------------------------------------------------------------------------------------------------------
-          [_b_] break                [_r_] run             [_p_] print         [_<_] up         [_M-s_] stepi
-
-          [_d_] remove               [_s_] step                              [_>_] down       [_M-n_] nexti
-
-          [_l_] list breaks          [_n_] next                              [_1_] stack current thread
-
-          [_q_] quit                 [_c_] continue                          [_2_] stack all threads
-
-                                   [_f_] finish
-"
-    ("b" gud-break)
-    ("d" gud-remove)
-    ("l" gud-listb)
-
-    ("r" gud-run)
-    ("s" gud-step)
-    ("n" gud-next)
-    ("c" gud-cont)
-
-    ("p" gud-print)
-    ("f" gud-finish)
-
-    ("<" gud-up)
-    (">" gud-down)
-    ("1" gud-bt)
-    ("2" gud-bt-all)
-
-    ("M-s" gud-stepi)
-    ("M-n" gud-nexti)
-
-    ("q" nil)
-    )
   )
 
 (use-package gud-lldb
