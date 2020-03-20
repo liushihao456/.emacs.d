@@ -57,7 +57,7 @@
  '(indent-tabs-mode nil)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(benchmark-init popup gnuplot-mode ivy parchment-theme ripgrep lsp-mode company-box lsp-java lsp-ui all-the-icons delight solarized-theme general evil spacemacs-theme ob-ipython hydra markdown-mode web-mode ess bibtex auctex magit multiple-cursors company yasnippet-snippets which-key flycheck doom-themes zenburn-theme htmlize cdlatex yasnippet))
+   '(benchmark-init gnuplot-mode ivy parchment-theme ripgrep lsp-mode lsp-java lsp-ui delight solarized-theme general evil spacemacs-theme hydra web-mode auctex magit company yasnippet-snippets which-key flycheck doom-themes zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
@@ -81,6 +81,7 @@
  '(company-tooltip-annotation ((t (:foreground "color-83"))))
  '(company-tooltip-common ((t (:foreground "brightwhite" :slant italic :weight bold))))
  '(company-tooltip-selection ((t (:background "color-242" :weight bold))))
+ '(error ((t (:foreground "color-28" :weight bold))))
  '(font-lock-builtin-face ((t (:foreground "color-76"))))
  '(font-lock-comment-face ((t (:foreground "cyan" :slant italic))))
  '(font-lock-constant-face ((t (:foreground "brightblue"))))
@@ -114,8 +115,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq inhibit-startup-message t)        ; hide the startup message
-(recentf-mode t)
-(setq initial-buffer-choice 'recentf-open-files)
 (fset 'yes-or-no-p 'y-or-n-p)           ; change all prompts to y or n
 (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
@@ -174,11 +173,12 @@
   (evil-operator-state-cursor nil)
   (evil-symbol-word-search t)
   :config
+  (evil-set-initial-state 'recentf-dialog-mode 'motion)
   (evil-set-initial-state 'use-package-statistics-mode 'motion)
   (evil-set-initial-state 'rst-mode 'motion)
   (evil-set-initial-state 'message-mode 'motion)
   (evil-set-initial-state 'flycheck-error-list-mode 'motion)
-  ;; (evil-set-initial-state 'fundamental-mode 'motion)
+  (evil-set-initial-state 'fundamental-mode 'motion)
   (evil-set-initial-state 'TeX-output-mode 'motion)
   (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
   (evil-set-initial-state 'lsp-ui-imenu-mode 'emacs)
@@ -194,6 +194,11 @@
   (evil-define-key 'motion 'global
     (kbd "SPC TAB") 'evil-normal-state)
   )
+
+(with-current-buffer "*Messages*"
+  (evil-motion-state))
+(recentf-mode t)
+(setq initial-buffer-choice 'recentf-open-files)
 
 (defun my/open-external-terminal ()
   "Open an external Terminal window under current directory."
@@ -258,7 +263,8 @@ split; vice versa."
    "_" 'mark-defun
    "C-u" 'evil-scroll-up
 
-   "SPC R" 'ripgrep-regexp
+   "SPC R" 'query-replace
+   "SPC S" 'ripgrep-regexp
    "SPC O" 'occur
    "SPC [" 'highlight-symbol-at-point
    "SPC ]" 'unhighlight-regexp
@@ -322,7 +328,6 @@ split; vice versa."
 
 (use-package ivy
   :ensure t
-  ;; :defer 1
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
@@ -384,8 +389,7 @@ split; vice versa."
            "s" 'flycheck-select-checker
            "d" 'flycheck-disable-checker
            )
-  :hook ((prog-mode . flycheck-mode)
-         (ess-r-mode . (lambda () (flycheck-mode -1))))
+  :hook ((prog-mode . flycheck-mode))
   )
 
 ;; Show key bindings below
@@ -414,7 +418,7 @@ split; vice versa."
 
 (use-package company
   :ensure t
-  :hook ((prog-mode org-mode eshell-mode shell-mode inferior-python-mode inferior-ess-mode) . company-mode)
+  :hook ((prog-mode LaTeX-mode org-mode eshell-mode shell-mode inferior-python-mode) . company-mode)
   :general
   (:keymaps 'company-active-map
             "C-n" 'company-select-next
@@ -425,79 +429,6 @@ split; vice versa."
   (setq company-dabbrev-downcase nil)
   (setq company-idle-delay 0)
   )
-
-;; (if (display-graphic-p)
-;;     (progn
-;;       (use-package company-box
-;;         :ensure t
-;;         :delight
-;;         :hook (company-mode . company-box-mode)
-;;         :config
-;;         (setq company-box-backends-colors nil
-;;               company-box-show-single-candidate t
-;;               company-box-max-candidates 50
-;;               company-box-icons-alist 'company-box-icons-all-the-icons)))
-;;     (add-to-list 'load-path "~/.config/emacs/packages/company-quickdoc")
-;;     (require 'company-quickdoc)
-;;     (company-quickdoc-mode t)
-;;     ;; (add-to-list 'load-path "~/.config/emacs/packages/company-doc")
-;;     ;; (require 'company-doc)
-;;     ;; (company-doc-enable)
-;;   )
-
-(use-package multiple-cursors
-  :ensure t
-  :general
-  (:states '(insert emacs)
-           "C-c m" 'hydra-multiple-cursors/body
-           )
-  :hydra (hydra-multiple-cursors (:hint nil)
-                                 "
-
-          Previous^^                  Next^^                 Miscellaneous         % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
-
-         ---------------------------------------------------------------------------------------------------
-
-          [_p_]   Next                [_n_]   Next           [_l_] Edit lines        [_0_] Insert numbers
-
-          [_P_]   Skip                [_N_]   Skip           [_a_] Mark all          [_A_] Insert letters
-
-          [_M-p_] Unmark              [_M-n_] Unmark         [_s_] Search
-
-          [Click] Cursor at point   [_q_]   Quit
-         "
-                                 ("l" mc/edit-lines :exit t)
-                                 ("a" mc/mark-all-like-this :exit t)
-                                 ("n" mc/mark-next-like-this)
-                                 ("N" mc/skip-to-next-like-this)
-                                 ("M-n" mc/unmark-next-like-this)
-                                 ("p" mc/mark-previous-like-this)
-                                 ("P" mc/skip-to-previous-like-this)
-                                 ("M-p" mc/unmark-previous-like-this)
-                                 ("s" mc/mark-all-in-region-regexp :exit t)
-                                 ("0" mc/insert-numbers :exit t)
-                                 ("A" mc/insert-letters :exit t)
-                                 ("<mouse-1>" mc/add-cursor-on-click)
-                                 ;; Help with click recognition in this hydra
-                                 ("<down-mouse-1>" ignore)
-                                 ("<drag-mouse-1>" ignore)
-                                 ("q" nil))
-  )
-
-(defun narrow-or-widen-dwim (p)
-  "If the buffer is narrowed, it widens.  Otherwise, it narrows intelligently.
-Intelligently means: region, org-src-block, org-subtree, or defun,
-whichever applies first.
-Narrowing to org-src-block actually calls `org-edit-src-code'.
-  With prefix P, don't widen, just narrow even if buffer is already
-narrowed."
-  (interactive "P")
-  (declare (interactive-only))
-  (cond ((and (buffer-narrowed-p) (not p)) (widen))
-        ((region-active-p)
-         (narrow-to-region (region-beginning) (region-end)))
-        (t (narrow-to-defun))))
-(global-set-key (kbd "C-c n") 'narrow-or-widen-dwim)
 
 (use-package magit
   :ensure t
@@ -598,6 +529,7 @@ narrowed."
   :init
   ;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+  (add-hook 'LaTeX-mode-hook 'lsp)
   :custom
   (TeX-auto-save t)
   (TeX-parse-self t)
@@ -611,9 +543,9 @@ narrowed."
   :hook (LaTeX-mode . reftex-mode)
   )
 
-(use-package cdlatex
-  :ensure t
-  :hook (LaTeX-mode . cdlatex-mode))
+;; (use-package cdlatex
+;;   :ensure t
+;;   :hook (LaTeX-mode . cdlatex-mode))
 
 ;; Gnuplot mode
 (use-package gnuplot-mode
@@ -633,7 +565,6 @@ narrowed."
 ;; Org mode
 (use-package org
   :ensure t
-  :ensure ob-ipython
   :mode ("\\.org\\'" . org-mode)
   :general
   (:states 'normal
@@ -770,9 +701,7 @@ narrowed."
      (latex . t)
      (R . t)
      (gnuplot . t)
-     (ipython . t)
      ))
-  (add-to-list 'org-latex-listings-langs '(ipython "Python"))
   (setq org-src-fontify-natively t)
   ;; (setq org-preview-latex-default-process 'imagemagick)
   (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
@@ -781,12 +710,6 @@ narrowed."
   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-  )
-
-(use-package htmlize
-  :ensure t
-  :commands htmlize-buffer		; Enable org exporting to html
-  :config (setq org-html-postamble nil)		; Don't include a footer with my contact and publishing information at the bottom of every exported HTML document
   )
 
 (use-package web-mode
@@ -1003,7 +926,7 @@ narrowed."
   (setq lsp-enable-indentation nil)
   (setq lsp-before-save-edits nil)
   (setq lsp-signature-render-documentation nil)
-
+  ;; (setq lsp-clients-texlab-executable "~/.config/emacs/.cache/lsp/texlab/target/release/texlab")
   ;; (setq lsp-log-io t)
 
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
