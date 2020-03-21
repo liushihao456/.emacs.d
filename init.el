@@ -133,6 +133,8 @@
 (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
+(add-hook 'after-init-hook (lambda () (message "Emacs started in %s" (emacs-init-time))))
+
 ;; (setq comment-style 'indent)
 ;; (global-hl-line-mode t)
 
@@ -239,7 +241,7 @@ split; vice versa."
 ;; unhighlight-regexp C-x w r / M-s h u
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
-(global-set-key (kbd "C-s") 'isearch-forward-symbol-at-point)
+;; (global-set-key (kbd "C-s") 'isearch-forward-symbol-at-point)
 
 (defun show-bookmark-list ()
   "Show bookmark list after calling 'list-bookmars'."
@@ -293,11 +295,11 @@ split; vice versa."
       ;; Support `company-lsp'
       (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas))
 
-    (defun my-company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
-      "Enable yasnippet but disable it inline."
+    (defun my-company-yasnippet-disable-after-dot (fun command &optional arg &rest _ignore)
+      "Enable yasnippet but disable it after dot."
       (if (eq command 'prefix)
           (when-let ((prefix (funcall fun 'prefix)))
-            (unless (memq (char-before (- (point) (length prefix))) '(?. ?> ?\())
+            (unless (eq (char-before (- (point) (length prefix))) ?.)
               prefix))
         (progn
           (when (and (bound-and-true-p lsp-mode)
@@ -308,7 +310,7 @@ split; vice versa."
               (put-text-property 0 len 'yas-annotation snip arg)
               (put-text-property 0 len 'yas-annotation-patch t arg)))
           (funcall fun command arg))))
-    (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline))
+    (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-after-dot))
   (company-prescient-mode t)
   )
 
@@ -617,8 +619,6 @@ list and their compilation command lines."
                            (lsp)
                            (setq comment-start "/* "
                                  comment-end " */")))
-
-(add-to-list 'load-path "~/.config/emacs/packages/gud-lldb")
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
