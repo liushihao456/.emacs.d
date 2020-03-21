@@ -229,9 +229,7 @@ split; vice versa."
 (global-set-key (kbd "C-x B") 'ibuffer)
 (global-set-key (kbd "C-x P") 'list-processes)
 (global-set-key (kbd "C-x ;") 'comment-line)
-(global-set-key (kbd "C-c t t") 'todo-show)
-(global-set-key (kbd "C-c t j") 'todo-jump-to-category)
-(global-set-key (kbd "C-c t i") 'todo-insert-item)
+(global-set-key (kbd "C-h F") 'describe-face)
 
 ;; query-replace M-%
 ;; occur M-s o
@@ -239,14 +237,15 @@ split; vice versa."
 ;; dired C-x d
 ;; highlight-symbol-at-point C-x w . / M-s h .
 ;; unhighlight-regexp C-x w r / M-s h u
-
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
+(global-set-key (kbd "C-s") 'isearch-forward-symbol-at-point)
 
 (defun show-bookmark-list ()
   "Show bookmark list after calling 'list-bookmars'."
   (switch-to-buffer "*Bookmark List*"))
-(advice-add #'bookmark-bmenu-list :after #'show-bookmark-list)
+(with-eval-after-load 'bookmark
+  (advice-add #'bookmark-bmenu-list :after #'show-bookmark-list))
 
 (ivy-mode t)
 (ivy-prescient-mode t)
