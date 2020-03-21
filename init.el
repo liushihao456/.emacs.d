@@ -66,6 +66,21 @@
  '(lsp-signature-render-documentation nil)
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
+ '(org-capture-templates
+   '(("t" "Todo list item"
+      entry (file+headline "~/notes/tasks.org" "Tasks")
+      "* TODO %?\n %i\n")
+     ;; "* TODO %?\n %i\n %a")
+     ("j" "Journal entry"
+      entry (file+olp+datetree "~/notes/journal.org" "Journals")
+      "* %U %^{Title}\n %?")
+     ("b" "Tidbit: quote, zinger, one-liner or textlet"
+      entry (file+headline "~/notes/tidbits.org" "Tidbits")
+      "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
+     ("n" "Notes"
+      entry (file "~/notes/notes.org" )
+      "* %?")
+     ))
  '(package-selected-packages
    '(company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
@@ -76,7 +91,7 @@
  '(split-width-threshold 150)
  '(tool-bar-mode nil)
  '(truncate-lines t)
- '(yas/root-directory "~/.config/emacs/snippets/"))
+ '(yas-snippet-dirs '("~/.config/emacs/snippets/")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -279,6 +294,7 @@ split; vice versa."
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (with-eval-after-load 'yasnippet
+    (yas-reload-all)
     (defun company-backend-with-yas (backend)
       "Add `yasnippet' to company backend."
       (if (and (listp backend) (member 'company-yasnippet backend))
@@ -334,146 +350,78 @@ split; vice versa."
   )
 
 ;; Org mode
-;; (use-package org
-;;   :ensure t
-;;   :mode ("\\.org\\'" . org-mode)
-;;   :custom
-;;   (org-capture-templates
-;;    '(("t" "Todo list item"
-;;       entry (file+headline "~/notes/tasks.org" "Tasks")
-;;       "* TODO %?\n %i\n")
-;;      ;; "* TODO %?\n %i\n %a")
-
-;;      ("j" "Journal entry"
-;;       entry (file+olp+datetree "~/notes/journal.org" "Journals")
-;;       "* %U %^{Title}\n %?")
-
-;;      ("b" "Tidbit: quote, zinger, one-liner or textlet"
-;;       entry (file+headline "~/notes/tidbits.org" "Tidbits")
-;;       "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
-
-;;      ("n" "Notes"
-;;       entry (file "~/notes/notes.org" )
-;;       "* %?")
-;;      ))
-;;   :init
-;;   (add-hook 'org-mode-hook 'auto-fill-mode)
-;;   ;; (setq org-startup-with-inline-images t) ; Display inline images by default
-;;   (defun add-pcomplete-to-capf ()
-;;     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-;;   (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
-;;   (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-;;   (add-hook 'org-mode-hook (lambda ()
-;;                              (setq-local company-minimum-prefix-length 1)
-;;                              ))
-;;   :config
-;;   (setq org-startup-indented t)		; Indent the tree structure
-
+(add-hook 'org-mode-hook 'auto-fill-mode)
+;; (setq org-startup-with-inline-images t) ; Display inline images by default
+;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+(defun add-pcomplete-to-capf ()
+  (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+(add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
+(add-hook 'org-mode-hook (lambda ()
+                           (setq-local company-minimum-prefix-length 1)
+                           (electric-pair-local-mode -1)
+                           ))
+(with-eval-after-load 'org
 ;;   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-
-;;   ;; ;; Continuous numbering of org mode equations
-;;   ;; (defun org-renumber-environment (orig-func &rest args)
-;;   ;;   (let ((results '())
-;;   ;;         (counter -1)
-;;   ;;         (numberp))
-;;   ;;     (setq results (loop for (begin .  env) in
-;;   ;;                         (org-element-map (org-element-parse-buffer) 'latex-environment
-;;   ;;                                          (lambda (env)
-;;   ;;                                            (cons
-;;   ;;                                             (org-element-property :begin env)
-;;   ;;                                             (org-element-property :value env))))
-;;   ;;                         collect
-;;   ;;                         (cond
-;;   ;;                          ((and (string-match "\\\\begin{equation}" env)
-;;   ;;                                (not (string-match "\\\\tag{" env)))
-;;   ;;                           (incf counter)
-;;   ;;                           (cons begin counter))
-;;   ;;                          ((string-match "\\\\begin{align}" env)
-;;   ;;                           (prog2
-;;   ;;                               (incf counter)
-;;   ;;                               (cons begin counter)
-;;   ;;                             (with-temp-buffer
-;;   ;;                               (insert env)
-;;   ;;                               (goto-char (point-min))
-;;   ;;                               ;; \\ is used for a new line. Each one leads to a number
-;;   ;;                               (incf counter (count-matches "\\\\$"))
-;;   ;;                               ;; unless there are nonumbers.
-;;   ;;                               (goto-char (point-min))
-;;   ;;                               (decf counter (count-matches "\\nonumber")))))
-;;   ;;                          (t
-;;   ;;                           (cons begin nil)))))
-
-;;   ;;     (when (setq numberp (cdr (assoc (point) results)))
-;;   ;;       (setf (car args)
-;;   ;;             (concat
-;;   ;;              (format "\\setcounter{equation}{%s}\n" numberp)
-;;   ;;              (car args)))))
-;;   ;;   (apply orig-func args))
-;;   ;; (advice-add 'org-create-formula-image :around #'org-renumber-environment)
-
 ;;   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
 ;;   (add-to-list 'image-file-name-extensions "eps")
 ;;   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
 ;;   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
-;;   (require 'ox-md)
-;;   (require 'ox-beamer)
-;;   (require 'ox-latex)
-;;   (setq org-highlight-latex-and-related '(native))
+  (require 'ox-md)
+  (require 'ox-beamer)
+  (setq org-highlight-latex-and-related '(native))
 ;;   (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
-;;   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
-;;   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-;;   (setq org-latex-listings 'listings)
-;;   (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
-;; \\ctexset{section/format=\\Large\\bfseries}"
-;;                                     ("\\section{%s}" . "\\section*{%s}")
-;;                                     ("\\subsection{%s}" . "\\subsection*{%s}")
-;;                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-;;                                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
-;;                                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-;;   (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
-;; \\ctexset{section/format=\\Large\\bfseries}"
-;;                                     ("\\part{%s}" . "\\part*{%s}")
-;;                                     ("\\chapter{%s}" . "\\chapter*{%s}")
-;;                                     ("\\section{%s}" . "\\section*{%s}")
-;;                                     ("\\subsection{%s}" . "\\subsection*{%s}")
-;;                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-;;   (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
-;;                                     ("\\part{%s}" . "\\part*{%s}")
-;;                                     ("\\chapter{%s}" . "\\chapter*{%s}")
-;;                                     ("\\section{%s}" . "\\section*{%s}")
-;;                                     ("\\subsection{%s}" . "\\subsection*{%s}")
-;;                                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-;;   (setq org-latex-compiler "xelatex")
-;;   (setq org-latex-pdf-process
-;;         '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
-;;           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-;;           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-;;           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-;;           ))
-;;   (setq org-latex-caption-above '(table)) ; Set the caption in exported pdf above
-;;   (org-babel-do-load-languages
-;;    'org-babel-load-languages
-;;    '((python . t)
-;;      (emacs-lisp . t)
-;;      (C . t)
-;;      (js . t)
-;;      (ditaa . t)
-;;      (dot . t)
-;;      (org . t)
-;;      (shell . t)
-;;      (latex . t)
-;;      (R . t)
-;;      (gnuplot . t)
-;;      ))
-;;   (setq org-src-fontify-natively t)
-;;   ;; (setq org-preview-latex-default-process 'imagemagick)
-;;   (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-;;                                                ("begin" "$1" "$" "$$" "\\(" "\\[")))
-;;   (setq org-src-window-setup 'current-window)
-;;   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
-;;   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
-;;   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-;;   )
+  (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
+  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
+  (add-to-list 'org-latex-packages-alist '("" "color")) ; Use listings package to export code blocks
+  (setq org-latex-listings 'listings)
+  (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
+\\ctexset{section/format=\\Large\\bfseries}"
+                                    ("\\section{%s}" . "\\section*{%s}")
+                                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
+\\ctexset{section/format=\\Large\\bfseries}"
+                                    ("\\part{%s}" . "\\part*{%s}")
+                                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                                    ("\\section{%s}" . "\\section*{%s}")
+                                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
+                                    ("\\part{%s}" . "\\part*{%s}")
+                                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                                    ("\\section{%s}" . "\\section*{%s}")
+                                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (setq org-latex-compiler "xelatex")
+  (setq org-latex-pdf-process
+        '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          ))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (C . t)
+     (js . t)
+     (ditaa . t)
+     (dot . t)
+     (org . t)
+     (shell . t)
+     (latex . t)
+     (R . t)
+     (gnuplot . t)
+     ))
+  ;; (setq org-preview-latex-default-process 'imagemagick)
+  ;; (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+  ;;                                              ("begin" "$1" "$" "$$" "\\(" "\\[")))
+  (setq org-src-window-setup 'current-window)
+  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
+  (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
+  (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
+  )
 
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
@@ -608,7 +556,8 @@ list and their compilation command lines."
     (define-key m "C-c l l" 'ccls-code-lens-mode)
     (define-key m "C-c l R" 'ccls-reload)))
 
-(add-to-list 'load-path "/usr/local/Cellar/cmake/3.15.4/share/emacs/site-lisp/cmake")
+;; Cmake
+(autoload 'cmake-mode "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 

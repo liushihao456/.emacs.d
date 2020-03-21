@@ -1,21 +1,22 @@
 # -*- mode: snippet -*-
 # name: code_block_setup
-# key: lst
+# key: code
 # --
-#+LATEX_HEADER: \usepackage{xcolor}
-#+LATEX_HEADER: \usepackage{baskervald}
-#+LATEX_HEADER: \usepackage[scale=0.85]{sourcecodepro}
-#+LATEX_HEADER: \usepackage[T1]{fontenc}
-#+LATEX_HEADER: \setCJKmainfont{Songti SC}
-#+LATEX_HEADER: \setlength\parindent{0pt}
-#+LATEX_HEADER: \lstset{numbers=left,
+#+LATEX_HEADER: \definecolor{dkgreen}{rgb}{0,0.6,0}
+#+LATEX_HEADER: \definecolor{gray}{rgb}{0.5,0.5,0.5}
+#+LATEX_HEADER: \definecolor{mauve}{rgb}{0.58,0,0.82}
+#+LATEX_HEADER: \lstset{frame=tb,
+#+LATEX_HEADER:   aboveskip=3mm,
+#+LATEX_HEADER:   belowskip=3mm,
 #+LATEX_HEADER:   showstringspaces=false,
-#+LATEX_HEADER:   basicstyle=\linespread{1.0}\scriptsize\ttfamily,
-#+LATEX_HEADER:   aboveskip={1.5\baselineskip}, belowskip={1.5\baselineskip},
-#+LATEX_HEADER:   numberstyle=\tiny,
-#+LATEX_HEADER:   keywordstyle= \color{blue!70}, commentstyle=\color{red!50!green!50!blue!50}, 
-#+LATEX_HEADER:   frame=single, frameround=tttt,
+#+LATEX_HEADER:   columns=flexible,
+#+LATEX_HEADER:   basicstyle={\small\bfseries\ttfamily},
+#+LATEX_HEADER:   numbers=none,
+#+LATEX_HEADER:   numberstyle=\tiny\color{gray},
+#+LATEX_HEADER:   keywordstyle=\color{blue},
+#+LATEX_HEADER:   commentstyle=\color{dkgreen},
+#+LATEX_HEADER:   stringstyle=\color{mauve},
 #+LATEX_HEADER:   breaklines=true,
-#+LATEX_HEADER:   backgroundcolor=\color[HTML]{F5F5F5},
+#+LATEX_HEADER:   breakatwhitespace=true,
+#+LATEX_HEADER:   tabsize=4
 #+LATEX_HEADER: }
-$0

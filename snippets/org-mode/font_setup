@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: font_setup
+# key: fs
+# --
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
+#+LATEX_HEADER: \usepackage[semibold,scale=0.85]{sourcecodepro}
+#+LATEX_HEADER: \setmainfont{QTFrizQuad.otf}
+#+LATEX_HEADER: \setCJKmainfont{Songti SC}
