@@ -17,6 +17,8 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
+;; (require 'benchmark-init)
+;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 ;; BASIC CUSTOMIZATION
@@ -31,50 +33,50 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(TeX-auto-save t)
+ '(TeX-command-extra-options "-shell-escape")
+ '(TeX-engine 'xetex)
+ '(TeX-parse-self t)
+ '(TeX-show-compilation t)
  '(blink-cursor-mode nil)
+ '(ccls-executable "~/.config/emacs/.cache/lsp/ccls/ccls")
  '(ccls-sem-highlight-method 'font-lock)
- '(ccls-executable "~/.config/emacs/.cache/lsp/ccls/ccls" t)
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
- '(company-selection-wrap-around t)
  '(company-dabbrev-downcase nil)
  '(company-idle-delay 0)
+ '(company-selection-wrap-around t)
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
+ '(enable-recursive-minibuffers t)
  '(indent-tabs-mode nil)
  '(ivy-use-virtual-buffers t)
- '(enable-recursive-minibuffers t)
- '(lsp-java-save-action-organize-imports nil)
- '(lsp-java-format-on-type-enabled nil)
+ '(lsp-before-save-edits nil)
+ '(lsp-enable-file-watchers nil)
+ '(lsp-enable-indentation nil)
+ '(lsp-enable-on-type-formatting nil)
+ '(lsp-idle-delay 0.5)
  '(lsp-java-autobuild-enabled nil)
  '(lsp-java-code-generation-generate-comments t)
+ '(lsp-java-format-on-type-enabled nil)
+ '(lsp-java-save-action-organize-imports nil)
  '(lsp-java-signature-help-enabled nil)
- '(lsp-enable-on-type-formatting nil)
- '(lsp-enable-file-watchers nil)
- '(lsp-idle-delay 0.5)
- '(lsp-enable-indentation nil)
- '(lsp-before-save-edits nil)
+ '(lsp-python-ms-executable
+   "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
  '(lsp-signature-render-documentation nil)
- '(read-process-output-max (* 1024 1024))
- '(lsp-python-ms-executable "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(ess benchmark-init gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
+   '(company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
+ '(read-process-output-max (* 1024 1024) t)
+ '(reftex-plug-into-AUCTeX t)
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(split-width-threshold 150)
- '(TeX-auto-save t)
- '(TeX-parse-self t)
- '(TeX-engine 'xetex)
- '(TeX-command-extra-options "-shell-escape")
- '(TeX-show-compilation t)
- '(reftex-plug-into-AUCTeX t)
  '(tool-bar-mode nil)
  '(truncate-lines t)
- '(yas/root-directory "~/.config/emacs/snippets/")
-)
+ '(yas/root-directory "~/.config/emacs/snippets/"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -104,6 +106,7 @@
  '(hi-yellow ((t (:background "cyan" :foreground "black"))))
  '(highlight ((t (:background "color-234"))))
  '(isearch-fail ((t (:background "color-125"))))
+ '(ivy-current-match ((t (:extend t :background "#1a4b77" :foreground "white" :weight bold))))
  '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
  '(ivy-minibuffer-match-face-2 ((t (:background "color-29" :weight bold))))
  '(ivy-minibuffer-match-face-3 ((t (:background "color-30" :weight bold))))
@@ -245,7 +248,8 @@ split; vice versa."
   (switch-to-buffer "*Bookmark List*"))
 (advice-add #'bookmark-bmenu-list :after #'show-bookmark-list)
 
-(ivy-mode 1)
+(ivy-mode t)
+(ivy-prescient-mode t)
 
 ;; (load-theme 'zenburn t)
 
@@ -272,7 +276,43 @@ split; vice versa."
 (add-hook 'inferior-python-mode-hook 'company-mode)
 (with-eval-after-load 'company
   (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous))
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  (with-eval-after-load 'yasnippet
+    (defun company-backend-with-yas (backend)
+      "Add `yasnippet' to company backend."
+      (if (and (listp backend) (member 'company-yasnippet backend))
+          backend
+        (append (if (consp backend) backend (list backend))
+                '(:with company-yasnippet))))
+
+    (defun my-company-enbale-yas (&rest _)
+      "Enable `yasnippet' in `company'."
+      (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
+    ;; Enable in current backends
+    (my-company-enbale-yas)
+    (with-eval-after-load 'lsp-mode
+      ;; Support `company-lsp'
+      (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas))
+
+    (defun my-company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
+      "Enable yasnippet but disable it inline."
+      (if (eq command 'prefix)
+          (when-let ((prefix (funcall fun 'prefix)))
+            (unless (memq (char-before (- (point) (length prefix))) '(?. ?> ?\())
+              prefix))
+        (progn
+          (when (and (bound-and-true-p lsp-mode)
+                     arg (not (get-text-property 0 'yas-annotation-patch arg)))
+            (let* ((name (get-text-property 0 'yas-annotation arg))
+                   (snip (format "%s (Snippet)" name))
+                   (len (length arg)))
+              (put-text-property 0 len 'yas-annotation snip arg)
+              (put-text-property 0 len 'yas-annotation-patch t arg)))
+          (funcall fun command arg))))
+    (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline))
+  (company-prescient-mode t)
+  )
+
 
 ;; Magit
 (global-set-key (kbd "C-c g") 'magit-status)
