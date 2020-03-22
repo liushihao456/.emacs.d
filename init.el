@@ -433,6 +433,7 @@ split; vice versa."
 
 ;; mu4e
 (add-to-list 'load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e")
+(autoload 'mu4e "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
 (with-eval-after-load 'mu4e
     (require 'org)
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
@@ -557,6 +558,7 @@ list and their compilation command lines."
     (define-key m "C-c l R" 'ccls-reload)))
 
 ;; Cmake
+(add-to-list 'load-path "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake")
 (autoload 'cmake-mode "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
