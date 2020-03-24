@@ -2,6 +2,6 @@
 # name: python_code_block
 # key: py
 # --
-#+BEGIN_SRC python :results output :async
+#+BEGIN_SRC python :results output
   $0
 #+END_SRC

@@ -67,22 +67,26 @@
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(org-capture-templates
-   '(("t" "Todo list item"
-      entry (file+headline "~/notes/tasks.org" "Tasks")
-      "* TODO %?\n %i\n")
-     ;; "* TODO %?\n %i\n %a")
-     ("j" "Journal entry"
-      entry (file+olp+datetree "~/notes/journal.org" "Journals")
-      "* %U %^{Title}\n %?")
-     ("b" "Tidbit: quote, zinger, one-liner or textlet"
-      entry (file+headline "~/notes/tidbits.org" "Tidbits")
-      "* %^{Name} captured %U\n %^{Tidbit type|quote|zinger|one-liner|textlet}\n Possible inspiration: %a %i\n %?")
-     ("n" "Notes"
-      entry (file "~/notes/notes.org" )
-      "* %?")
-     ))
+   '(("t" "Todo list item" entry
+      (file+headline "~/notes/tasks.org" "Tasks")
+      "* TODO %?
+ %i
+")
+     ("j" "Journal entry" entry
+      (file+olp+datetree "~/notes/journal.org" "Journals")
+      "* %U %^{Title}
+ %?")
+     ("b" "Tidbit: quote, zinger, one-liner or textlet" entry
+      (file+headline "~/notes/tidbits.org" "Tidbits")
+      "* %^{Name} captured %U
+ %^{Tidbit type|quote|zinger|one-liner|textlet}
+ Possible inspiration: %a %i
+ %?")
+     ("n" "Notes" entry
+      (file "~/notes/notes.org")
+      "* %?")))
  '(package-selected-packages
-   '(company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
+   '(expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -248,15 +252,8 @@ split; vice versa."
 (global-set-key (kbd "C-x ;") 'comment-line)
 (global-set-key (kbd "C-h F") 'describe-face)
 
-;; query-replace M-%
-;; occur M-s o
-;; tmm-menubar M-`
-;; dired C-x d
-;; highlight-symbol-at-point C-x w . / M-s h .
-;; unhighlight-regexp C-x w r / M-s h u
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
-;; (global-set-key (kbd "C-s") 'isearch-forward-symbol-at-point)
 
 (defun show-bookmark-list ()
   "Show bookmark list after calling 'list-bookmars'."
@@ -264,11 +261,17 @@ split; vice versa."
 (with-eval-after-load 'bookmark
   (advice-add #'bookmark-bmenu-list :after #'show-bookmark-list))
 
+;; Expand region
+(global-set-key (kbd "C-\\") 'er/expand-region)
+
+;; Ivy
 (ivy-mode t)
 (ivy-prescient-mode t)
 
+;; Zenburn theme
 ;; (load-theme 'zenburn t)
 
+;; Flycheck
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (with-eval-after-load 'flycheck
   (define-key flycheck-mode-map (kbd "C-c f p") 'flycheck-previous-error)
@@ -337,6 +340,7 @@ split; vice versa."
 ;; LaTeX
 (add-hook 'LaTeX-mode-hook 'reftex-mode)
 ;; (add-hook 'LaTeX-mode-hook 'cdlatex-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 (add-hook 'LaTeX-mode-hook 'lsp)
 
@@ -348,6 +352,9 @@ split; vice versa."
 (with-eval-after-load 'ess
   (setq ess-eval-visibly 'nowait) ; Allow asynchronous executing
   )
+
+;; Matlab: octave-mode
+(add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
 ;; Org mode
 (add-hook 'org-mode-hook 'auto-fill-mode)
