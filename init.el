@@ -44,7 +44,7 @@
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(company-dabbrev-downcase nil)
- '(company-idle-delay 0)
+ '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
@@ -58,13 +58,13 @@
  '(lsp-idle-delay 0.5)
  '(lsp-java-autobuild-enabled nil)
  '(lsp-java-code-generation-generate-comments t)
+ '(lsp-java-completion-overwrite nil)
  '(lsp-java-format-on-type-enabled nil)
  '(lsp-java-save-action-organize-imports nil)
  '(lsp-java-signature-help-enabled nil)
  '(lsp-python-ms-executable
    "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
  '(lsp-signature-render-documentation nil)
- '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(org-capture-templates
    '(("t" "Todo list item" entry
@@ -86,7 +86,7 @@
       (file "~/notes/notes.org")
       "* %?")))
  '(package-selected-packages
-   '(expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java lsp-ui delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
+   '(expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -131,7 +131,7 @@
  '(ivy-minibuffer-match-face-3 ((t (:background "color-30" :weight bold))))
  '(ivy-minibuffer-match-face-4 ((t (:background "color-31" :weight bold))))
  '(lazy-highlight ((t (:background "red"))))
- '(lsp-ui-doc-background ((t (:background "brightblack"))))
+ '(lsp-lsp-flycheck-warning-unnecessary-face ((t (:inherit warning :underline t))) t)
  '(magit-section-highlight ((t (:extend t :background "color-239"))))
  '(match ((t (:background "color-102"))))
  '(minibuffer-prompt ((t (:foreground "color-171"))))
@@ -177,7 +177,7 @@
 
 (if (display-graphic-p)
     (progn
-      (setq initial-frame-alist ('((fullscreen . maximized))))
+      ;; (setq initial-frame-alist ('((fullscreen . maximized))))
       ;; (setq
       ;;  mac-command-modifier 'meta
       ;;  mac-option-modifier 'none
@@ -318,7 +318,8 @@ split; vice versa."
       "Enable yasnippet but disable it after dot."
       (if (eq command 'prefix)
           (when-let ((prefix (funcall fun 'prefix)))
-            (unless (eq (char-before (- (point) (length prefix))) ?.)
+            (unless (memq (char-before (- (point) (length prefix)))
+                          '(?. ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?`))
               prefix))
         (progn
           (when (and (bound-and-true-p lsp-mode)
@@ -330,7 +331,8 @@ split; vice versa."
               (put-text-property 0 len 'yas-annotation-patch t arg)))
           (funcall fun command arg))))
     (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-after-dot))
-  (company-prescient-mode t)
+  ;; Causes lag
+  ;; (company-prescient-mode t)
   )
 
 
@@ -506,13 +508,13 @@ split; vice versa."
 
 (with-eval-after-load 'lsp-mode
   (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
-  (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
-  (define-key lsp-mode-map (kbd "C-c l R") 'lsp-ui-peek-find-references)
+  ;; (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
+  ;; (define-key lsp-mode-map (kbd "C-c l R") 'lsp-ui-peek-find-references)
   (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)
   (define-key lsp-mode-map (kbd "C-c l o") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l r") 'lsp-rename)
   (define-key lsp-mode-map (kbd "C-c l f") 'lsp-format-buffer)
-  (define-key lsp-mode-map (kbd "C-c l m") 'lsp-ui-imenu)
+  ;; (define-key lsp-mode-map (kbd "C-c l m") 'lsp-ui-imenu)
   (define-key lsp-mode-map (kbd "C-c l x") 'lsp-execute-code-action)
   (define-key lsp-mode-map (kbd "C-c l M-s") 'lsp-describe-session)
   (define-key lsp-mode-map (kbd "C-c l M-r") 'lsp-workspace-restart)
