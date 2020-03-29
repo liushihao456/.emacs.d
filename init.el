@@ -61,7 +61,6 @@
  '(lsp-java-completion-overwrite nil)
  '(lsp-java-format-on-type-enabled nil)
  '(lsp-java-save-action-organize-imports nil)
- '(lsp-java-signature-help-enabled nil)
  '(lsp-python-ms-executable
    "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
  '(lsp-signature-render-documentation nil)
