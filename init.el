@@ -64,7 +64,9 @@
  '(lsp-python-ms-executable
    "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
  '(lsp-signature-render-documentation nil)
+ '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
+ '(org-agenda-files '("~/notes/tasks.org"))
  '(org-capture-templates
    '(("t" "Todo list item" entry
       (file+headline "~/notes/tasks.org" "Tasks")
@@ -85,7 +87,7 @@
       (file "~/notes/notes.org")
       "* %?")))
  '(package-selected-packages
-   '(expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
+   '(lsp-ui expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -105,42 +107,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "unspecified-bg" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 1 :width normal :foundry "default" :family "default"))))
- '(company-scrollbar-bg ((t (:background "color-242"))))
- '(company-scrollbar-fg ((t (:background "color-240"))))
- '(company-tooltip ((t (:background "color-244"))))
- '(company-tooltip-annotation ((t (:foreground "color-83"))))
- '(company-tooltip-common ((t (:foreground "brightwhite" :slant italic :weight bold))))
- '(company-tooltip-selection ((t (:background "color-242" :weight bold))))
- '(error ((t (:foreground "color-28" :weight bold))))
- '(font-lock-builtin-face ((t (:foreground "color-76"))))
- '(font-lock-comment-face ((t (:foreground "cyan" :slant italic))))
- '(font-lock-constant-face ((t (:foreground "brightblue"))))
- '(font-lock-function-name-face ((t (:foreground "color-27"))))
- '(font-lock-keyword-face ((t (:foreground "yellow" :weight semi-bold))))
- '(font-lock-string-face ((t (:foreground "color-78"))))
- '(hi-green ((t (:background "color-30" :foreground "black"))))
- '(hi-pink ((t (:background "color-24" :foreground "black"))))
- '(hi-yellow ((t (:background "cyan" :foreground "black"))))
- '(highlight ((t (:background "color-234"))))
- '(isearch-fail ((t (:background "color-125"))))
- '(ivy-current-match ((t (:extend t :background "#1a4b77" :foreground "white" :weight bold))))
- '(ivy-minibuffer-match-face-1 ((t (:background "color-28"))))
- '(ivy-minibuffer-match-face-2 ((t (:background "color-29" :weight bold))))
- '(ivy-minibuffer-match-face-3 ((t (:background "color-30" :weight bold))))
- '(ivy-minibuffer-match-face-4 ((t (:background "color-31" :weight bold))))
- '(lazy-highlight ((t (:background "red"))))
- '(lsp-lsp-flycheck-warning-unnecessary-face ((t (:inherit warning :underline t))) t)
- '(magit-section-highlight ((t (:extend t :background "color-239"))))
- '(match ((t (:background "color-102"))))
- '(minibuffer-prompt ((t (:foreground "color-171"))))
- '(mode-line ((t (:background "color-236" :box (:line-width -1 :style released-button)))))
- '(mode-line-inactive ((t (:inherit mode-line :background "color-236" :foreground "brightcyan" :box (:line-width -1 :color "grey75") :weight light))))
- '(popup-tip-face ((t (:background "color-238"))))
- '(region ((t (:extend t :background "color-237"))))
- '(show-paren-match ((t (:underline "brightyellow" :weight bold))))
- '(warning ((t (:foreground "color-22" :weight bold))))
- '(web-mode-html-tag-bracket-face ((t (:foreground "color-28")))))
+ )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
@@ -152,7 +119,6 @@
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
 (add-hook 'after-init-hook (lambda () (message "Emacs started in %s" (emacs-init-time))))
-
 ;; (setq comment-style 'indent)
 ;; (global-hl-line-mode t)
 
@@ -202,13 +168,6 @@
   (shell-command "open -a Terminal .")
   )
 (global-set-key (kbd "C-c T") 'my/open-external-terminal)
-
-(defun find-init-file ()
-  "Find init.el file."
-  (interactive)
-  (find-file "~/.config/emacs/init.el")
-  )
-(global-set-key (kbd "C-c f i") 'find-init-file)
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -268,7 +227,11 @@ split; vice versa."
 (ivy-prescient-mode t)
 
 ;; Zenburn theme
-;; (load-theme 'zenburn t)
+(if (display-graphic-p)
+    (load-theme 'zenburn t)
+  ;; (load-theme 'terminal-pro t)
+  (load-theme 'terminal-silver-aerogel t)
+  )
 
 ;; Flycheck
 (add-hook 'prog-mode-hook 'flycheck-mode)
@@ -368,6 +331,8 @@ split; vice versa."
                            (setq-local company-minimum-prefix-length 1)
                            (electric-pair-local-mode -1)
                            ))
+(global-set-key (kbd "C-c o c") 'org-capture)
+(global-set-key (kbd "C-c o a") 'org-agenda)
 (with-eval-after-load 'org
 ;;   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 ;;   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
@@ -440,8 +405,10 @@ split; vice versa."
   (setq web-mode-enable-auto-expanding t))
 
 ;; mu4e
-(add-to-list 'load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e")
-(autoload 'mu4e "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
+;; (add-to-list 'load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e")
+;; (autoload 'mu4e "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
+(autoload 'mu4e "/usr/local/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
 (with-eval-after-load 'mu4e
     (require 'org)
   (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
@@ -566,8 +533,10 @@ list and their compilation command lines."
     (define-key m "C-c l R" 'ccls-reload)))
 
 ;; Cmake
-(add-to-list 'load-path "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake")
-(autoload 'cmake-mode "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/cmake")
+;; (autoload 'cmake-mode "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
+;; (add-to-list 'load-path "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake")
+(autoload 'cmake-mode "/usr/local/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 
