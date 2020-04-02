@@ -230,7 +230,8 @@ split; vice versa."
 (if (display-graphic-p)
     (load-theme 'zenburn t)
   ;; (load-theme 'terminal-pro t)
-  (load-theme 'terminal-silver-aerogel t)
+  ;; (load-theme 'terminal-silver-aerogel t)
+  (load-theme 'terminal-zenburn t)
   )
 
 ;; Flycheck

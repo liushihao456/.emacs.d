@@ -5,7 +5,11 @@
  'terminal-silver-aerogel
  '(default ((t (:family "default" :foundry "default" :width normal :height 1 :weight normal :slant normal :underline nil :overline nil :extend nil :strike-through nil :box nil :inverse-video nil :foreground "unspecified-fg" :background "unspecified-bg" :stipple nil :inherit nil))))
  '(cursor ((((background light)) (:background "black")) (((background dark)) (:background "white"))))
+ '(error ((t (:foreground "color-202" :weight bold))))
  '(fixed-pitch ((t (:family "Monospace"))))
+ '(font-lock-comment-face ((t (:foreground "green" :slant italic))))
+ '(font-lock-keyword-face ((t (:foreground "color-120" :weight bold))))
+ '(font-lock-variable-name-face ((t (:foreground "brightblack"))))
  '(variable-pitch ((((type w32)) (:foundry "outline" :family "Arial")) (t (:family "Sans Serif"))))
  '(escape-glyph ((((background dark)) (:foreground "cyan")) (((type pc)) (:foreground "magenta")) (t (:foreground "brown"))))
  '(homoglyph ((((background dark)) (:foreground "cyan")) (((type pc)) (:foreground "magenta")) (t (:foreground "brown"))))

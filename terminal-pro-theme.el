@@ -29,6 +29,8 @@
  '(ivy-minibuffer-match-face-4 ((t (:background "color-31" :weight bold))))
  '(lazy-highlight ((t (:background "red"))))
  '(lsp-lsp-flycheck-warning-unnecessary-face ((t (:inherit warning :underline t))) t)
+ '(lsp-ui-doc-background ((t (:background "color-242"))))
+ '(lsp-ui-doc-header ((t (:background "color-240" :foreground "black"))))
  '(magit-section-highlight ((t (:extend t :background "color-239"))))
  '(match ((t (:background "color-102"))))
  '(minibuffer-prompt ((t (:foreground "color-171"))))
