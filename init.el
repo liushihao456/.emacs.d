@@ -39,8 +39,6 @@
  '(TeX-parse-self t)
  '(TeX-show-compilation t)
  '(blink-cursor-mode nil)
- '(ccls-executable "~/.config/emacs/.cache/lsp/ccls/ccls")
- '(ccls-sem-highlight-method 'font-lock)
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(company-dabbrev-downcase nil)
@@ -87,7 +85,7 @@
       (file "~/notes/notes.org")
       "* %?")))
  '(package-selected-packages
-   '(lsp-ui expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight web-mode auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
+   '(lsp-ui expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -397,23 +395,14 @@ split; vice versa."
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
   )
 
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
-(with-eval-after-load 'web-mode
-  (setq web-mode-engines-alist
-        '(("django" . "\\.html\\'")))
-  (setq web-mode-enable-auto-pairing t)
-  (setq web-mode-enable-auto-expanding t))
-
 ;; mu4e
-;; (add-to-list 'load-path "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e")
-;; (autoload 'mu4e "/usr/local/Cellar/mu/1.2.0_1/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
 (autoload 'mu4e "/usr/local/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
+(global-set-key (kbd "C-c m") 'mu4e)
 (with-eval-after-load 'mu4e
     (require 'org)
-  (setq mail-user-agent 'mu4e-user-agent)	; Use mu4e as default mail agent
-  (setq mu4e-maildir (expand-file-name "~/Maildir"))		; Mail folder set to ~/mail
+  (setq mail-user-agent 'mu4e-user-agent) ; Use mu4e as default mail agent
+  (setq mu4e-maildir (expand-file-name "~/Maildir")) ; Mail folder set to ~/mail
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a")
   (setq mu4e-update-interval 300)
   (setq mu4e-headers-auto-update t)
@@ -507,18 +496,15 @@ split; vice versa."
   (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer))
 
 ;; Lsp C++
-(add-to-list 'load-path "~/.config/emacs/packages/ccls")
-(with-eval-after-load 'cc-mode
-  (require 'ccls))
-(dolist (m (list 'c-mode-hook 'c++mode-hook 'objc-mode-hook))
+(dolist (m (list 'c-mode-hook 'c++-mode-hook 'objc-mode-hook))
   (add-hook m (lambda ()
                 (lsp)
                 (setq-local company-backends (delete 'company-clang company-backends))
                 (setq comment-start "/* "
                       comment-end " */")))
   )
-(with-eval-after-load 'ccls
-  (defun my/cmake-project-setup-for-ccls ()
+(with-eval-after-load 'cc-mode
+  (defun my/cmake-project-generate-compile-commands ()
     "ccls typically indexes an entire project. In order for this
 to work properly, ccls needs to be able to obtain the source file
 list and their compilation command lines."
@@ -529,14 +515,10 @@ list and their compilation command lines."
                "\nln -s Debug/compile_commands.json")))
     )
   (dolist (m (list c-mode-map c++-mode-map objc-mode-map))
-    (define-key m "C-c l s" 'my/cmake-project-setup-for-ccls)
-    (define-key m "C-c l l" 'ccls-code-lens-mode)
-    (define-key m "C-c l R" 'ccls-reload)))
+    (define-key m (kbd "C-c l s") 'my/cmake-project-generate-compile-commands)))
 
 ;; Cmake
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/cmake")
-;; (autoload 'cmake-mode "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
-;; (add-to-list 'load-path "/usr/local/Cellar/cmake/3.16.5/share/emacs/site-lisp/cmake")
 (autoload 'cmake-mode "/usr/local/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
