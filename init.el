@@ -39,6 +39,7 @@
  '(TeX-parse-self t)
  '(TeX-show-compilation t)
  '(blink-cursor-mode nil)
+ '(c-basic-offset 4)
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(company-dabbrev-downcase nil)
@@ -92,6 +93,7 @@
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(split-width-threshold 150)
+ '(tab-width 4)
  '(tool-bar-mode nil)
  '(truncate-lines t)
  '(yas-snippet-dirs '("~/.config/emacs/snippets/")))
@@ -459,8 +461,6 @@ split; vice versa."
                                          xref-find-definitions-other-frame
                                          xref-find-references)))
 
-;; (setq-default c-basic-offset 4)
-;; (setq-default tab-width 4)
 
 (with-eval-after-load 'lsp-mode
   (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
