@@ -162,12 +162,13 @@
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
 
-(defun my/open-external-terminal ()
+(defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
   (interactive)
-  (shell-command "open -a Terminal .")
+  (let ((default-directory (cdr (project-current))))
+    (shell-command "open -a Terminal ."))
   )
-(global-set-key (kbd "C-c T") 'my/open-external-terminal)
+(global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.

@@ -170,8 +170,7 @@ Also bind `class' to ((class color) (min-colors 89))."
    '(button ((t (:underline t))))
    `(link ((t (:foreground ,terminal-zenburn-yellow :underline t :weight bold))))
    `(link-visited ((t (:foreground ,terminal-zenburn-yellow-2 :underline t :weight normal))))
-   ;; `(default ((t (:foreground ,terminal-zenburn-fg))))
-   ;; `(default ((t (:foreground ,terminal-zenburn-fg :background ,terminal-zenburn-bg))))
+   `(default ((t (:foreground ,terminal-zenburn-fg))))
    `(cursor ((t (:foreground ,terminal-zenburn-fg :background ,terminal-zenburn-fg+1))))
    `(widget-field ((t (:foreground ,terminal-zenburn-fg :background ,terminal-zenburn-bg+3))))
    `(escape-glyph ((t (:foreground ,terminal-zenburn-yellow :weight bold))))
@@ -810,9 +809,5 @@ this should be done.  This requires library `rainbow-mode'."
 
 (provide-theme 'terminal-zenburn)
 
-;; Local Variables:
-;; no-byte-compile: t
-;; indent-tabs-mode: nil
-;; eval: (when (require 'rainbow-mode nil t) (rainbow-mode 1))
 ;; End:
 ;;; terminal-zenburn-theme.el ends here
