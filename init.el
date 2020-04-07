@@ -227,6 +227,9 @@ split; vice versa."
 ;; Ivy
 (ivy-mode t)
 (ivy-prescient-mode t)
+(with-eval-after-load 'ivy
+  (define-key ivy-minibuffer-map (kbd "C-@") 'ivy-mark)
+)
 
 ;; Zenburn theme
 (if (display-graphic-p)
