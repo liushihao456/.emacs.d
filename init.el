@@ -47,6 +47,7 @@
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
  '(enable-recursive-minibuffers t)
+ '(help-window-select t)
  '(indent-tabs-mode nil)
  '(ivy-use-virtual-buffers t)
  '(lsp-before-save-edits nil)
@@ -86,17 +87,18 @@
       (file "~/notes/notes.org")
       "* %?")))
  '(package-selected-packages
-   '(lsp-ui expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(json-mode emmet-mode lsp-ui expand-region ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
- '(split-width-threshold 150)
+ '(split-width-threshold 120)
  '(tab-width 4)
  '(tool-bar-mode nil)
  '(truncate-lines t)
- '(yas-snippet-dirs '("~/.config/emacs/snippets/")))
+ '(yas-snippet-dirs '("~/.config/emacs/snippets/"))
+ '(yas-triggers-in-field t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -167,9 +169,42 @@
   "Open an external Terminal window under current directory."
   (interactive)
   (let ((default-directory (cdr (project-current))))
-    (shell-command "open -a Terminal ."))
-  )
+    (shell-command "open -a Terminal .")))
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
+
+(defun my/project-compile-command ()
+  "Return the compile command for the project."
+  (cond
+   ((or (equal major-mode 'c++-mode)
+        (equal major-mode 'cmake-mode))
+    "cd build && cmake .. && make")
+   ((or (equal major-mode 'nxml-mode)
+        (equal major-mode 'java-mode))
+    "mvn compile exec:java")
+   ((or (equal major-mode 'json-mode)
+        (equal major-mode 'js-mode))
+    "npm start")
+   ((equal major-mode 'emacs-lisp-mode)
+    "elisp mode")))
+
+(defun my/compile-project ()
+  "Compile the project."
+  (interactive)
+  (let ((default-directory (cdr (project-current))))
+    (compile (my/project-compile-command))))
+(global-set-key (kbd "C-c p c") 'my/compile-project)
+
+(with-eval-after-load 'compile
+  (require 'ansi-color)
+  (defun colorize-compilation-buffer ()
+    "Apply ansi color rendering in compilation buffer."
+    (read-only-mode)
+    (ansi-color-apply-on-region compilation-filter-start (point))
+    (read-only-mode))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer))
+
+(add-hook 'occur-hook (lambda () (pop-to-buffer (get-buffer "*Occur*"))))
+(add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (get-buffer "*compilation*"))))
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -264,43 +299,6 @@ split; vice versa."
 (with-eval-after-load 'company
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (with-eval-after-load 'yasnippet
-    (yas-reload-all)
-    (defun company-backend-with-yas (backend)
-      "Add `yasnippet' to company backend."
-      (if (and (listp backend) (member 'company-yasnippet backend))
-          backend
-        (append (if (consp backend) backend (list backend))
-                '(:with company-yasnippet))))
-
-    (defun my-company-enbale-yas (&rest _)
-      "Enable `yasnippet' in `company'."
-      (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
-    ;; Enable in current backends
-    (my-company-enbale-yas)
-    (with-eval-after-load 'lsp-mode
-      ;; Support `company-lsp'
-      (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas))
-
-    (defun my-company-yasnippet-disable-after-dot (fun command &optional arg &rest _ignore)
-      "Enable yasnippet but disable it after dot."
-      (if (eq command 'prefix)
-          (when-let ((prefix (funcall fun 'prefix)))
-            (unless (memq (char-before (- (point) (length prefix)))
-                          '(?. ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?`))
-              prefix))
-        (progn
-          (when (and (bound-and-true-p lsp-mode)
-                     arg (not (get-text-property 0 'yas-annotation-patch arg)))
-            (let* ((name (get-text-property 0 'yas-annotation arg))
-                   (snip (format "%s (Snippet)" name))
-                   (len (length arg)))
-              (put-text-property 0 len 'yas-annotation snip arg)
-              (put-text-property 0 len 'yas-annotation-patch t arg)))
-          (funcall fun command arg))))
-    (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-after-dot))
-  ;; Causes lag
-  ;; (company-prescient-mode t)
   )
 
 
@@ -477,6 +475,13 @@ list and their compilation command lines."
                            (lsp)
                            (setq comment-start "/* "
                                  comment-end " */")))
+
+;; Lsp javascript
+(add-hook 'js-mode-hook 'lsp)
+
+;; Emmet mode
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
