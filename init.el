@@ -44,6 +44,7 @@
  '(company-dabbrev-downcase nil)
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
+ '(compilation-scroll-output 'first-error)
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
  '(enable-recursive-minibuffers t)
@@ -183,9 +184,7 @@
     "mvn compile exec:java")
    ((or (equal major-mode 'json-mode)
         (equal major-mode 'js-mode))
-    "npm start")
-   ((equal major-mode 'emacs-lisp-mode)
-    "elisp mode")))
+    "npm start")))
 
 (defun my/compile-project ()
   "Compile the project."
