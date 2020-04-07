@@ -37,7 +37,6 @@
  '(TeX-command-extra-options "-shell-escape")
  '(TeX-engine 'xetex)
  '(TeX-parse-self t)
- '(TeX-show-compilation t)
  '(blink-cursor-mode nil)
  '(c-basic-offset 4)
  '(cmake-tab-width 4 t)
@@ -65,6 +64,7 @@
  '(lsp-signature-render-documentation nil)
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
+ '(nxml-child-indent 4)
  '(org-agenda-files '("~/notes/tasks.org"))
  '(org-capture-templates
    '(("t" "Todo list item" entry
@@ -86,7 +86,7 @@
       (file "~/notes/notes.org")
       "* %?")))
  '(package-selected-packages
-   '(lsp-ui expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme cdlatex yasnippet))
+   '(lsp-ui expand-region company-prescient ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -119,6 +119,7 @@
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
 (add-hook 'after-init-hook (lambda () (message "Emacs started in %s" (emacs-init-time))))
+(add-to-list 'Info-directory-list "/usr/local/texlive/2019basic/texmf-dist/doc/info")
 ;; (setq comment-style 'indent)
 ;; (global-hl-line-mode t)
 
@@ -308,7 +309,8 @@ split; vice versa."
 ;; (add-hook 'LaTeX-mode-hook 'cdlatex-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-(add-hook 'LaTeX-mode-hook 'lsp)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(setq-default TeX-master nil)
 
 ;; Gnuplot mode
 (add-to-list 'auto-mode-alist '("\\.gnuplot\\'" . gnuplot-mode))
@@ -330,11 +332,10 @@ split; vice versa."
   (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
 (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
 (add-hook 'org-mode-hook (lambda ()
-                           (setq-local company-minimum-prefix-length 1)
                            (electric-pair-local-mode -1)
                            ))
-(global-set-key (kbd "C-c o c") 'org-capture)
-(global-set-key (kbd "C-c o a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c a") 'org-agenda)
 (with-eval-after-load 'org
 ;;   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
 ;;   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
@@ -403,7 +404,6 @@ split; vice versa."
 (autoload 'mu4e "/usr/local/share/emacs/site-lisp/mu/mu4e/mu4e.el" "Mu4e autoload" t)
 (global-set-key (kbd "C-c m") 'mu4e)
 (with-eval-after-load 'mu4e
-    (require 'org)
   (setq mail-user-agent 'mu4e-user-agent) ; Use mu4e as default mail agent
   (setq mu4e-maildir (expand-file-name "~/Maildir")) ; Mail folder set to ~/mail
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a")
@@ -430,12 +430,12 @@ split; vice versa."
                       (:size . 7)))))
   (add-to-list 'mu4e-view-actions
                '("browser view" . mu4e-action-view-in-browser) t)
-  (add-hook 'mu4e-view-mode-hook
-            (lambda()
-              (local-set-key (kbd "TAB") 'org-next-link)
-              (local-set-key (kbd "<backtab>") 'org-previous-link)
-              (local-set-key (kbd "<return>") 'mu4e~view-browse-url-from-binding))
-            )
+  ;; (add-hook 'mu4e-view-mode-hook
+  ;;           (lambda()
+  ;;             ;; (local-set-key (kbd "TAB") 'org-next-link)
+  ;;             ;; (local-set-key (kbd "<backtab>") 'org-previous-link)
+  ;;             ;; (local-set-key (kbd "<return>") 'mu4e~view-browse-url-from-binding))
+  ;;           )
 
   (setq mu4e-sent-folder   "/liushihao-pku/Sent Items")
   (setq mu4e-drafts-folder "/liushihao-pku/Drafts")
@@ -454,7 +454,54 @@ split; vice versa."
   (setq smtpmail-smtp-server "mail.pku.edu.cn")
   (setq smtpmail-default-smtp-server "mail.pku.edu.cn")
   (setq smtpmail-smtp-service 465)
-  (setq smtpmail-smtp-user "liushihao@pku.edu.cn"))
+  (setq smtpmail-smtp-user "liushihao@pku.edu.cn")
+
+  (defvar my-mu4e-account-alist
+    '(("liushihao-pku"
+       (smtpmail-stream-type 'ssl)
+       (user-mail-address "liushihao@pku.edu.cn")
+       (smtpmail-smtp-server "mail.pku.edu.cn")
+       (smtpmail-default-smtp-server "mail.pku.edu.cn")
+       (smtpmail-smtp-service 465)
+       (smtpmail-smtp-user "Shihao Liu")
+       (mu4e-sent-folder   "/liushihao-pku/Sent Items")
+       (mu4e-drafts-folder "/liushihao-pku/Drafts")
+       (mu4e-trash-folder  "/liushihao-pku/Trash")
+       (mu4e-refile-folder  "/liushihao-pku/Archive")
+       ))
+    ("nm-dev"
+       (smtpmail-stream-type 'ssl)
+       (user-mail-address "shihao.liu@nm.dev")
+       (smtpmail-smtp-server "smtp.gmail.com")
+       (smtpmail-default-smtp-server "smtp.gmail.com")
+       (smtpmail-smtp-service 465)
+       (smtpmail-smtp-user "Shihao Liu")
+       (mu4e-sent-folder   "/nm-dev/Sent Items")
+       (mu4e-drafts-folder "/nm-dev/Drafts")
+       (mu4e-trash-folder  "/nm-dev/Trash")
+       (mu4e-refile-folder  "/nm-dev/Archive")
+       ))
+  
+  (defun my-mu4e-set-account ()
+    "Set the account for composing a message."
+    (let* ((account
+            (if mu4e-compose-parent-message
+                (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+                  (string-match "/\\(.*?\\)/" maildir)
+                  (match-string 1 maildir))
+              (completing-read (format "Compose with account: (%s) "
+                                       (mapconcat #'(lambda (var) (car var))
+                                                  my-mu4e-account-alist "/"))
+                               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+                               nil t nil nil (caar my-mu4e-account-alist))))
+           (account-vars (cdr (assoc account my-mu4e-account-alist))))
+      (if account-vars
+          (mapc #'(lambda (var)
+                    (set (car var) (cadr var)))
+                account-vars)
+        (error "No email account found"))))
+  (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
+  )
 
 (with-eval-after-load 'xref
   (setq xref-prompt-for-identifier '(not xref-find-definitions
