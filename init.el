@@ -44,7 +44,7 @@
  '(company-dabbrev-downcase nil)
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
- '(compilation-scroll-output 'first-error)
+ '(compilation-scroll-output t)
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
  '(enable-recursive-minibuffers t)
@@ -200,10 +200,14 @@
     (read-only-mode)
     (ansi-color-apply-on-region compilation-filter-start (point))
     (read-only-mode))
-  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
-(add-hook 'occur-hook (lambda () (pop-to-buffer (get-buffer "*Occur*"))))
-(add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (get-buffer "*compilation*"))))
+  (defun my/pop-to-compilation-buffer ()
+    "Pop to compilation buffer."
+    (pop-to-buffer (buffer-name)))
+  (setq compilation-process-setup-function #'my/pop-to-compilation-buffer)
+  )
+
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -242,18 +246,16 @@ split; vice versa."
 (global-set-key (kbd "C-c `") 'fileloop-continue)
 (global-set-key (kbd "C-c i") 'imenu)
 (global-set-key (kbd "C-x B") 'ibuffer)
-(global-set-key (kbd "C-x P") 'list-processes)
+(global-set-key (kbd "C-x p") 'list-processes)
 (global-set-key (kbd "C-x ;") 'comment-line)
 (global-set-key (kbd "C-h F") 'describe-face)
 
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
+(add-hook 'occur-hook (lambda () (pop-to-buffer (get-buffer "*Occur*"))))
+(add-hook 'bookmark-bmenu-mode-hook (lambda () (switch-to-buffer "*Bookmark List*")))
+(add-hook 'process-menu-mode-hook (lambda () (pop-to-buffer "*Process List*")))
 
-(defun show-bookmark-list ()
-  "Show bookmark list after calling 'list-bookmars'."
-  (switch-to-buffer "*Bookmark List*"))
-(with-eval-after-load 'bookmark
-  (advice-add #'bookmark-bmenu-list :after #'show-bookmark-list))
 
 ;; Expand region
 (global-set-key (kbd "C-\\") 'er/expand-region)
