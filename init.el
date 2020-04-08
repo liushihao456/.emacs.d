@@ -201,11 +201,7 @@
     (ansi-color-apply-on-region compilation-filter-start (point))
     (read-only-mode))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-
-  (defun my/pop-to-compilation-buffer ()
-    "Pop to compilation buffer."
-    (pop-to-buffer (buffer-name)))
-  (setq compilation-process-setup-function #'my/pop-to-compilation-buffer)
+  (add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (buffer-name))))
   )
 
 
