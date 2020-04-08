@@ -99,7 +99,6 @@
  '(tab-width 4)
  '(tool-bar-mode nil)
  '(truncate-lines t)
- '(yas-snippet-dirs '("~/.config/emacs/snippets/"))
  '(yas-triggers-in-field t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -272,6 +271,8 @@ split; vice versa."
 (which-key-setup-side-window-bottom)
 
 ;; Yasnippet mode
+(with-eval-after-load 'yasnippet
+  (yas-reload-all))
 (add-hook 'prog-mode-hook 'yas-minor-mode)
 (add-hook 'LaTeX-mode-hook 'yas-minor-mode)
 (add-hook 'org-mode-hook 'yas-minor-mode)
