@@ -93,6 +93,7 @@
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
  '(scroll-bar-mode nil)
+ '(sgml-basic-offset 4)
  '(show-paren-mode t)
  '(split-width-threshold 120)
  '(tab-width 4)
@@ -173,25 +174,12 @@
     (shell-command "open -a Terminal .")))
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 
-(defun my/project-compile-command ()
-  "Return the compile command for the project."
-  (cond
-   ((or (equal major-mode 'c++-mode)
-        (equal major-mode 'cmake-mode))
-    "cd build && cmake .. && make")
-   ((or (string-match-p (regexp-quote "pom.xml") (buffer-name))
-        (equal major-mode 'java-mode))
-    "mvn compile exec:java")
-   ((or (equal major-mode 'json-mode)
-        (equal major-mode 'js-mode))
-    "npm start")))
-
 (defun my/compile-project ()
   "Compile the project."
   (interactive)
   (let ((default-directory (cdr (project-current))))
-    (compile (my/project-compile-command))))
-(global-set-key (kbd "C-c p c") 'my/compile-project)
+    (call-interactively 'compile)))
+(global-set-key (kbd "C-c m") 'my/compile-project)
 
 (with-eval-after-load 'compile
   (require 'ansi-color)
