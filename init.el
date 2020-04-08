@@ -179,7 +179,7 @@
    ((or (equal major-mode 'c++-mode)
         (equal major-mode 'cmake-mode))
     "cd build && cmake .. && make")
-   ((or (equal major-mode 'nxml-mode)
+   ((or (string-match-p (regexp-quote "pom.xml") (buffer-name))
         (equal major-mode 'java-mode))
     "mvn compile exec:java")
    ((or (equal major-mode 'json-mode)
