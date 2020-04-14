@@ -123,6 +123,8 @@
 (setq-default fill-column 80)
 (add-hook 'after-init-hook (lambda () (message "Emacs started in %s" (emacs-init-time))))
 (add-to-list 'Info-directory-list "/usr/local/texlive/2019basic/texmf-dist/doc/info")
+(add-hook 'help-mode-hook 'visual-line-mode)
+
 ;; (setq comment-style 'indent)
 ;; (global-hl-line-mode t)
 
@@ -188,9 +190,7 @@
     (ansi-color-apply-on-region compilation-filter-start (point))
     (read-only-mode))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-  (add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (buffer-name))))
-  )
-
+  (add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (buffer-name)))))
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
@@ -463,7 +463,10 @@ list and their compilation command lines."
                                  comment-end " */")))
 
 ;; Lsp javascript
-(add-hook 'js-mode-hook 'lsp)
+(add-hook 'js-mode-hook (lambda ()
+                          (lsp)
+                          (setq comment-start "/* "
+	                            comment-end " */")))
 
 ;; Emmet mode
 (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
