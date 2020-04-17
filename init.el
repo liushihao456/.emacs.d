@@ -171,7 +171,9 @@
 (defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
   (interactive)
-  (let ((default-directory (cdr (project-current))))
+  (if (cdr (project-current))
+      (let ((default-directory (cdr (project-current))))
+        (shell-command "open -a Terminal ."))
     (shell-command "open -a Terminal .")))
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 
@@ -471,6 +473,10 @@ list and their compilation command lines."
 ;; Emmet mode
 (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
 (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+;; Lsp html
+(add-hook 'mhtml-mode-hook 'lsp)
+
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
