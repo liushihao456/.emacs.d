@@ -39,6 +39,8 @@
  '(TeX-parse-self t)
  '(blink-cursor-mode nil)
  '(c-basic-offset 4)
+ '(calendar-latitude 32.0105)
+ '(calendar-longitude 112.0856)
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(company-dabbrev-downcase nil)
@@ -67,7 +69,12 @@
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(nxml-child-indent 4)
- '(org-agenda-files '("~/notes/tasks.org"))
+ '(org-agenda-files
+   '("~/Documents/Org-mode/src/agenda-expressions.org" "~/notes/tasks.org"))
+ '(org-agenda-time-grid
+   '((daily today require-timed)
+     (300 600 900 1200 1500 1800 2100 2400)
+     "......" "----------------"))
  '(org-capture-templates
    '(("t" "Todo list item" entry
       (file+headline "~/notes/tasks.org" "Tasks")
@@ -127,7 +134,6 @@
 
 ;; (setq comment-style 'indent)
 ;; (global-hl-line-mode t)
-
 
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
@@ -320,9 +326,35 @@ split; vice versa."
 (defun add-pcomplete-to-capf ()
   (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
 (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
-(add-hook 'org-mode-hook (lambda ()
-                           (electric-pair-local-mode -1)
-                           ))
+(add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
+;; Sunrise and Sunset
+(defun diary-sunrise ()
+  (let ((dss (diary-sunrise-sunset)))
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ",")
+      (buffer-substring (point-min) (match-beginning 0)))))
+
+(defun diary-sunset ()
+  (let ((dss (diary-sunrise-sunset))
+        start end)
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ", ")
+      (setq start (match-end 0))
+      (search-forward " at")
+      (setq end (match-beginning 0))
+      (goto-char start)
+      (capitalize-word 1)
+      (buffer-substring start end))))
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (with-eval-after-load 'org
