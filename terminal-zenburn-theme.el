@@ -249,7 +249,7 @@ Also bind `class' to ((class color) (min-colors 89))."
    `(vertical-border ((t (:foreground ,terminal-zenburn-fg))))
 ;;;;; font lock
    `(font-lock-builtin-face ((t (:foreground ,terminal-zenburn-fg :weight bold))))
-   `(font-lock-comment-face ((t (:foreground ,terminal-zenburn-green))))
+   `(font-lock-comment-face ((t (:foreground ,terminal-zenburn-green :slant italic))))
    `(font-lock-comment-delimiter-face ((t (:foreground ,terminal-zenburn-green-2))))
    `(font-lock-constant-face ((t (:foreground ,terminal-zenburn-green+4))))
    `(font-lock-doc-face ((t (:foreground ,terminal-zenburn-green+2))))

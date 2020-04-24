@@ -69,30 +69,27 @@
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(nxml-child-indent 4)
+ '(org-adapt-indentation nil)
  '(org-agenda-files
-   '("~/Documents/Org-mode/src/agenda-expressions.org" "~/notes/tasks.org"))
+   '("~/Documents/Org-mode/capture/journals.org" "~/Documents/Org-mode/capture/tasks.org" "~/Documents/Org-mode/src/agenda-expressions.org"))
  '(org-agenda-time-grid
    '((daily today require-timed)
      (300 600 900 1200 1500 1800 2100 2400)
      "......" "----------------"))
  '(org-capture-templates
    '(("t" "Todo list item" entry
-      (file+headline "~/notes/tasks.org" "Tasks")
+      (file "~/Documents/Org-mode/capture/tasks.org")
       "* TODO %?
- %i
-")
-     ("j" "Journal entry" entry
-      (file+olp+datetree "~/notes/journal.org" "Journals")
-      "* %U %^{Title}
- %?")
-     ("b" "Tidbit: quote, zinger, one-liner or textlet" entry
-      (file+headline "~/notes/tidbits.org" "Tidbits")
-      "* %^{Name} captured %U
- %^{Tidbit type|quote|zinger|one-liner|textlet}
- Possible inspiration: %a %i
- %?")
+SCHEDULED: %^T")
+     ("j" "Journals" entry
+      (file+datetree "~/Documents/Org-mode/capture/journals.org")
+      "* %?
+Entered on %T")
      ("n" "Notes" entry
-      (file "~/notes/notes.org")
+      (file "~/Documents/Org-mode/notes/notes.org")
+      "* %?")
+     ("p" "Programming notes" entry
+      (file "~/Documents/Org-mode/notes/programming-notes.org")
       "* %?")))
  '(package-selected-packages
    '(json-mode emmet-mode lsp-ui expand-region ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
@@ -230,6 +227,7 @@ split; vice versa."
 
 (global-set-key (kbd "C-c s") 'ripgrep-regexp)
 (global-set-key (kbd "C-c f r") 'recentf-open-files)
+(global-set-key (kbd "C-c f f") 'find-file-at-point)
 (global-set-key (kbd "C-c p f") 'project-find-file)
 (global-set-key (kbd "C-c p s") 'project-search)
 (global-set-key (kbd "C-c p r") 'project-find-regexp)
