@@ -72,6 +72,7 @@
  '(org-adapt-indentation nil)
  '(org-agenda-files
    '("~/Documents/Org-mode/capture/journals.org" "~/Documents/Org-mode/capture/tasks.org" "~/Documents/Org-mode/src/agenda-expressions.org"))
+ '(org-agenda-span 'day)
  '(org-agenda-time-grid
    '((daily today require-timed)
      (300 600 900 1200 1500 1800 2100 2400)
@@ -191,9 +192,7 @@ Entered on %T")
   (require 'ansi-color)
   (defun colorize-compilation-buffer ()
     "Apply ansi color rendering in compilation buffer."
-    (read-only-mode)
-    (ansi-color-apply-on-region compilation-filter-start (point))
-    (read-only-mode))
+    (ansi-color-apply-on-region compilation-filter-start (point-max)))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
   (add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (buffer-name)))))
 
