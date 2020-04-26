@@ -84,7 +84,7 @@
       "* TODO %?
 SCHEDULED: %^T")
      ("j" "Journals" entry
-      (file+datetree "~/Documents/Org-mode/capture/journals.org")
+      (file+olp+datetree "~/Documents/Org-mode/capture/journals.org")
       "* %?
 Entered on %T")
      ("n" "Notes" entry
@@ -94,7 +94,7 @@ Entered on %T")
       (file "~/Documents/Org-mode/notes/programming-notes.org")
       "* %?")))
  '(package-selected-packages
-   '(json-mode emmet-mode lsp-ui expand-region ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(typescript-mode json-mode emmet-mode lsp-ui expand-region ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -494,11 +494,15 @@ list and their compilation command lines."
                            (setq comment-start "/* "
                                  comment-end " */")))
 
-;; Lsp javascript
+;; Lsp javascript/typescript
 (add-hook 'js-mode-hook (lambda ()
                           (lsp)
                           (setq comment-start "/* "
 	                            comment-end " */")))
+(add-hook 'typescript-mode-hook (lambda ()
+                                  (lsp)
+                                  (setq comment-start "/* "
+	                                    comment-end " */")))
 
 ;; Emmet mode
 (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
@@ -506,7 +510,6 @@ list and their compilation command lines."
 
 ;; Lsp html
 (add-hook 'mhtml-mode-hook 'lsp)
-
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
