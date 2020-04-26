@@ -46,6 +46,7 @@
  '(company-dabbrev-downcase nil)
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
+ '(company-tooltip-align-annotations t)
  '(compilation-scroll-output t)
  '(dired-use-ls-dired nil)
  '(electric-pair-mode t)
