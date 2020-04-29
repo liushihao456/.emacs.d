@@ -53,7 +53,6 @@
  '(enable-recursive-minibuffers t)
  '(help-window-select t)
  '(indent-tabs-mode nil)
- '(ivy-use-virtual-buffers t)
  '(lsp-before-save-edits nil)
  '(lsp-enable-file-watchers nil)
  '(lsp-enable-indentation nil)
@@ -91,10 +90,11 @@ Entered on %T")
       (file "~/Documents/Org-mode/notes/notes.org")
       "* %?")
      ("p" "Programming notes" entry
-      (file "~/Documents/Org-mode/notes/programming-notes.org")
-      "* %?")))
+      (file "~/Documents/Org-mode/notes/prog-notes.org")
+      "* %? %^g")))
+ '(org-log-done 'time)
  '(package-selected-packages
-   '(typescript-mode json-mode emmet-mode lsp-ui expand-region ivy-prescient ess gnuplot-mode ivy ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -238,6 +238,8 @@ split; vice versa."
 (global-set-key (kbd "C-x p") 'list-processes)
 (global-set-key (kbd "C-x ;") 'comment-line)
 (global-set-key (kbd "C-h F") 'describe-face)
+(global-set-key (kbd "M-n") 'scroll-up-line)
+(global-set-key (kbd "M-p") 'scroll-down-line)
 
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
@@ -250,11 +252,15 @@ split; vice versa."
 (global-set-key (kbd "C-\\") 'er/expand-region)
 
 ;; Ivy
-(ivy-mode t)
-(ivy-prescient-mode t)
-(with-eval-after-load 'ivy
-  (define-key ivy-minibuffer-map (kbd "C-@") 'ivy-mark)
-)
+;; (ivy-mode t)
+;; (ivy-prescient-mode t)
+;; (with-eval-after-load 'ivy
+;;   (define-key ivy-minibuffer-map (kbd "C-@") 'ivy-mark)
+;; )
+
+;; Selectrum
+(selectrum-mode t)
+(selectrum-prescient-mode t)
 
 ;; Zenburn theme
 (if (display-graphic-p)
