@@ -168,7 +168,7 @@ Entered on %T")
 
 (delight '((eldoc-mode nil "eldoc")
            (emacs-lisp-mode "Elisp" :major)
-           (undo-tree-mode nil "Undo-Tree")))
+           (which-key-mode nil "which-key")))
 
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
