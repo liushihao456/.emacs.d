@@ -9,10 +9,8 @@
 (setq read-process-output-max (* 1024 1024))
 (require 'package)
 (setq package-enable-at-startup nil)
-(setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
-                         ("melpa" . "http://elpa.emacs-china.org/melpa/")
-                         ("melpa-stable" . "http://elpa.emacs-china.org/melpa-stable/")
-                         ))
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -101,7 +99,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -160,14 +158,18 @@ Entered on %T")
 
 (if (display-graphic-p)
     (progn
-      ;; (setq initial-frame-alist ('((fullscreen . maximized))))
+      (setq initial-frame-alist '((fullscreen . maximized)))
       ;; (setq
       ;;  mac-command-modifier 'meta
       ;;  mac-option-modifier 'none
       ;;  )
 
+      (set-frame-parameter (selected-frame) 'alpha '(85 . 85))
+      (add-to-list 'default-frame-alist '(alpha . (85 . 85)))
+
       (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
-      (set-face-attribute 'default nil :font "Source Code Pro-13")
+      (set-face-attribute 'default nil :font "Source Code Pro-16")
+      (setq-default line-spacing 0.2)
       (set-fontset-font t 'han      (font-spec :family "STkaiti"))
       (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
       )
@@ -255,6 +257,11 @@ split; vice versa."
 (add-hook 'process-menu-mode-hook (lambda () (pop-to-buffer "*Process List*")))
 
 
+;; Color rg
+(add-to-list 'load-path "~/.config/emacs/packages/color-rg")
+(autoload 'color-rg-search-input-in-project "~/.config/emacs/packages/color-rg/color-rg.el" "Color-rg search input in project autoload" t)
+(global-set-key (kbd "C-c p c") 'color-rg-search-input-in-project)
+
 ;; Expand region
 (global-set-key (kbd "C-\\") 'er/expand-region)
 
@@ -304,6 +311,12 @@ split; vice versa."
 (with-eval-after-load 'company
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  (if (display-graphic-p)
+      (progn
+        (require 'company-box)
+        (add-hook 'company-mode-hook 'company-box-mode)
+        )
+    )
   )
 
 
