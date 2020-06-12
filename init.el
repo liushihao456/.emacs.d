@@ -72,6 +72,7 @@
    "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
  '(lsp-signature-render-documentation nil)
  '(lsp-ui-sideline-show-hover t)
+ '(lsp-ui-sideline-update-mode 'line)
  '(menu-bar-mode nil)
  '(nxml-child-indent 4)
  '(org-adapt-indentation nil)
@@ -133,7 +134,7 @@ Entered on %T")
 (setq ring-bell-function 'ignore)
 (setq-default fill-column 80)
 (add-hook 'after-init-hook (lambda () (message "Emacs started in %s" (emacs-init-time))))
-(add-to-list 'Info-directory-list "/usr/local/texlive/2019basic/texmf-dist/doc/info")
+;; (add-to-list 'Info-directory-list "/usr/local/texlive/2019basic/texmf-dist/doc/info")
 (add-hook 'help-mode-hook 'visual-line-mode)
 
 ;; (setq comment-style 'indent)
@@ -164,12 +165,12 @@ Entered on %T")
       ;;  mac-option-modifier 'none
       ;;  )
 
-      (set-frame-parameter (selected-frame) 'alpha '(85 . 85))
-      (add-to-list 'default-frame-alist '(alpha . (85 . 85)))
+      (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
+      (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
 
       (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
       (set-face-attribute 'default nil :font "Source Code Pro-16")
-      (setq-default line-spacing 0.2)
+      ;; (setq-default line-spacing 0.2)
       (set-fontset-font t 'han      (font-spec :family "STkaiti"))
       (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
       )
@@ -205,6 +206,12 @@ Entered on %T")
     (ansi-color-apply-on-region compilation-filter-start (point-max)))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
   (add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (buffer-name)))))
+
+(defun switch-to-other-buffer ()
+  "Switch to most recently selected buffer."
+  (interactive)
+  (switch-to-buffer (other-buffer)))
+(global-set-key (kbd "M-'") 'switch-to-other-buffer)
 
 (defun toggle-window-split ()
   "Toggle window split.  Works only when there are exactly two windows open.
