@@ -58,6 +58,7 @@
  '(enable-recursive-minibuffers t)
  '(help-window-select t)
  '(indent-tabs-mode nil)
+ '(js-indent-align-list-continuation nil)
  '(lsp-before-save-edits nil)
  '(lsp-enable-file-watchers nil)
  '(lsp-enable-indentation nil)
@@ -525,7 +526,8 @@ list and their compilation command lines."
 (add-hook 'java-mode-hook (lambda ()
                            (lsp)
                            (setq comment-start "/* "
-                                 comment-end " */")))
+                                 comment-end " */")
+                           (c-set-offset 'arglist-intro '+)))
 
 ;; Lsp javascript/typescript
 (add-hook 'js-mode-hook (lambda ()
