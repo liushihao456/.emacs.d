@@ -101,7 +101,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode ripgrep lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(deadgrep wgrep company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -242,7 +242,7 @@ split; vice versa."
       (if this-win-is-2nd (other-window 1)))))
 (global-set-key (kbd "C-c |") 'toggle-window-split)
 
-(global-set-key (kbd "C-c s") 'ripgrep-regexp)
+(global-set-key (kbd "C-c s") 'deadgrep)
 (global-set-key (kbd "C-c f r") 'recentf-open-files)
 (global-set-key (kbd "C-c f f") 'find-file-at-point)
 (global-set-key (kbd "C-c p f") 'project-find-file)
@@ -264,11 +264,12 @@ split; vice versa."
 (add-hook 'bookmark-bmenu-mode-hook (lambda () (switch-to-buffer "*Bookmark List*")))
 (add-hook 'process-menu-mode-hook (lambda () (pop-to-buffer "*Process List*")))
 
+;; Wgrep
+(add-to-list 'load-path "~/.config/emacs/packages/wgrep")
+(require 'wgrep) ; C-c C-p to enable editing in the grep result buffer
+(autoload 'wgrep-deadgrep-setup "wgrep-deadgrep")
+(add-hook 'deadgrep-finished-hook 'wgrep-deadgrep-setup)
 
-;; Color rg
-(add-to-list 'load-path "~/.config/emacs/packages/color-rg")
-(autoload 'color-rg-search-input-in-project "~/.config/emacs/packages/color-rg/color-rg.el" "Color-rg search input in project autoload" t)
-(global-set-key (kbd "C-c p c") 'color-rg-search-input-in-project)
 
 ;; Expand region
 (global-set-key (kbd "C-\\") 'er/expand-region)
