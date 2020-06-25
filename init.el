@@ -179,7 +179,9 @@ Entered on %T")
 
 (delight '((eldoc-mode nil "eldoc")
            (emacs-lisp-mode "Elisp" :major)
-           (which-key-mode nil "which-key")))
+           (which-key-mode nil "which-key")
+           (abbrev-mode nil "abbrev")
+           (lsp-mode nil "lsp-mode")))
 
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
@@ -528,7 +530,8 @@ list and their compilation command lines."
                            (lsp)
                            (setq comment-start "/* "
                                  comment-end " */")
-                           (c-set-offset 'arglist-intro '+)))
+                           (c-set-offset 'arglist-intro '+)
+                           (c-set-offset 'arglist-close '0)))
 
 ;; Lsp javascript/typescript
 (add-hook 'js-mode-hook (lambda ()
