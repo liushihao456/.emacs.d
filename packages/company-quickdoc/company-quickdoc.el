@@ -36,6 +36,7 @@
 (require 'company)
 (require 'cl-lib)
 (require 's)
+(require 'dash)
 
 (defgroup company-quickdoc nil
   "Documentation popups for `company-mode'"
@@ -50,13 +51,6 @@ be triggered manually using `company-quickdoc-manual-begin'."
                  (const :tag "Don't popup help automatically" nil))
   :group 'company-quickdoc)
 
-(defcustom company-quickdoc-default-tip-width 80
-  "Default popup tip width.
-
-If not suitable, the tip width will adapt according to current window."
-  :type 'integer
-  :group 'company-quickdoc)
-
 (defcustom company-quickdoc-max-lines nil
   "When not NIL, limits the number of lines in the popup."
   :type '(choice (integer :tag "Max lines to show in popup")
@@ -64,7 +58,7 @@ If not suitable, the tip width will adapt according to current window."
   :group 'company-quickdoc)
 
 (defface company-quickdoc-background
-  '((((background light)) :background "#9E9E9E")
+  '((((background light)) :background "#6F6F6F")
     (t :background "#272A36"))
   "Background color of the documentation.
 Only the `background' is used in this face."
@@ -90,16 +84,14 @@ Only the `background' is used in this face."
 (defvar-local company-quickdoc--timer nil
   "Quickhelp idle timer.")
 
-(defvar-local company-quickdoc--original-overlay-start nil
-  "The original start of company pesudo tooltip overlay start.")
-
-(defvar-local company-quickdoc--original-overlay-end nil
-  "The original start of company pesudo tooltip overlay end.")
-
 (defun company-quickdoc-frontend (command)
   "`company-mode' front-end showing documentation in a popup."
   (pcase command
     (`show
+     ;; Save current row when completion starts, because when the company
+     ;; tooltip is rendered via the `after-string' porperty of overlay, the
+     ;; cursor will go to the end of the tooltip, leading to an incorrect
+     ;; result if `company-row' is called then.
      (setq company-quickdoc--current-row (company--row)))
     (`hide
      (setq company-quickdoc--current-row nil))
@@ -162,6 +154,7 @@ just grab the first candidate and press forward."
               (company-quickdoc--docstring-from-buffer (or doc-begin (point-min))))))))))
 
 (defun company-quickdoc--doc (selected)
+  "Get docstring for SELECTED candidate."
   (cl-letf (((symbol-function 'completing-read)
              #'company-quickdoc--completing-read))
     (let* ((doc-and-meta (company-quickdoc--fetch-docstring selected))
@@ -173,11 +166,10 @@ just grab the first candidate and press forward."
           doc)))))
 
 (defun company-quickdoc--manual-begin ()
-  "Manually trigger the `company-quickdoc' popup for the
-currently active `company' completion candidate."
+  "Manually trigger the `company-quickdoc' popup for the currently active `company' completion candidate."
   (interactive)
-  ;; This might seem a bit roundabout, but when I attempted to call
-  ;; `company-quickdoc--show' in a more direct manner it triggered a
+  ;; This might seem a bit roundabout, but when attempting to call
+  ;; `company-quickdoc--show' in a more direct manner it may trigger a
   ;; redisplay of company's list of completion candidates which looked
   ;; quite weird.
   (let ((company-quickdoc-delay 0.01))
@@ -222,15 +214,10 @@ off."
                   (forward-line n)
                   (point)))
 
-(defun company-quickdoc--pos-eol (pos)
-  "Get the end of line position at line that POS is on."
-  (save-excursion (goto-char pos)
-                  (line-end-position)))
-
 (defun company-quickdoc--merge-docstrings (old-strings doc-strings position)
   "Concatenate DOC-STRINGS to OLD-STRINGS.
 
-The 3rd arg RIGHT, if non-nil, means to concat to the right, otherwise to the left."
+The 3rd arg POSITION, indicates at which side the doc will be rendered."
   (let* ((ov company-pseudo-tooltip-overlay)
          (tooltip-width (overlay-get ov 'company-width))
          (company-column (overlay-get ov 'company-column))
@@ -238,141 +225,233 @@ The 3rd arg RIGHT, if non-nil, means to concat to the right, otherwise to the le
          (tooltip-column (min (- horizontal-span tooltip-width) company-column))
          (index-start (if (eq position 'right)
                           (+ tooltip-column tooltip-width)
-                        (1+ (window-hscroll))))
-         (result-strings nil))
+                        (1+ (window-hscroll)))))
     (company-quickdoc--merge-lines old-strings doc-strings index-start)))
 
 (defun company-quickdoc--merge-lines (lines1 lines2 start)
+  "Concatenate LINES1 and LINES2.
+
+Replacing a substring starting from START of each line in LINES1 with the
+corresponding line in LINES2."
   (let* ((index-start start)
-         (index-end (+ index-start (length (car lines2))))
          (result-strings nil))
     (dotimes (i
               (max (length lines1) (length lines2))
               (nreverse result-strings))
       (!cons
-       (cond
-        ((not (nth i lines2))
-         (nth i lines1))
-        ((not (nth i lines1))
-         (concat (truncate-string-to-width "" index-start nil ?\s)
-                 (nth i lines2)))
-        (t
-         (concat (truncate-string-to-width (nth i lines1) index-start nil ?\s)
-                 (nth i lines2)
-                 (truncate-string-to-width
-                  (nth i lines1)
-                  (length (nth i lines1))
-                  (min (length (nth i lines1)) index-end)
-                  ?\s))))
+       (let* ((line1 (nth i lines1))
+              (line2 (nth i lines2))
+              (index-end (+ index-start (length line2))))
+         (cond
+          ((not line2)
+           line1)
+          ((not line1)
+           (concat (truncate-string-to-width "" index-start nil ?\s)
+                   line2))
+          (t
+           (concat (truncate-string-to-width line1 index-start nil ?\s)
+                   line2
+                   (truncate-string-to-width line1 (length line1) (min (length line1) index-end) ?\s)))))
        result-strings))))
 
-(defun company-quickdoc--show-sidewise (doc-strings position)
+(defun company-quickdoc--render-doc-part-above (doc-lines doc-position)
+  "Render a part of the doc above the company tooltip.
+
+The 1st arg DOC-LINES is a list containing doc string lines.  The 2nd arg
+DOC-POSITION indicates at which side the doc will be rendered."
+  (let* ((tooltip-height
+          (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
+         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
+         (n-lines (length doc-lines))
+
+         (ov-end (if tooltip-abovep
+                     (company-quickdoc--pos-after-lines
+                      (line-beginning-position) (- tooltip-height))
+                   (line-beginning-position)))
+         (ov-start (company-quickdoc--pos-after-lines ov-end (- n-lines)))
+         (buffer-lines
+          (split-string (buffer-substring ov-start ov-end) "[\n\v\f\r]"))
+         (ov (make-overlay ov-start ov-end)))
+    (!cons ov company-quickdoc-overlays)
+    (--> (company-quickdoc--merge-docstrings buffer-lines doc-lines doc-position)
+         (string-join it "\n")
+         (if (< (overlay-start ov) (overlay-end ov))
+             (overlay-put ov 'display it)
+           (overlay-put ov 'after-string it)))
+    (overlay-put ov 'window (selected-window))))
+
+(defun company-quickdoc--render-doc-part-current-line (doc-lines doc-position)
+  "Render a part of the doc on current line.
+
+The 1st arg DOC-LINES is a list of doc string lines.  The 2nd arg DOC-POSITION
+indicates at which side the doc will be rendered."
+  (let* ((company-nl
+          (nth 2 (overlay-get company-pseudo-tooltip-overlay
+                              'company-replacement-args)))
+         (current-buffer-line
+          (buffer-substring (line-beginning-position) (line-end-position)))
+         (tooltip-lines
+          (split-string
+           (overlay-get company-pseudo-tooltip-overlay 'company-display)
+           "[\n\v\f\r]"))
+         (use-after-string
+          (overlay-get company-pseudo-tooltip-overlay 'after-string))
+         (ov-start-col
+          (save-excursion
+            (goto-char (overlay-start company-pseudo-tooltip-overlay))
+            (current-column)))
+         (tooltip-popped-nl
+          (and use-after-string company-nl (pop tooltip-lines))))
+
+    (if (and (eq doc-position 'right) tooltip-popped-nl)
+
+        (--> (->
+              (company-quickdoc--merge-docstrings (list current-buffer-line) doc-lines doc-position)
+              (string-join "\n")
+              (substring ov-start-col))
+             (cons it tooltip-lines)
+             (string-join it "\n")
+             (overlay-put company-pseudo-tooltip-overlay 'company-display it)
+             (overlay-put company-pseudo-tooltip-overlay 'after-string it))
+
+      (let* ((ov-start (if (eq doc-position 'right) (point) (line-beginning-position)))
+             (ov-end (if (eq doc-position 'right) (line-end-position) (- (point) 1)))
+             (ov (make-overlay ov-start ov-end)))
+        (!cons ov company-quickdoc-overlays)
+        (--> (company-quickdoc--merge-docstrings (list current-buffer-line) doc-lines doc-position)
+             (string-join it "\n")
+             (substring it
+                        (if (eq doc-position 'right) (current-column) 0)
+                        (if (eq doc-position 'right) nil (- (current-column) 1)))
+             (if (< ov-start ov-end)
+                 (overlay-put ov 'display it)
+               (overlay-put ov 'after-string it)))
+        (overlay-put ov 'window (selected-window))))))
+
+(defun company-quickdoc--render-doc-part-matching-tooltip (doc-lines doc-position)
+  "Render a part of the doc matching the company tooltip.
+
+The 1st arg DOC-LINES is a list containing doc string lines.  The 2nd arg
+DOC-POSITION indicates at which side the doc will be rendered."
+  (let* ((company-nl
+          (nth 2 (overlay-get company-pseudo-tooltip-overlay
+                              'company-replacement-args)))
+         (tooltip-lines
+          (split-string
+           (overlay-get company-pseudo-tooltip-overlay 'company-display)
+           "[\n\v\f\r]"))
+         (use-after-string
+          (overlay-get company-pseudo-tooltip-overlay 'after-string))
+         (tooltip-popped-nl
+          (and use-after-string company-nl (pop tooltip-lines))))
+    (--> (company-quickdoc--merge-docstrings tooltip-lines doc-lines doc-position)
+         (if tooltip-popped-nl (cons tooltip-popped-nl it) it)
+         (string-join it "\n")
+         (overlay-put company-pseudo-tooltip-overlay
+                      (if use-after-string 'after-string 'display) it))))
+
+(defun company-quickdoc--render-doc-part-below (doc-lines doc-position)
+  "Render a part of the doc below the company tooltip.
+
+The 1st arg DOC-LINES is a list containing doc string lines.  The 2nd arg
+DOC-POSITION indicates at which side the doc will be rendered."
+  (let* ((n-lines (length doc-lines))
+         (ncandidates (length company-candidates))
+         (tooltip-height
+          (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
+         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
+         (ov-start
+          (if tooltip-abovep
+              (company-quickdoc--pos-after-lines
+               (line-beginning-position) 1)
+              (company-quickdoc--pos-after-lines
+               (line-beginning-position) (1+ tooltip-height))))
+         (ov-end (company-quickdoc--pos-after-lines ov-start (1+ n-lines)))
+         (buffer-lines
+          (split-string (buffer-substring ov-start ov-end) "[\n\v\f\r]"))
+         (use-after-string (>= ov-start ov-end))
+         (ov (make-overlay ov-start ov-end)))
+    (!cons ov company-quickdoc-overlays)
+    (--> (company-quickdoc--merge-docstrings buffer-lines doc-lines doc-position)
+         (if (and use-after-string
+                  (or tooltip-abovep (< ncandidates tooltip-height)))
+             (cons "" it) it)
+         (string-join it "\n")
+         (if use-after-string
+             (overlay-put ov 'after-string it)
+           (overlay-put ov 'display it)))
+    (overlay-put ov 'window (selected-window))))
+
+(defun company-quickdoc--get-layout (doc-lines-length)
+  "Get the layout for doc parts.  DOC-LINES-LENGTH is the number of lines of doc."
+  (let* ((tooltip-height (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
+         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args))))
+    (if tooltip-abovep
+        (let* ((nlines-above
+                (min (max (- company-quickdoc--current-row tooltip-height) 0)
+                     (max (- doc-lines-length tooltip-height) 0)))
+               (nlines-matching-tooltip
+                (min tooltip-height
+                     doc-lines-length))
+               (nlines-current-line
+                (if (> doc-lines-length company-quickdoc--current-row) 1 0))
+               (nlines-below
+                (min (- (company--window-height) company-quickdoc--current-row 1)
+                     (max (- doc-lines-length company-quickdoc--current-row 1) 0)))
+               (layout-alist '()))
+          (when (> nlines-above 0)
+            (!cons `(:above . ,nlines-above) layout-alist))
+          (when (> nlines-matching-tooltip 0)
+            (!cons `(:matching-tooltip . ,nlines-matching-tooltip) layout-alist))
+          (when (> nlines-current-line 0)
+            (!cons `(:current-line . ,nlines-current-line) layout-alist))
+          (when (> nlines-below 0)
+            (!cons `(:below . ,nlines-below) layout-alist))
+          (nreverse layout-alist))
+
+      (let* ((nrows-below-current-line (- (company--window-height) company-quickdoc--current-row 1))
+             (nlines-below
+              (min (max (- nrows-below-current-line tooltip-height) 0)
+                   (max (- doc-lines-length tooltip-height) 0)))
+             (nlines-matching-tooltip
+              (min tooltip-height
+                   doc-lines-length))
+             (nlines-current-line
+              (if (> doc-lines-length nrows-below-current-line) 1 0))
+             (nlines-above
+              (min company-quickdoc--current-row
+                   (max (- doc-lines-length nrows-below-current-line 1) 0)))
+             (layout-alist '()))
+        (when (> nlines-above 0)
+          (!cons `(:above . ,nlines-above) layout-alist))
+        (when (> nlines-current-line 0)
+          (!cons `(:current-line . ,nlines-current-line) layout-alist))
+        (when (> nlines-matching-tooltip 0)
+          (!cons `(:matching-tooltip . ,nlines-matching-tooltip) layout-alist))
+        (when (> nlines-below 0)
+          (!cons `(:below . ,nlines-below) layout-alist))
+        (nreverse layout-alist)))))
+
+(defun company-quickdoc--render-sidewise (doc-lines position)
   "Show doc on the right side of company pseudo tooltip.
 
-DOC-STRINGS is a list of doc string lines.  The 2nd arg POSITION, should be
+DOC-LINES is a list of doc string lines.  The 2nd arg POSITION, should be
 either 'right, meaning showing the doc on the right side, or 'left, meaning left
 side."
-  (let* ((right (eq position 'right))
-         (ncandidates (length company-candidates))
-         (ov company-pseudo-tooltip-overlay)
-         (tooltip-height (overlay-get ov 'company-height))
-         (tooltip-string (overlay-get ov 'company-display))
-         (tooltip-strings (split-string tooltip-string "[\n\v\f\r]"))
-         (tooltip-start-line (1+ company-quickdoc--current-row))
-         ;; Above tooltip
-         (extra-nlines-above (- (length doc-strings) (- (company--window-height) tooltip-start-line) 1))
-         (extra-buffer-lines-above-end
-          (and (> extra-nlines-above 0) (line-beginning-position)))
-         (extra-buffer-lines-above-start
-          (and extra-buffer-lines-above-end
-               (company-quickdoc--pos-after-lines extra-buffer-lines-above-end (- extra-nlines-above))))
-         (extra-buffer-string-above
-          (and extra-buffer-lines-above-end
-               (buffer-substring extra-buffer-lines-above-start extra-buffer-lines-above-end)))
-         (extra-buffer-lines-above
-          (and extra-buffer-string-above (split-string extra-buffer-string-above "[\n\v\f\r]")))
-         (extra-doc-lines-above
-          (and extra-buffer-lines-above
-               (cl-subseq doc-strings 0 extra-nlines-above)))
-         ;; Whether add overlay on current line
-         (extra-buffer-line-current
-          (and (>= extra-nlines-above 0)
-               (buffer-substring (line-beginning-position) (line-end-position))))
-         (extra-doc-line-current
-          (and extra-buffer-line-current (cl-subseq doc-strings extra-nlines-above (1+ extra-nlines-above))))
-         ;; Below tooltip
-         (extra-nlines-below (- (length doc-strings) tooltip-height))
-         (extra-buffer-lines-below-start
-          (and (> extra-nlines-below 0)
-               (company-quickdoc--pos-after-lines (line-beginning-position) (1+ tooltip-height))))
-         (extra-buffer-lines-below-end
-          (and extra-buffer-lines-below-start
-               (company-quickdoc--pos-after-lines extra-buffer-lines-below-start (1+ extra-nlines-below))))
-         (extra-buffer-string-below
-          (and extra-buffer-lines-below-start
-               (buffer-substring extra-buffer-lines-below-start extra-buffer-lines-below-end)))
-         (extra-buffer-lines-below
-          (and extra-buffer-string-below (split-string extra-buffer-string-below "[\n\v\f\r]")))
-         (extra-doc-lines-below
-          (and extra-buffer-lines-below
-               (cl-subseq doc-strings
-                          (+ tooltip-height (max 0 extra-nlines-above) (if extra-buffer-line-current 1 0)))))
-         ;; Matching tooltip
-         (matching-doc-lines
-          (cl-subseq doc-strings
-                     (+ (max 0 extra-nlines-above) (if extra-buffer-line-current 1 0))
-                     (min (length doc-strings) (+ tooltip-height (max 0 extra-nlines-above) (if extra-buffer-line-current 1 0)))))
-         ;; Company uses after-string in overlay when current point is on last
-         ;; or second last line of buffer
-         (use-after-string (overlay-get ov 'after-string))
-         (tooltip-first-line
-          (and use-after-string
-               (string-empty-p (string-trim (car tooltip-strings)))
-               (pop tooltip-strings)))
-         (ov-start-col (save-excursion (goto-char (overlay-start ov)) (current-column))))
-    ;; Add overlay above tooltip
-    (when extra-doc-lines-above
-      (let ((extra-overlay (make-overlay extra-buffer-lines-above-start extra-buffer-lines-above-end)))
-        (!cons extra-overlay company-quickdoc-overlays)
-        (--> (company-quickdoc--merge-docstrings extra-buffer-lines-above extra-doc-lines-above position)
-             (string-join it "\n")
-             (if (< (overlay-start extra-overlay) (overlay-end extra-overlay))
-                 (overlay-put extra-overlay 'display it)
-               (overlay-put extra-overlay 'after-string it)))
-        (overlay-put extra-overlay 'window (selected-window))))
-    ;; Add overlay on current line
-    (when extra-buffer-line-current
-      (if (and right tooltip-first-line)
-          (setq tooltip-first-line
-                (->
-                 (company-quickdoc--merge-docstrings (split-string extra-buffer-line-current "[\n\v\f\r]") extra-doc-line-current position)
-                 (string-join "\n")
-                 (substring ov-start-col)))
-        (let* ((extra-overlay-start (if right (point) (line-beginning-position)))
-               (extra-overlay-end (if right (line-end-position) (- (point) 1)))
-               (extra-overlay (make-overlay extra-overlay-start extra-overlay-end)))
-          (!cons extra-overlay company-quickdoc-overlays)
-          (--> (company-quickdoc--merge-docstrings (split-string extra-buffer-line-current "[\n\v\f\r]") extra-doc-line-current position)
-               (string-join it "\n")
-               (substring it (if right (current-column) 0) (if right nil (- (current-column) 1)))
-               (if (< extra-overlay-start extra-overlay-end)
-                   (overlay-put extra-overlay 'display it)
-                 (overlay-put extra-overlay 'after-string it)))
-          (overlay-put extra-overlay 'window (selected-window)))))
-    ;; Add overlay below tooltip
-    (when extra-doc-lines-below
-      (let ((extra-overlay (make-overlay extra-buffer-lines-below-start extra-buffer-lines-below-end)))
-        (!cons extra-overlay company-quickdoc-overlays)
-        (--> (company-quickdoc--merge-docstrings extra-buffer-lines-below extra-doc-lines-below position)
-             (string-join (if (and use-after-string (< ncandidates tooltip-height)) (!cons "" it) it) "\n")
-             (if (< (overlay-start extra-overlay) (overlay-end extra-overlay))
-                 (overlay-put extra-overlay 'display it)
-               (overlay-put extra-overlay 'after-string it)))
-        (overlay-put extra-overlay 'window (selected-window))))
-    ;; Modify company tooltip overlay
-    (--> (company-quickdoc--merge-docstrings tooltip-strings matching-doc-lines position)
-         (string-join (if tooltip-first-line (!cons tooltip-first-line it) it) "\n")
-         (overlay-put ov (if use-after-string 'after-string 'display) it))))
+  (let* ((layout (company-quickdoc--get-layout (length doc-lines))))
+    (message "%s" layout)
+    (dolist (i layout t)
+      (let* ((doc-part-lines (cl-subseq doc-lines 0 (cdr i))))
+        (setq doc-lines (cl-subseq doc-lines (cdr i)))
+        (cond
+         ((eq (car i) :above)
+          (company-quickdoc--render-doc-part-above doc-part-lines position))
+         ((eq (car i) :current-line)
+          (company-quickdoc--render-doc-part-current-line doc-part-lines position))
+         ((eq (car i) :matching-tooltip)
+          (company-quickdoc--render-doc-part-matching-tooltip doc-part-lines position))
+         ((eq (car i) :below)
+          (company-quickdoc--render-doc-part-below doc-part-lines position)))))))
 
 (defun company-quickdoc--show-stackwise (doc-strings position)
   "Show doc on the top or bottom of company pseudo tooltip.
@@ -381,72 +460,61 @@ DOC-STRINGS is a list of doc string lines.  The 2nd arg POSITION, should be
 either 'top, meaning showing the doc on the top side, or 'bottom, meaning bottom
 side."
   (let* ((ov company-pseudo-tooltip-overlay)
-         (tooltip-height (overlay-get ov 'company-height))
+         (ncandidates (length company-candidates))
+         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
+         (tooltip-height (abs (overlay-get ov 'company-height)))
          (tooltip-string (overlay-get ov 'company-display))
-         (tooltip-strings (split-string tooltip-string "[\n\v\f\r]"))
+         (tooltip-strings
+          (if tooltip-abovep
+              (cl-subseq (split-string tooltip-string "[\n\v\f\r]") 0 -1)
+            (split-string tooltip-string "[\n\v\f\r]")))
          (tooltip-start-line (1+ company-quickdoc--current-row)))
     (cond
      ((eq position 'top)
-      (let* ((extra-nlines-above (length doc-strings))
-             (extra-buffer-lines-above-end
-              (and (> extra-nlines-above 0) (line-beginning-position)))
-             (extra-buffer-lines-above-start
-              (and extra-buffer-lines-above-end
-                   (company-quickdoc--pos-after-lines extra-buffer-lines-above-end (- extra-nlines-above))))
-             (extra-buffer-string-above
-              (and extra-buffer-lines-above-end
-                   (buffer-substring extra-buffer-lines-above-start extra-buffer-lines-above-end)))
-             (extra-buffer-lines-above
-              (and extra-buffer-string-above (split-string extra-buffer-string-above "[\n\v\f\r]"))))
-        (let ((extra-overlay (make-overlay extra-buffer-lines-above-start extra-buffer-lines-above-end)))
-          (!cons extra-overlay company-quickdoc-overlays)
-          (--> (company-quickdoc--merge-docstrings extra-buffer-lines-above doc-strings position)
-               (string-join it "\n")
-               (if (< (overlay-start extra-overlay) (overlay-end extra-overlay))
-                   (overlay-put extra-overlay 'display it)
-                 (overlay-put extra-overlay 'after-string it)))
-          (overlay-put extra-overlay 'window (selected-window)))))
-     ((eq position 'bottom)
-      (let* (
-             ;; Company uses after-string in overlay when current point is on last
-             ;; or second last line of buffer
-             (use-after-string (overlay-get ov 'after-string))
-             (tooltip-first-line
-              (and use-after-string
-                   (string-empty-p (string-trim (car tooltip-strings)))
-                   (pop tooltip-strings)))
-             (ncandidates (length company-candidates))
-             (matching-doc-lines
-              (append (mapcar (lambda (l) (substring l (+ 1 (window-hscroll)))) (cl-subseq tooltip-strings 0 ncandidates))
-                      (cl-subseq doc-strings 0 (min (length doc-strings) (- tooltip-height ncandidates)))))
+      (if tooltip-abovep
+          (let* ((doc-part-matching-tooltip
+                  (and (< ncandidates tooltip-height)
+                       (append
+                        (if (< (length doc-strings) (- tooltip-height ncandidates))
+                            (mapcar
+                             (lambda (l) (substring l (+ 1 (window-hscroll))))
+                             (cl-subseq tooltip-strings 0 (- (- tooltip-height ncandidates) (length doc-strings)))))
+                        (cl-subseq doc-strings (- (min (length doc-strings) (- tooltip-height ncandidates))))
+                        (mapcar
+                         (lambda (l) (substring l (+ 1 (window-hscroll))))
+                         (cl-subseq tooltip-strings (- ncandidates))))))
 
-             (extra-nlines-below (- (+ (length doc-strings) ncandidates) (length matching-doc-lines)))
-             (extra-buffer-lines-below-start
-              (and (> extra-nlines-below 0)
-                   (company-quickdoc--pos-after-lines (line-beginning-position) (1+ tooltip-height))))
-             (extra-buffer-lines-below-end
-              (and extra-buffer-lines-below-start
-                   (company-quickdoc--pos-after-lines extra-buffer-lines-below-start (1+ extra-nlines-below))))
-             (extra-buffer-string-below
-              (and extra-buffer-lines-below-start
-                   (buffer-substring extra-buffer-lines-below-start extra-buffer-lines-below-end)))
-             (extra-buffer-lines-below
-              (and extra-buffer-string-below (split-string extra-buffer-string-below "[\n\v\f\r]")))
-             (extra-doc-lines-below
-              (and extra-buffer-lines-below
-                   (cl-subseq doc-strings (- extra-nlines-below)))))
-        ;; (message "%s" (string-join matching-doc-lines "\n"))
-        (--> (company-quickdoc--merge-docstrings tooltip-strings matching-doc-lines position)
-             (string-join (if tooltip-first-line (!cons tooltip-first-line it) it) "\n")
-             (overlay-put ov (if use-after-string 'after-string 'display) it))
-        (let ((extra-overlay (make-overlay extra-buffer-lines-below-start extra-buffer-lines-below-end)))
-          (!cons extra-overlay company-quickdoc-overlays)
-          (--> (company-quickdoc--merge-docstrings extra-buffer-lines-below extra-doc-lines-below position)
-               (string-join (if (and use-after-string (< ncandidates tooltip-height)) (!cons "" it) it) "\n")
-               (if (< (overlay-start extra-overlay) (overlay-end extra-overlay))
-                   (overlay-put extra-overlay 'display it)
-                 (overlay-put extra-overlay 'after-string it)))
-          (overlay-put extra-overlay 'window (selected-window))))))))
+                 (doc-part-nlines-above
+                  (if doc-part-matching-tooltip
+                      (- (+ (length doc-strings) ncandidates) (length doc-part-matching-tooltip))
+                    (length doc-strings)))
+                 (doc-part-lines-above
+                  (and (> doc-part-nlines-above 0)
+                       (cl-subseq doc-strings (- doc-part-nlines-above)))))
+            (when doc-part-matching-tooltip
+              (company-quickdoc--render-doc-part-matching-tooltip doc-part-matching-tooltip position))
+            (when doc-part-lines-above
+              (company-quickdoc--render-doc-part-above doc-part-lines-above position)))
+        (company-quickdoc--render-doc-part-above doc-strings position)))
+     ((eq position 'bottom)
+      (if tooltip-abovep
+          (company-quickdoc--render-doc-part-below doc-strings position)
+        (let* ((doc-part-matching-tooltip
+                (and (< ncandidates tooltip-height)
+                     (append (mapcar (lambda (l) (substring l (+ 1 (window-hscroll)))) (cl-subseq tooltip-strings 0 ncandidates))
+                             (cl-subseq doc-strings 0 (min (length doc-strings) (- tooltip-height ncandidates))))))
+
+               (doc-part-nlines-below
+                (if doc-part-matching-tooltip
+                    (- (+ (length doc-strings) ncandidates) (length doc-part-matching-tooltip))
+                  (length doc-strings)))
+               (doc-part-lines-below
+                (and (> doc-part-nlines-below 0)
+                     (cl-subseq doc-strings (- doc-part-nlines-below)))))
+          (when doc-part-matching-tooltip
+            (company-quickdoc--render-doc-part-matching-tooltip doc-part-matching-tooltip position))
+          (when doc-part-lines-below
+            (company-quickdoc--render-doc-part-below doc-part-lines-below position))))))))
 
 (defun company-quickdoc--show ()
   "Override `company-quickdoc--show' function from `company-quickdoc'."
@@ -458,60 +526,28 @@ side."
            (ov company-pseudo-tooltip-overlay)
            (ov-str (overlay-get ov 'company-display))
            (tooltip-width (overlay-get ov 'company-width))
-           (tooltip-height (overlay-get ov 'company-height))
+           (tooltip-height (abs (overlay-get ov 'company-height)))
            (company-column (overlay-get ov 'company-column))
            (window-width (company--window-width))
            (horizontal-span (+ window-width (window-hscroll)))
            (tooltip-column (min (- horizontal-span tooltip-width) company-column))
+           (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
            (remaining-cols-right (- (+ (company--window-width) (window-hscroll)) tooltip-column tooltip-width 2))
            (remaining-cols-left (- tooltip-column (window-hscroll) 5))
-           (remaining-rows-top company-quickdoc--current-row)
-           (remaining-rows-bottom (- (window-height) company-quickdoc--current-row (length company-candidates) 2)))
+           (remaining-rows-top (- company-quickdoc--current-row
+                                  (if tooltip-abovep (min tooltip-height (length company-candidates)) 0)))
+           (remaining-rows-bottom (- (company--window-height) company-quickdoc--current-row
+                                     (if tooltip-abovep 0 (min tooltip-height (length company-candidates))) 1)))
       (when (and ov doc)
-        ;; (message "%d" (length company-candidates))
-        ;; (message "rb %d %d %d" remaining-rows-top remaining-rows-bottom tooltip-height)
-        ;; (message "Doc: ----------------------------------------------")
-        ;; (message "%s" doc)
-        ;; (message "Overlay string: -----------------------------------")
-        ;; (message "%s" ov-str)
-        ;; (message "company-width: -----------------------------------")
-        ;; (message "%d" (overlay-get ov 'company-width))
-        ;; (message "company-column: -----------------------------------")
-        ;; (message "%d" (overlay-get ov 'company-column))
-        ;; (message "column: ------------------------------------------")
-        ;; (message "%d" (current-column))
-        ;; (message "company-height: -----------------------------------")
-        ;; (message "%d" (overlay-get ov 'company-height))
-        ;; (message "company-replacement-args: -------------------------")
-        ;; (message "%s" (overlay-get ov 'company-replacement-args))
-        ;; (message "company-prefix: -----------------------------------")
-        ;; (message company-prefix)
-        ;; (message "horizontal span: -----------------------------------")
-        ;; (message "%d" (+ (company--window-width) (window-hscroll)))
-        ;; (message "company--col-row: ---------------------------------")
-        ;; (message "%s" (company--col-row (point)))
-        ;; (message "company--window-width: ----------------------------")
-        ;; (message "%d %d" (company--window-width) (window-width))
-        ;; (message "company--window-height: ---------------------------")
-        ;; (message "%d %d" (company--window-height) (window-height))
-        ;; (message "company--row: ---------------------------------------")
-        ;; (message "%d" (company--row))
-        ;; (message "company-tooltip-offset: ---------------------------")
-        ;; (message "%d" company-tooltip-offset)
-        ;; (message "overlay-start: -----------------------------------")
-        ;; (message "%d" (overlay-start ov))
-        ;; (message "overlay-end: -----------------------------------")
-        ;; (message "%d" (overlay-end ov))
-        ;; (message "%s" (string-join doc-strings "\n"))
         (or
          (and (> remaining-cols-right 5)
           (let ((doc-strings (company-quickdoc--format-string doc remaining-cols-right)))
             (and (<= (length doc-strings) (company--window-height))
-                 (company-quickdoc--show-sidewise doc-strings 'right))))
+                 (company-quickdoc--render-sidewise doc-strings 'right))))
          (and (> remaining-cols-left 5)
           (let ((doc-strings (company-quickdoc--format-string doc remaining-cols-left)))
             (and (<= (length doc-strings) (company--window-height))
-                 (company-quickdoc--show-sidewise doc-strings 'left))))
+                 (company-quickdoc--render-sidewise doc-strings 'left))))
          (and t
           (let ((doc-strings (company-quickdoc--format-string doc (- window-width 3))))
             (cond
@@ -541,23 +577,6 @@ side."
   (when (timerp company-quickdoc--timer)
     (cancel-timer company-quickdoc--timer)
     (setq company-quickdoc--timer nil)))
-
-;; (defun company-quickdoc--popup-tip-scroll-up ()
-;;   "Scroll up 3 lines of the popup tip."
-;;   (interactive)
-;;   (when company-quickdoc-popup-tip
-;;     (popup-scroll-up company-quickdoc-popup-tip 3))
-;;   )
-
-;; (defun company-quickdoc--popup-tip-scroll-down ()
-;;   "Scroll up 3 lines of the popup down."
-;;   (interactive)
-;;   (when company-quickdoc-popup-tip
-;;     (popup-scroll-down company-quickdoc-popup-tip 3))
-;;   )
-
-;; (define-key company-active-map "\M-p" 'company-quickdoc--popup-tip-scroll-up)
-;; (define-key company-active-map "\M-n" 'company-quickdoc--popup-tip-scroll-down)
 
 (defun company-quickdoc--enable ()
   (add-hook 'focus-out-hook #'company-cancel nil t)
