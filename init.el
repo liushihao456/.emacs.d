@@ -325,10 +325,12 @@ split; vice versa."
   (if (display-graphic-p)
       (progn
         (require 'company-box)
-        (add-hook 'company-mode-hook 'company-box-mode)
-        )
-    )
-  )
+        (add-hook 'company-mode-hook 'company-box-mode))
+    (progn
+      (add-to-list 'load-path "~/.config/emacs/packages/company-quickdoc")
+      (require 'company-quickdoc)
+      (company-quickdoc-mode t)
+      )))
 
 
 ;; Magit
