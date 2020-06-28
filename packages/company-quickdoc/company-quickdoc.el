@@ -178,8 +178,9 @@ just grab the first candidate and press forward."
 (defun company-quickdoc--hide ()
   "Hide the current quickdoc tip."
   (when (> (length company-quickdoc-overlays) 0)
-    (dolist (element company-quickdoc-overlays)
-      (delete-overlay element))))
+    (dolist (ov company-quickdoc-overlays)
+      (delete-overlay ov))
+    (setq company-quickdoc-overlays nil)))
 
 (defun company-quickdoc--wrapped-line (line line-width)
   "Wrap a line of text LINE to max width LINE-WIDTH."
@@ -314,15 +315,19 @@ indicates at which side the doc will be rendered."
              (overlay-put company-pseudo-tooltip-overlay 'company-display it)
              (overlay-put company-pseudo-tooltip-overlay 'after-string it))
 
-      (let* ((ov-start (if (eq doc-position 'right) (point) (line-beginning-position)))
-             (ov-end (if (eq doc-position 'right) (line-end-position) (- (point) 1)))
-             (ov (make-overlay ov-start ov-end)))
+      (let* (;; (ov-start (if (eq doc-position 'right) (point) (line-beginning-position)))
+             ;; (ov-end (if (eq doc-position 'right) (line-end-position) (- (point) 1)))
+             (ov-start (line-beginning-position))
+             (ov-end (line-end-position))
+             (ov (make-overlay ov-start ov-end))
+             (tooltip-width (overlay-get company-pseudo-tooltip-overlay 'company-width))
+             (company-column (overlay-get company-pseudo-tooltip-overlay 'company-column))
+             (horizontal-span (+ (company--window-width) (window-hscroll)))
+             (tooltip-column (min (- horizontal-span tooltip-width) company-column)))
         (!cons ov company-quickdoc-overlays)
         (--> (company-quickdoc--merge-docstrings (list current-buffer-line) doc-lines doc-position)
-             (string-join it "\n")
-             (substring it
-                        (if (eq doc-position 'right) (current-column) 0)
-                        (if (eq doc-position 'right) nil (- (current-column) 1)))
+             (car it)
+             (or (put-text-property (current-column) (+ 1 (current-column)) 'cursor (length it) it) it)
              (if (< ov-start ov-end)
                  (overlay-put ov 'display it)
                (overlay-put ov 'after-string it)))
@@ -356,7 +361,10 @@ DOC-POSITION indicates at which side the doc will be rendered."
 The 1st arg DOC-LINES is a list containing doc string lines.  The 2nd arg
 DOC-POSITION indicates at which side the doc will be rendered."
   (let* ((n-lines (length doc-lines))
-         (ncandidates (length company-candidates))
+         (tooltip-lines
+          (split-string
+           (overlay-get company-pseudo-tooltip-overlay 'company-display)
+           "[\n\v\f\r]"))
          (tooltip-height
           (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
          (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
@@ -374,7 +382,7 @@ DOC-POSITION indicates at which side the doc will be rendered."
     (!cons ov company-quickdoc-overlays)
     (--> (company-quickdoc--merge-docstrings buffer-lines doc-lines doc-position)
          (if (and use-after-string
-                  (or tooltip-abovep (< ncandidates tooltip-height)))
+                  (or tooltip-abovep (< (length tooltip-lines) (+ 1 tooltip-height))))
              (cons "" it) it)
          (string-join it "\n")
          (if use-after-string
@@ -439,7 +447,7 @@ DOC-LINES is a list of doc string lines.  The 2nd arg POSITION, should be
 either 'right, meaning showing the doc on the right side, or 'left, meaning left
 side."
   (let* ((layout (company-quickdoc--get-layout (length doc-lines))))
-    (message "%s" layout)
+    ;; (message "%s" layout)
     (dolist (i layout t)
       (let* ((doc-part-lines (cl-subseq doc-lines 0 (cdr i))))
         (setq doc-lines (cl-subseq doc-lines (cdr i)))
@@ -453,7 +461,7 @@ side."
          ((eq (car i) :below)
           (company-quickdoc--render-doc-part-below doc-part-lines position)))))))
 
-(defun company-quickdoc--show-stackwise (doc-strings position)
+(defun company-quickdoc--render-stackwise (doc-strings position)
   "Show doc on the top or bottom of company pseudo tooltip.
 
 DOC-STRINGS is a list of doc string lines.  The 2nd arg POSITION, should be
@@ -552,13 +560,13 @@ side."
           (let ((doc-strings (company-quickdoc--format-string doc (- window-width 3))))
             (cond
              ((and (> remaining-rows-top 3) (<= (length doc-strings) remaining-rows-top))
-              (company-quickdoc--show-stackwise doc-strings 'top))
+              (company-quickdoc--render-stackwise doc-strings 'top))
              ((and (> remaining-rows-bottom 3) (<= (length doc-strings) remaining-rows-bottom))
-              (company-quickdoc--show-stackwise doc-strings 'bottom))
+              (company-quickdoc--render-stackwise doc-strings 'bottom))
              ((>= remaining-rows-top remaining-rows-bottom)
-              (company-quickdoc--show-stackwise (cl-subseq doc-strings 0 remaining-rows-top) 'top))
+              (company-quickdoc--render-stackwise (cl-subseq doc-strings 0 remaining-rows-top) 'top))
              ((>= remaining-rows-bottom remaining-rows-top)
-              (company-quickdoc--show-stackwise (cl-subseq doc-strings 0 remaining-rows-bottom) 'bottom))
+              (company-quickdoc--render-stackwise (cl-subseq doc-strings 0 remaining-rows-bottom) 'bottom))
              ))))
 
         ;; (message "Changed overlay string: ---------------------------")
@@ -567,6 +575,7 @@ side."
         ))))
 
 (defun company-quickdoc--set-timer ()
+  (company-quickdoc--hide)
   (when (or (null company-quickdoc--timer)
             (eq this-command #'company-quickdoc--manual-begin))
     (setq company-quickdoc--timer
