@@ -315,9 +315,7 @@ indicates at which side the doc will be rendered."
              (overlay-put company-pseudo-tooltip-overlay 'company-display it)
              (overlay-put company-pseudo-tooltip-overlay 'after-string it))
 
-      (let* (;; (ov-start (if (eq doc-position 'right) (point) (line-beginning-position)))
-             ;; (ov-end (if (eq doc-position 'right) (line-end-position) (- (point) 1)))
-             (ov-start (line-beginning-position))
+      (let* ((ov-start (line-beginning-position))
              (ov-end (line-end-position))
              (ov (make-overlay ov-start ov-end))
              (tooltip-width (overlay-get company-pseudo-tooltip-overlay 'company-width))
@@ -537,6 +535,7 @@ side."
            (tooltip-height (abs (overlay-get ov 'company-height)))
            (company-column (overlay-get ov 'company-column))
            (window-width (company--window-width))
+           (window-height (company--window-height))
            (horizontal-span (+ window-width (window-hscroll)))
            (tooltip-column (min (- horizontal-span tooltip-width) company-column))
            (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
@@ -544,30 +543,53 @@ side."
            (remaining-cols-left (- tooltip-column (window-hscroll) 5))
            (remaining-rows-top (- company-quickdoc--current-row
                                   (if tooltip-abovep (min tooltip-height (length company-candidates)) 0)))
-           (remaining-rows-bottom (- (company--window-height) company-quickdoc--current-row
+           (remaining-rows-bottom (- window-height company-quickdoc--current-row
                                      (if tooltip-abovep 0 (min tooltip-height (length company-candidates))) 1)))
       (when (and ov doc)
-        (or
-         (and (> remaining-cols-right 5)
-          (let ((doc-strings (company-quickdoc--format-string doc remaining-cols-right)))
-            (and (<= (length doc-strings) (company--window-height))
-                 (company-quickdoc--render-sidewise doc-strings 'right))))
-         (and (> remaining-cols-left 5)
-          (let ((doc-strings (company-quickdoc--format-string doc remaining-cols-left)))
-            (and (<= (length doc-strings) (company--window-height))
-                 (company-quickdoc--render-sidewise doc-strings 'left))))
-         (and t
-          (let ((doc-strings (company-quickdoc--format-string doc (- window-width 3))))
-            (cond
-             ((and (> remaining-rows-top 3) (<= (length doc-strings) remaining-rows-top))
-              (company-quickdoc--render-stackwise doc-strings 'top))
-             ((and (> remaining-rows-bottom 3) (<= (length doc-strings) remaining-rows-bottom))
-              (company-quickdoc--render-stackwise doc-strings 'bottom))
-             ((>= remaining-rows-top remaining-rows-bottom)
-              (company-quickdoc--render-stackwise (cl-subseq doc-strings 0 remaining-rows-top) 'top))
-             ((>= remaining-rows-bottom remaining-rows-top)
-              (company-quickdoc--render-stackwise (cl-subseq doc-strings 0 remaining-rows-bottom) 'bottom))
-             ))))
+        (let (doc-strings-right
+              doc-strings-left
+              doc-strings-top-bottom)
+          (or
+           (and (> remaining-cols-right 5)
+                (setq doc-strings-right (company-quickdoc--format-string doc remaining-cols-right))
+                (and (<= (length doc-strings-right) (company--window-height))
+                     (company-quickdoc--render-sidewise doc-strings-right 'right)))
+           (and (> remaining-cols-left 5)
+                (setq doc-strings-left (company-quickdoc--format-string doc remaining-cols-left))
+                (and (<= (length doc-strings-left) (company--window-height))
+                     (company-quickdoc--render-sidewise doc-strings-left 'left)))
+           (and (> remaining-rows-top 3)
+                (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3)))
+                (and (<= (length doc-strings-top-bottom) remaining-rows-top)
+                     (company-quickdoc--render-stackwise doc-strings-top-bottom 'top)))
+           (and (> remaining-rows-bottom 3)
+                (or doc-strings-top-bottom
+                    (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3))))
+                (and (<= (length doc-strings-top-bottom) remaining-rows-bottom)
+                     (company-quickdoc--render-stackwise doc-strings-top-bottom 'bottom)))
+           (and t
+                (let* ((area-right (* remaining-cols-right window-height))
+                       (area-left (* remaining-cols-left window-height))
+                       (area-top (* remaining-rows-top window-width))
+                       (area-bottom (* remaining-rows-bottom window-width)))
+                  (cond
+                   ((>= area-right (max area-left area-top area-bottom))
+                    (or doc-strings-right
+                        (setq doc-strings-right (company-quickdoc--format-string doc remaining-cols-right)))
+                    (company-quickdoc--render-sidewise (cl-subseq doc-strings-right 0 window-height) 'right))
+                   ((>= area-left (max area-right area-top area-bottom))
+                    (or doc-strings-left
+                        (setq doc-strings-left (company-quickdoc--format-string doc remaining-cols-left)))
+                    (company-quickdoc--render-sidewise (cl-subseq doc-strings-left 0 window-height) 'left))
+                   ((>= area-top (max area-right area-left area-bottom))
+                    (or doc-strings-top-bottom
+                        (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3))))
+                    (company-quickdoc--render-sidewise (cl-subseq doc-strings-top-bottom 0 remaining-rows-top) 'top))
+                   ((>= area-bottom (max area-right area-left area-top))
+                    (or doc-strings-top-bottom
+                        (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3))))
+                    (company-quickdoc--render-sidewise (cl-subseq doc-strings-top-bottom 0 remaining-rows-bottom) 'bottom))
+                   )))))
 
         ;; (message "Changed overlay string: ---------------------------")
         ;; (message "%s" (or (overlay-get ov 'display) (overlay-get ov 'after-string)))
