@@ -69,8 +69,7 @@
  '(lsp-java-completion-overwrite nil)
  '(lsp-java-format-on-type-enabled nil)
  '(lsp-java-save-action-organize-imports nil)
- '(lsp-python-ms-executable
-   "~/.config/emacs/.cache/lsp/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")
+ '(lsp-modeline-code-actions-enable nil)
  '(lsp-signature-render-documentation nil)
  '(lsp-ui-sideline-show-hover t)
  '(lsp-ui-sideline-update-mode 'line)
@@ -101,7 +100,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(deadgrep wgrep company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(lsp-python-ms deadgrep wgrep company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -479,12 +478,10 @@ split; vice versa."
   (define-key lsp-mode-map (kbd "C-c l S") 'lsp-shutdown-workspace)
   (define-key lsp-mode-map (kbd "C-c l a") 'xref-find-apropos)
 
-  ;; (setq lsp-clients-texlab-executable "~/.config/emacs/.cache/lsp/texlab/target/release/texlab")
-  ;; (setq lsp-log-io t)
+  (setq lsp-log-io t)
   )
 
 ;; Lsp Python
-(add-to-list 'load-path "~/.config/emacs/packages/lsp-python-ms")
 (add-hook 'python-mode-hook 'lsp)
 (with-eval-after-load 'python
   (require 'lsp-python-ms)
