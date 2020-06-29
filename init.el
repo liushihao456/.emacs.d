@@ -327,9 +327,9 @@ split; vice versa."
         (require 'company-box)
         (add-hook 'company-mode-hook 'company-box-mode))
     (progn
-      (add-to-list 'load-path "~/.config/emacs/packages/company-quickdoc")
-      (require 'company-quickdoc)
-      (company-quickdoc-mode t)
+      (add-to-list 'load-path "~/.config/emacs/packages/company-tip")
+      (require 'company-tip)
+      (company-tip-mode t)
       )))
 
 
