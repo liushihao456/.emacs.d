@@ -1,4 +1,4 @@
-;;; company-quickdoc.el --- Popup documentation for completion candidates
+;;; company-quickdoc.el --- Popup documentation for completion candidates  -*- lexical-binding: t; -*-
 
 ;; Author: Shihao Liu <liushihao@pku.edu.com>
 ;; Keywords: company popup documentation quickdoc
@@ -78,23 +78,12 @@ Only the `background' is used in this face."
 (defvar company-quickdoc-overlays nil
   "Quickdoc overlays.")
 
-(defvar company-quickdoc--current-row nil
-  "Current row the pointer is on, relative to window.")
-
 (defvar-local company-quickdoc--timer nil
   "Quickhelp idle timer.")
 
 (defun company-quickdoc-frontend (command)
   "`company-mode' front-end showing documentation in a popup."
   (pcase command
-    (`show
-     ;; Save current row when completion starts, because when the company
-     ;; tooltip is rendered via the `after-string' porperty of overlay, the
-     ;; cursor will go to the end of the tooltip, leading to an incorrect
-     ;; result if `company-row' is called then.
-     (setq company-quickdoc--current-row (company--row)))
-    (`hide
-     (setq company-quickdoc--current-row nil))
     (`pre-command
      (company-quickdoc--cancel-timer)
      (company-quickdoc--hide))
@@ -262,7 +251,7 @@ The 1st arg DOC-LINES is a list containing doc string lines.  The 2nd arg
 DOC-POSITION indicates at which side the doc will be rendered."
   (let* ((tooltip-height
           (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
-         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
+         (tooltip-abovep (nth 3 (overlay-get company-pseudo-tooltip-overlay 'company-replacement-args)))
          (n-lines (length doc-lines))
 
          (ov-end (if tooltip-abovep
@@ -317,11 +306,7 @@ indicates at which side the doc will be rendered."
 
       (let* ((ov-start (line-beginning-position))
              (ov-end (line-end-position))
-             (ov (make-overlay ov-start ov-end))
-             (tooltip-width (overlay-get company-pseudo-tooltip-overlay 'company-width))
-             (company-column (overlay-get company-pseudo-tooltip-overlay 'company-column))
-             (horizontal-span (+ (company--window-width) (window-hscroll)))
-             (tooltip-column (min (- horizontal-span tooltip-width) company-column)))
+             (ov (make-overlay ov-start ov-end)))
         (!cons ov company-quickdoc-overlays)
         (--> (company-quickdoc--merge-docstrings (list current-buffer-line) doc-lines doc-position)
              (car it)
@@ -365,7 +350,7 @@ DOC-POSITION indicates at which side the doc will be rendered."
            "[\n\v\f\r]"))
          (tooltip-height
           (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
-         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
+         (tooltip-abovep (nth 3 (overlay-get company-pseudo-tooltip-overlay 'company-replacement-args)))
          (ov-start
           (if tooltip-abovep
               (company-quickdoc--pos-after-lines
@@ -391,19 +376,20 @@ DOC-POSITION indicates at which side the doc will be rendered."
 (defun company-quickdoc--get-layout (doc-lines-length)
   "Get the layout for doc parts.  DOC-LINES-LENGTH is the number of lines of doc."
   (let* ((tooltip-height (abs (overlay-get company-pseudo-tooltip-overlay 'company-height)))
-         (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args))))
+         (tooltip-abovep (nth 3 (overlay-get company-pseudo-tooltip-overlay 'company-replacement-args)))
+         (current-row (cdr (company--col-row (line-beginning-position)))))
     (if tooltip-abovep
         (let* ((nlines-above
-                (min (max (- company-quickdoc--current-row tooltip-height) 0)
+                (min (max (- current-row tooltip-height) 0)
                      (max (- doc-lines-length tooltip-height) 0)))
                (nlines-matching-tooltip
                 (min tooltip-height
                      doc-lines-length))
                (nlines-current-line
-                (if (> doc-lines-length company-quickdoc--current-row) 1 0))
+                (if (> doc-lines-length current-row) 1 0))
                (nlines-below
-                (min (- (company--window-height) company-quickdoc--current-row 1)
-                     (max (- doc-lines-length company-quickdoc--current-row 1) 0)))
+                (min (- (company--window-height) current-row 1)
+                     (max (- doc-lines-length current-row 1) 0)))
                (layout-alist '()))
           (when (> nlines-above 0)
             (!cons `(:above . ,nlines-above) layout-alist))
@@ -415,7 +401,7 @@ DOC-POSITION indicates at which side the doc will be rendered."
             (!cons `(:below . ,nlines-below) layout-alist))
           (nreverse layout-alist))
 
-      (let* ((nrows-below-current-line (- (company--window-height) company-quickdoc--current-row 1))
+      (let* ((nrows-below-current-line (- (company--window-height) current-row 1))
              (nlines-below
               (min (max (- nrows-below-current-line tooltip-height) 0)
                    (max (- doc-lines-length tooltip-height) 0)))
@@ -425,7 +411,7 @@ DOC-POSITION indicates at which side the doc will be rendered."
              (nlines-current-line
               (if (> doc-lines-length nrows-below-current-line) 1 0))
              (nlines-above
-              (min company-quickdoc--current-row
+              (min current-row
                    (max (- doc-lines-length nrows-below-current-line 1) 0)))
              (layout-alist '()))
         (when (> nlines-above 0)
@@ -473,8 +459,7 @@ side."
          (tooltip-strings
           (if tooltip-abovep
               (cl-subseq (split-string tooltip-string "[\n\v\f\r]") 0 -1)
-            (split-string tooltip-string "[\n\v\f\r]")))
-         (tooltip-start-line (1+ company-quickdoc--current-row)))
+            (split-string tooltip-string "[\n\v\f\r]"))))
     (cond
      ((eq position 'top)
       (if tooltip-abovep
@@ -523,14 +508,13 @@ side."
             (company-quickdoc--render-doc-part-below doc-part-lines-below position))))))))
 
 (defun company-quickdoc--show ()
-  "Override `company-quickdoc--show' function from `company-quickdoc'."
-  (company-quickdoc--cancel-timer)
+  "Show doc."
   (while-no-input
     (let* ((selected (nth company-selection company-candidates))
            (doc (let ((inhibit-message t))
                   (ignore-errors (company-quickdoc--doc selected))))
            (ov company-pseudo-tooltip-overlay)
-           (ov-str (overlay-get ov 'company-display))
+           ;; (ov-str (overlay-get ov 'company-display))
            (tooltip-width (overlay-get ov 'company-width))
            (tooltip-height (abs (overlay-get ov 'company-height)))
            (company-column (overlay-get ov 'company-column))
@@ -539,12 +523,17 @@ side."
            (horizontal-span (+ window-width (window-hscroll)))
            (tooltip-column (min (- horizontal-span tooltip-width) company-column))
            (tooltip-abovep (nth 3 (overlay-get ov 'company-replacement-args)))
-           (remaining-cols-right (- (+ (company--window-width) (window-hscroll)) tooltip-column tooltip-width 2))
-           (remaining-cols-left (- tooltip-column (window-hscroll) 5))
-           (remaining-rows-top (- company-quickdoc--current-row
-                                  (if tooltip-abovep (min tooltip-height (length company-candidates)) 0)))
-           (remaining-rows-bottom (- window-height company-quickdoc--current-row
-                                     (if tooltip-abovep 0 (min tooltip-height (length company-candidates))) 1)))
+           (current-row (cdr (company--col-row (line-beginning-position))))
+           (remaining-cols-right
+            (- (+ (company--window-width) (window-hscroll)) tooltip-column tooltip-width 2))
+           (remaining-cols-left
+            (- tooltip-column (window-hscroll) 5))
+           (remaining-rows-top
+            (- current-row
+               (if tooltip-abovep (min tooltip-height (length company-candidates)) 0)))
+           (remaining-rows-bottom
+            (- window-height current-row
+               (if tooltip-abovep 0 (min tooltip-height (length company-candidates))) 1)))
       (when (and ov doc)
         (let (doc-strings-right
               doc-strings-left
@@ -611,7 +600,6 @@ side."
 
 (defun company-quickdoc--enable ()
   (add-hook 'focus-out-hook #'company-cancel nil t)
-  (setq-local company-quickdoc--original-tooltip-width company-tooltip-minimum-width)
   (make-local-variable 'company-frontends)
   (add-to-list 'company-frontends 'company-quickdoc-frontend :append))
 
