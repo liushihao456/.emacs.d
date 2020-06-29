@@ -514,7 +514,6 @@ side."
            (doc (let ((inhibit-message t))
                   (ignore-errors (company-quickdoc--doc selected))))
            (ov company-pseudo-tooltip-overlay)
-           ;; (ov-str (overlay-get ov 'company-display))
            (tooltip-width (overlay-get ov 'company-width))
            (tooltip-height (abs (overlay-get ov 'company-height)))
            (company-column (overlay-get ov 'company-column))
@@ -539,23 +538,12 @@ side."
               doc-strings-left
               doc-strings-top-bottom)
           (or
+           ;; Prefer show on right
            (and (> remaining-cols-right 5)
                 (setq doc-strings-right (company-quickdoc--format-string doc remaining-cols-right))
                 (and (<= (length doc-strings-right) (company--window-height))
                      (company-quickdoc--render-sidewise doc-strings-right 'right)))
-           (and (> remaining-cols-left 5)
-                (setq doc-strings-left (company-quickdoc--format-string doc remaining-cols-left))
-                (and (<= (length doc-strings-left) (company--window-height))
-                     (company-quickdoc--render-sidewise doc-strings-left 'left)))
-           (and (> remaining-rows-top 3)
-                (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3)))
-                (and (<= (length doc-strings-top-bottom) remaining-rows-top)
-                     (company-quickdoc--render-stackwise doc-strings-top-bottom 'top)))
-           (and (> remaining-rows-bottom 3)
-                (or doc-strings-top-bottom
-                    (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3))))
-                (and (<= (length doc-strings-top-bottom) remaining-rows-bottom)
-                     (company-quickdoc--render-stackwise doc-strings-top-bottom 'bottom)))
+           ;; If no enough space on the right, show on the side with the most space
            (and t
                 (let* ((area-right (* remaining-cols-right window-height))
                        (area-left (* remaining-cols-left window-height))
@@ -567,16 +555,13 @@ side."
                         (setq doc-strings-right (company-quickdoc--format-string doc remaining-cols-right)))
                     (company-quickdoc--render-sidewise (cl-subseq doc-strings-right 0 window-height) 'right))
                    ((>= area-left (max area-right area-top area-bottom))
-                    (or doc-strings-left
-                        (setq doc-strings-left (company-quickdoc--format-string doc remaining-cols-left)))
+                    (setq doc-strings-left (company-quickdoc--format-string doc remaining-cols-left))
                     (company-quickdoc--render-sidewise (cl-subseq doc-strings-left 0 window-height) 'left))
                    ((>= area-top (max area-right area-left area-bottom))
-                    (or doc-strings-top-bottom
-                        (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3))))
+                    (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3)))
                     (company-quickdoc--render-sidewise (cl-subseq doc-strings-top-bottom 0 remaining-rows-top) 'top))
                    ((>= area-bottom (max area-right area-left area-top))
-                    (or doc-strings-top-bottom
-                        (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3))))
+                    (setq doc-strings-top-bottom (company-quickdoc--format-string doc (- window-width 3)))
                     (company-quickdoc--render-sidewise (cl-subseq doc-strings-top-bottom 0 remaining-rows-bottom) 'bottom))
                    )))))
 
