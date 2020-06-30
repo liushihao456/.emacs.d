@@ -102,7 +102,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(lsp-python-ms deadgrep wgrep company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(company-prescient lsp-python-ms deadgrep wgrep company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -335,8 +335,46 @@ split; vice versa."
     (progn
       (add-to-list 'load-path "~/.config/emacs/packages/company-tip")
       (require 'company-tip)
-      (company-tip-mode t))))
+      (company-tip-mode t)))
 
+  ;; Better sorting and filtering
+  (company-prescient-mode t)
+
+  ;; Yasnippet integration
+  (require 'yasnippet)
+  (defun company-backend-with-yas (backend)
+    "Add `yasnippet' to company backend."
+    (if (and (listp backend) (member 'company-yasnippet backend))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+
+  (defun my-company-enbale-yas (&rest _)
+    "Enable `yasnippet' in `company'."
+    (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
+  ;; Enable in current backends
+  (my-company-enbale-yas)
+  ;; Enable in `lsp-mode'
+  (with-eval-after-load 'lsp-mode
+    (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas))
+
+  (defun my-company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
+    "Enable yasnippet but disable it inline."
+    (if (eq command 'prefix)
+        (when-let ((prefix (funcall fun 'prefix)))
+          (unless (eq (char-before (- (point) (length prefix)))
+                      ?.)
+            prefix))
+      (progn
+        (when arg (and (bound-and-true-p lsp-mode)
+                       (not (get-text-property 0 'yas-annotation-patch arg)))
+              (let* ((name (get-text-property 0 'yas-annotation arg))
+                     (snip (format "-> %s (Snippet)" name))
+                     (len (length arg)))
+                (put-text-property 0 len 'yas-annotation snip arg)
+                (put-text-property 0 len 'yas-annotation-patch t arg)))
+        (funcall fun command arg))))
+  (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline))
 
 ;; Magit
 (global-set-key (kbd "C-c g") 'magit-status)
