@@ -180,7 +180,11 @@ Entered on %T")
            (emacs-lisp-mode "Elisp" :major)
            (which-key-mode nil "which-key")
            (abbrev-mode nil "abbrev")
-           (lsp-mode nil "lsp-mode")))
+           (lsp-mode nil "lsp-mode")
+           (company-mode nil "company")
+           (yas-minor-mode nil "yasnippet")
+           (auto-revert-mode nil "autorevert")
+           (sphinx-doc-mode nil "sphinx-doc")))
 
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
@@ -258,6 +262,7 @@ split; vice versa."
 (global-set-key (kbd "C-h F") 'describe-face)
 (global-set-key (kbd "M-n") 'scroll-up-line)
 (global-set-key (kbd "M-p") 'scroll-down-line)
+(global-set-key (kbd "M-o") 'other-window)
 
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
@@ -463,7 +468,22 @@ split; vice versa."
                                          xref-find-references)))
 
 
+;; LSP mode
 (with-eval-after-load 'lsp-mode
+  (defun my/lsp-ui-doc--make-request nil
+    (if (and (not company-pseudo-tooltip-overlay)
+             (not (eq this-command 'self-insert-command)))
+        (lsp-ui-doc--make-request)
+      (lsp-ui-doc--hide-frame)))
+  (add-hook
+   'lsp-ui-doc-mode-hook
+   (lambda ()
+     (when lsp-ui-doc-mode
+       (remove-hook 'post-command-hook 'lsp-ui-doc--make-request t)
+       (add-hook 'post-command-hook 'my/lsp-ui-doc--make-request nil t))
+     (unless lsp-ui-doc-mode
+       (remove-hook 'post-command-hook 'my/lsp-ui-doc--make-request t))))
+
   (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
   ;; (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
   ;; (define-key lsp-mode-map (kbd "C-c l R") 'lsp-ui-peek-find-references)
@@ -478,10 +498,11 @@ split; vice versa."
   (define-key lsp-mode-map (kbd "C-c l S") 'lsp-shutdown-workspace)
   (define-key lsp-mode-map (kbd "C-c l a") 'xref-find-apropos)
 
-  (setq lsp-log-io t)
+  ;; (setq lsp-log-io t)
   )
 
 ;; Lsp Python
+(add-to-list 'load-path "~/.config/emacs/packages/sphinx-doc")
 (add-hook 'python-mode-hook 'lsp)
 (with-eval-after-load 'python
   (require 'lsp-python-ms)
@@ -492,7 +513,10 @@ split; vice versa."
       (erase-buffer)
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
       (goto-char old-point)))
-  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer))
+  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer)
+
+  (require 'sphinx-doc)
+  (add-hook 'python-mode-hook 'sphinx-doc-mode))
 
 ;; Lsp C++
 (dolist (m (list 'c-mode-hook 'c++-mode-hook 'objc-mode-hook))
@@ -500,8 +524,7 @@ split; vice versa."
                 (lsp)
                 (setq-local company-backends (delete 'company-clang company-backends))
                 (setq comment-start "/* "
-                      comment-end " */")))
-  )
+                      comment-end " */"))))
 (with-eval-after-load 'cc-mode
   (defun my/cmake-project-generate-compile-commands ()
     "ccls typically indexes an entire project. In order for this
