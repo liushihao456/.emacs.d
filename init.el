@@ -42,6 +42,8 @@
  '(cmake-tab-width 4 t)
  '(column-number-mode t)
  '(company-dabbrev-downcase nil)
+ '(company-frontends
+   '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
  '(company-idle-delay 0.2)
  '(company-selection-wrap-around t)
  '(company-tooltip-align-annotations t)
@@ -333,8 +335,7 @@ split; vice versa."
     (progn
       (add-to-list 'load-path "~/.config/emacs/packages/company-tip")
       (require 'company-tip)
-      (company-tip-mode t)
-      )))
+      (company-tip-mode t))))
 
 
 ;; Magit
