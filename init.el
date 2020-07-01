@@ -368,13 +368,13 @@ split; vice versa."
                       ?.)
             prefix))
       (progn
-        (when arg (and (bound-and-true-p lsp-mode)
-                       (not (get-text-property 0 'yas-annotation-patch arg)))
-              (let* ((name (get-text-property 0 'yas-annotation arg))
-                     (snip (format "-> %s (Snippet)" name))
-                     (len (length arg)))
-                (put-text-property 0 len 'yas-annotation snip arg)
-                (put-text-property 0 len 'yas-annotation-patch t arg)))
+        (when (and arg
+                   (not (get-text-property 0 'yas-annotation-patch arg)))
+          (let* ((name (get-text-property 0 'yas-annotation arg))
+                 (snip (format "-> %s (Snippet)" name))
+                 (len (length arg)))
+            (put-text-property 0 len 'yas-annotation snip arg)
+            (put-text-property 0 len 'yas-annotation-patch t arg)))
         (funcall fun command arg))))
   (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline))
 
@@ -506,19 +506,11 @@ split; vice versa."
 
 ;; LSP mode
 (with-eval-after-load 'lsp-mode
-  (defun my/lsp-ui-doc--make-request nil
-    (if (and (not company-pseudo-tooltip-overlay)
+  (defun my/lsp-ui-doc--make-request (fun &rest args)
+    (when (and (not company-pseudo-tooltip-overlay)
              (not (eq this-command 'self-insert-command)))
-        (lsp-ui-doc--make-request)
-      (lsp-ui-doc--hide-frame)))
-  (add-hook
-   'lsp-ui-doc-mode-hook
-   (lambda ()
-     (when lsp-ui-doc-mode
-       (remove-hook 'post-command-hook 'lsp-ui-doc--make-request t)
-       (add-hook 'post-command-hook 'my/lsp-ui-doc--make-request nil t))
-     (unless lsp-ui-doc-mode
-       (remove-hook 'post-command-hook 'my/lsp-ui-doc--make-request t))))
+        (funcall fun)))
+  (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
 
   (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
   ;; (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
