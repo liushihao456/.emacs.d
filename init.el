@@ -9,8 +9,10 @@
 (setq read-process-output-max (* 1024 1024))
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+(setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
+                         ("melpa" . "http://elpa.emacs-china.org/melpa/")))
+;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+;; (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -391,11 +393,6 @@ split; vice versa."
 (add-to-list 'auto-mode-alist '("\\.gnuplot\\'" . gnuplot-mode))
 (add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot-mode))
 
-;; ESS and R
-(with-eval-after-load 'ess
-  (setq ess-eval-visibly 'nowait) ; Allow asynchronous executing
-  )
-
 ;; Matlab: octave-mode
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
@@ -539,6 +536,11 @@ split; vice versa."
 
   ;; (setq lsp-log-io t)
   )
+
+;; Lsp, ESS and R
+(with-eval-after-load 'ess
+  (setq ess-eval-visibly 'nowait) ; Allow asynchronous executing
+  (add-hook 'ess-r-mode-hook 'lsp))
 
 ;; Lsp Python
 (add-to-list 'load-path "~/.config/emacs/packages/sphinx-doc")
