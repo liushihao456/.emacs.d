@@ -580,13 +580,34 @@ list and their compilation command lines."
 
 ;; Lsp java
 (with-eval-after-load 'cc-mode
-  (require 'lsp-java))
+  (require 'lsp-java)
+  (defun java-compile-run-current-main-class ()
+    "If the current java file contains main method, compile project and run it."
+    (interactive)
+    (let* ((default-directory (cdr (project-current)))
+           (buffer-string (buffer-string))
+           (file-class-name (file-name-base buffer-file-name))
+           (compile-command
+            (if (and (string-match-p
+                      (regexp-quote "public static void main(String[] args)")
+                      buffer-string)
+                     (string-match-p
+                      (concat "public[ \n]+class[ \n]+" file-class-name "[ \na-zA-Z0-9_]*{")
+                      buffer-string)
+                     (string-match "package[ \n]+\\(.+?\\);" buffer-string))
+                (concat "mvn compile exec:java -Dexec.mainClass=\""
+                        (match-string 1 buffer-string)
+                        "." file-class-name "\"")
+              "mvn compile")))
+      (call-interactively 'compile)))
+  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class))
+
 (add-hook 'java-mode-hook (lambda ()
-                           (lsp)
-                           (setq comment-start "/* "
-                                 comment-end " */")
-                           (c-set-offset 'arglist-intro '+)
-                           (c-set-offset 'arglist-close '0)))
+                            (lsp)
+                            (setq comment-start "/* "
+                                  comment-end " */")
+                            (c-set-offset 'arglist-intro '+)
+                            (c-set-offset 'arglist-close '0)))
 
 ;; Lsp javascript/typescript
 (add-hook 'js-mode-hook (lambda ()
