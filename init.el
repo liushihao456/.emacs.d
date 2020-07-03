@@ -11,8 +11,6 @@
 (setq package-enable-at-startup nil)
 (setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
                          ("melpa" . "http://elpa.emacs-china.org/melpa/")))
-;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-;; (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -585,20 +583,22 @@ list and their compilation command lines."
     "If the current java file contains main method, compile project and run it."
     (interactive)
     (let* ((default-directory (cdr (project-current)))
-           (buffer-string (buffer-string))
            (file-class-name (file-name-base buffer-file-name))
            (compile-command
-            (if (and (string-match-p
-                      (regexp-quote "public static void main(String[] args)")
-                      buffer-string)
-                     (string-match-p
-                      (concat "public[ \n]+class[ \n]+" file-class-name "[ \na-zA-Z0-9_]*{")
-                      buffer-string)
-                     (string-match "package[ \n]+\\(.+?\\);" buffer-string))
-                (concat "mvn compile exec:java -Dexec.mainClass=\""
-                        (match-string 1 buffer-string)
-                        "." file-class-name "\"")
-              "mvn compile")))
+            (save-excursion
+              (goto-char (point-min))
+              (if (and
+                   (search-forward-regexp
+                    (concat "public\s+class\s+" file-class-name "\s?[a-zA-Z0-9_<>]?[\sa-zA-Z0-9_<>]*{")
+                    nil t)
+                   (search-forward-regexp
+                    (regexp-quote "public static void main(String[] args)")
+                    nil t)
+                   (search-backward-regexp "package\s+\\(.+?\\);" nil t))
+                  (concat "mvn compile exec:java -Dexec.mainClass=\""
+                          (match-string 1)
+                          "." file-class-name "\"")
+                "mvn compile"))))
       (call-interactively 'compile)))
   (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class))
 
