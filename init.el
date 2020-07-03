@@ -102,7 +102,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(company-prescient lsp-python-ms deadgrep wgrep company-box selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(company-prescient lsp-python-ms deadgrep wgrep selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -187,7 +187,8 @@ Entered on %T")
            (yas-minor-mode nil "yasnippet")
            (auto-revert-mode nil "autorevert")
            (sphinx-doc-mode nil "sphinx-doc")
-           (hi-lock-mode nil "hi-lock")))
+           (hi-lock-mode nil "hi-lock")
+           (auto-fill-function nil "simple")))
 
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
@@ -326,23 +327,19 @@ split; vice versa."
 (add-hook 'LaTeX-mode-hook 'company-mode)
 (add-hook 'org-mode-hook 'company-mode)
 (add-hook 'inferior-python-mode-hook 'company-mode)
+(add-to-list 'load-path "~/.config/emacs/packages/company-tip")
 (with-eval-after-load 'company
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (if (display-graphic-p)
-      (progn
-        (require 'company-box)
-        (add-hook 'company-mode-hook 'company-box-mode))
-    (progn
-      (add-to-list 'load-path "~/.config/emacs/packages/company-tip")
-      (require 'company-tip)
-      (company-tip-mode t)))
+  (require 'company-tip)
+  (company-tip-mode t)
 
   ;; Better sorting and filtering
   (company-prescient-mode t)
 
   ;; Yasnippet integration
   (require 'yasnippet)
+  (global-set-key (kbd "C-]") 'company-yasnippet)
   (defun company-backend-with-yas (backend)
     "Add `yasnippet' to company backend."
     (if (and (listp backend) (member 'company-yasnippet backend))
@@ -402,7 +399,7 @@ split; vice versa."
 (defun add-pcomplete-to-capf ()
   (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
 (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
-(add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
+;; (add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
 ;; Sunrise and Sunset
 (defun diary-sunrise ()
   (let ((dss (diary-sunrise-sunset)))

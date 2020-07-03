@@ -6,5 +6,6 @@
 #+LATEX_HEADER: \geometry{a4paper,left=2cm,right=2cm,top=3cm,bottom=3cm}
 #+LATEX_HEADER: \usepackage{subcaption}
 #+LATEX_HEADER: \usepackage{float}
-#+LATEX_HEADER: \setlength{\parskip}{12pt}
+#+LATEX_HEADER: \setlength\parindent{0pt}
+#+LATEX_HEADER: \setlength\parskip{10pt}
 $0
