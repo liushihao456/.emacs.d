@@ -65,6 +65,7 @@
  '(lsp-enable-file-watchers nil)
  '(lsp-enable-indentation nil)
  '(lsp-enable-on-type-formatting nil)
+ '(lsp-enable-semantic-highlighting t)
  '(lsp-idle-delay 0.5)
  '(lsp-java-autobuild-enabled nil)
  '(lsp-java-code-generation-generate-comments t)
@@ -329,6 +330,7 @@ split; vice versa."
 (add-hook 'inferior-python-mode-hook 'company-mode)
 (add-to-list 'load-path "~/.config/emacs/packages/company-tip")
 (with-eval-after-load 'company
+  (setq company-backends '(company-capf company-files))
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (require 'company-tip)
@@ -531,9 +533,14 @@ split; vice versa."
   (add-hook 'ess-r-mode-hook 'lsp))
 
 ;; Lsp Python
-(add-to-list 'load-path "~/.config/emacs/packages/sphinx-doc")
+;; (add-to-list 'load-path "~/.config/emacs/packages/sphinx-doc")
+;; (require 'sphinx-doc)
+;; (add-hook 'python-mode-hook 'sphinx-doc-mode)
+(add-to-list 'load-path "~/.config/emacs/packages/autodoc")
 (add-hook 'python-mode-hook 'lsp)
 (with-eval-after-load 'python
+  (require 'autodoc)
+  (add-hook 'python-mode-hook 'autodoc-mode)
   (require 'lsp-python-ms)
   (defun my/format-buffer ()
     "Format buffer using yapf."
@@ -542,10 +549,7 @@ split; vice versa."
       (erase-buffer)
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
       (goto-char old-point)))
-  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer)
-
-  (require 'sphinx-doc)
-  (add-hook 'python-mode-hook 'sphinx-doc-mode))
+  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer))
 
 ;; Lsp C++
 (dolist (m (list 'c-mode-hook 'c++-mode-hook 'objc-mode-hook))
@@ -587,7 +591,7 @@ list and their compilation command lines."
               (goto-char (point-min))
               (if (and
                    (search-forward-regexp
-                    (concat "public\s+class\s+" file-class-name "\s?[a-zA-Z0-9_<>]?[\sa-zA-Z0-9_<>]*{")
+                    (concat "public\s+class\s+" file-class-name "\s?[^{]*{")
                     nil t)
                    (search-forward-regexp
                     (regexp-quote "public static void main(String[] args)")
@@ -616,6 +620,13 @@ list and their compilation command lines."
                                   (lsp)
                                   (setq comment-start "/* "
 	                                    comment-end " */")))
+(add-to-list 'load-path "~/.config/emacs/packages/prettier-js")
+(with-eval-after-load 'js
+  (require 'prettier-js)
+  (define-key js-mode-map (kbd "C-c l F") 'prettier-js))
+(with-eval-after-load 'typescript-mode
+  (require 'prettier-js)
+  (define-key typescript-mode-map (kbd "C-c l F") 'prettier-js))
 
 ;; Emmet mode
 (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
