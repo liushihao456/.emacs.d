@@ -187,7 +187,6 @@ Entered on %T")
            (company-mode nil "company")
            (yas-minor-mode nil "yasnippet")
            (auto-revert-mode nil "autorevert")
-           (sphinx-doc-mode nil "sphinx-doc")
            (hi-lock-mode nil "hi-lock")
            (auto-fill-function nil "simple")))
 
@@ -533,9 +532,6 @@ split; vice versa."
   (add-hook 'ess-r-mode-hook 'lsp))
 
 ;; Lsp Python
-;; (add-to-list 'load-path "~/.config/emacs/packages/sphinx-doc")
-;; (require 'sphinx-doc)
-;; (add-hook 'python-mode-hook 'sphinx-doc-mode)
 (add-to-list 'load-path "~/.config/emacs/packages/autodoc")
 (add-hook 'python-mode-hook 'lsp)
 (with-eval-after-load 'python
