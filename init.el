@@ -505,7 +505,8 @@ split; vice versa."
 (with-eval-after-load 'lsp-mode
   (defun my/lsp-ui-doc--make-request (fun &rest args)
     (when (and (not company-pseudo-tooltip-overlay)
-             (not (eq this-command 'self-insert-command)))
+               (not (eq this-command 'self-insert-command))
+               (not (eq this-command 'company-complete-selection)))
         (funcall fun)))
   (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
 
@@ -537,7 +538,7 @@ split; vice versa."
 (with-eval-after-load 'python
   (require 'autodoc)
   (add-hook 'python-mode-hook 'autodoc-mode)
-  (require 'lsp-python-ms)
+
   (defun my/format-buffer ()
     "Format buffer using yapf."
     (interactive)
@@ -598,7 +599,10 @@ list and their compilation command lines."
                           "." file-class-name "\"")
                 "mvn compile"))))
       (call-interactively 'compile)))
-  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class))
+  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class)
+
+  (require 'autodoc)
+  (add-hook 'c-mode-common-hook 'autodoc-mode))
 
 (add-hook 'java-mode-hook (lambda ()
                             (lsp)
