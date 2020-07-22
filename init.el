@@ -296,6 +296,13 @@ split; vice versa."
   (load-theme 'terminal-zenburn t)
   )
 
+;; Powerline
+;; In terminal version of emacs, transparency must be set to 0 for the
+;; separators' color to match
+;; (add-to-list 'load-path "~/.config/emacs/packages/powerline")
+;; (require 'powerline)
+;; (powerline-center-theme)
+
 ;; Tidy mode line
 (defun tidy-modeline--fill (reserve)
   "Return empty space leaving RESERVE space on the right.  Adapted from powerline.el."
