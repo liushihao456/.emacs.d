@@ -34,29 +34,33 @@
   '(:python
     ":$"
     :cc
-    ")"))
+    "{"
+    :jsts
+    "{"))
 (defconst autodoc--defun-regex
   '(:python
-    "def \\([[:alnum:]_]+\\)[[:space:]\n]*(\\([^)]*\\))\\(?:[[:space:]\n]*->[[:space:]\n]*\\([^):]+\\)\\)? *:$"
+    "\\(?:^\\|[[:space:]]\\)+def \\([[:alnum:]_]+\\)[[:space:]\n]*(\\([^)]*\\))\\(?:[[:space:]\n]*->[[:space:]\n]*\\([^):[:space:]\n]+\\)\\)? *:$"
     :cc
-    "\\(?:^\\|[[:space:]]\\)+\\([][<>[:alnum:]_]+\\)[[:space:]\n]+\\([[:alnum:]_]+\\)+[[:space:]\n]*(\\([^)]*\\))"))
+    "\\(?:^\\|[[:space:]]\\)+\\([][<>[:alnum:]_]+\\)[[:space:]\n]+\\([[:alnum:]_]+\\)+[[:space:]\n]*(\\([^)]*\\))"
+    :jsts
+    "\\(?:^\\|[[:space:]]\\)+function \\([[:alnum:]_]+\\)[[:space:]\n]*(\\([^)]*\\))\\(?:[[:space:]\n]*:[[:space:]\n]*\\([^):[:space:]\n]+\\)\\)?[[:space:]\n]*{$"))
 
-(defconst autodoc--docstring-begin-regex "\"\"\"[[:space:]\n]*")
-(defconst autodoc--docstring-end-regex "[[:space:]\n]*\"\"\"")
+;; (defconst autodoc--docstring-begin-regex "\"\"\"[[:space:]\n]*")
+;; (defconst autodoc--docstring-end-regex "[[:space:]\n]*\"\"\"")
 
-(defun autodoc--get-docstring-existing ()
-  "Get the existing docstring.  Cursor has to be at the end of function declaration."
-  (skip-chars-forward "[:space:]\n")
-  (when (looking-at-p autodoc--docstring-begin-regex)
-    (save-match-data
-      (search-forward-regexp autodoc--docstring-begin-regex)
-      (push-mark)
-      (search-forward-regexp autodoc--docstring-end-regex)
-      (skip-chars-backward "\"[:space:]\n"))
-    (buffer-substring-no-properties (mark) (point))))
+;; (defun autodoc--get-docstring-existing ()
+;;   "Get the existing docstring.  Cursor has to be at the end of function declaration."
+;;   (skip-chars-forward "[:space:]\n")
+;;   (when (looking-at-p autodoc--docstring-begin-regex)
+;;     (save-match-data
+;;       (search-forward-regexp autodoc--docstring-begin-regex)
+;;       (push-mark)
+;;       (search-forward-regexp autodoc--docstring-end-regex)
+;;       (skip-chars-backward "\"[:space:]\n"))
+;;     (buffer-substring-no-properties (mark) (point))))
 
 (defun autodoc--generate-docstring-template-cc ()
-  "Generate the docstring template for cc language methods.
+  "Generate the docstring template for cc language functions.
 The ``match-data'' has to be set to the result of
 applying ``autodoc--defun-regex'' when calling this function."
   (let ((params (match-string 3))
@@ -66,8 +70,33 @@ applying ``autodoc--defun-regex'' when calling this function."
     (when params
       (!cons " \*" doc-lines)
       (dolist (param-type (mapcar 'string-trim (split-string params ",")))
-        (let ((param-type-list (mapcar 'string-trim (split-string param-type "[ \f\t\n\r\v]+"))))
-          (!cons (concat " \* @param " (nth 1 param-type-list) (format " ${%d:[ParamDescription]}" (setq n (1+ n))))
+        (let* ((param-type-list (mapcar 'string-trim (split-string param-type "[ \f\t\n\r\v]+")))
+               (param (string-remove-prefix "*" (string-remove-suffix "[]" (car (last param-type-list)))))
+               (type (car (last param-type-list 2))))
+          (!cons (concat " \* @param " param (format " ${%d:[ParamDescription]}" (setq n (1+ n))))
+                 doc-lines))))
+    (unless (string= rtype "void")
+      (when (eq (length doc-lines) 2)
+        (!cons " \*" doc-lines))
+      (!cons (format " \* @return ${%d:[ReturnDescription]}" (setq n (1+ n))) doc-lines))
+    (!cons " \*/" doc-lines)
+    (string-join (nreverse doc-lines) "\n")))
+
+(defun autodoc--generate-docstring-template-jsts ()
+  "Generate the docstring template for javascript or typescript functions.
+The ``match-data'' has to be set to the result of
+applying ``autodoc--defun-regex'' when calling this function."
+  (let ((params (match-string 2))
+        (rtype (match-string 3))
+        (doc-lines (list " \* ${1:[Summary]}" "/\*\*"))
+        (n 1))
+    (when params
+      (!cons " \*" doc-lines)
+      (dolist (param-type (mapcar 'string-trim (split-string params ",")))
+        (let* ((param-type-list (mapcar 'string-trim (split-string param-type ":")))
+               (param (car param-type-list))
+               (type (cadr param-type-list)))
+          (!cons (concat " \* @param " param (format " ${%d:[ParamDescription]}" (setq n (1+ n))))
                  doc-lines))))
     (unless (string= rtype "void")
       (when (eq (length doc-lines) 2)
@@ -87,12 +116,14 @@ applying ``autodoc--defun-regex'' when calling this function."
     (when (and params (not (string= (string-trim params) "self")))
       (!cons "" doc-lines)
       (dolist (param-type (mapcar 'string-trim (split-string params ",")))
-        (let ((param-type-list (mapcar 'string-trim (split-string param-type ":"))))
+        (let* ((param-type-list (mapcar 'string-trim (split-string param-type ":")))
+               (param (car param-type-list))
+               (type (cadr param-type-list)))
           (unless (string= (car param-type-list) "self")
-            (!cons (concat ":param " (car param-type-list) (format ": ${%d:[ParamDescription]}" (setq n (1+ n))))
+            (!cons (concat ":param " param (format ": ${%d:[ParamDescription]}" (setq n (1+ n))))
                    doc-lines)
-            (!cons (concat ":type " (car param-type-list) ": "
-                           (or (nth 1 param-type-list) (format "${%d:[ParamType]}" (setq n (1+ n))))
+            (!cons (concat ":type " param ": "
+                           (or type (format "${%d:[ParamType]}" (setq n (1+ n))))
                            (format "${%d:(, optional)}" (setq n (1+ n))))
                    doc-lines)))))
     (setcar doc-lines (concat (car doc-lines) (format "${%d:" (setq n (1+ n)))))
@@ -108,7 +139,8 @@ The ``match-data'' has to be set to the result of
 applying ``autodoc--defun-regex'' when calling this function."
   (cond
    ((eq major-mode 'python-mode) (autodoc--generate-docstring-template-python))
-   ((eq major-mode 'java-mode) (autodoc--generate-docstring-template-cc))))
+   ((memq major-mode '(java-mode c-mode c++-mode)) (autodoc--generate-docstring-template-cc))
+   ((memq major-mode '(js-mode typescript-mode)) (autodoc--generate-docstring-template-jsts))))
 
 (defun autodoc--goto-docstring-insertion-point ()
   "Go to the insertion point of the docstring.
@@ -118,7 +150,7 @@ function."
   (cond
    ((eq major-mode 'python-mode)
     (newline-and-indent))
-   ((memq major-mode '(java-mode c-mode c++-mode))
+   ((memq major-mode '(java-mode c-mode c++-mode js-mode typescript-mode))
     (autodoc--search-backward-defun)
     (goto-char (point-at-bol))
     (newline)
@@ -131,16 +163,20 @@ function."
   (cond
    ((eq major-mode 'python-mode)
     (search-forward-regexp (plist-get autodoc--end-of-defun-pattern :python) nil t))
-   ((eq major-mode 'java-mode)
-    (search-forward-regexp (plist-get autodoc--end-of-defun-pattern :cc) nil t))))
+   ((memq major-mode '(java-mode c-mode c++-mode))
+    (search-forward-regexp (plist-get autodoc--end-of-defun-pattern :cc) nil t))
+   ((memq major-mode '(js-mode typescript-mode))
+    (search-forward-regexp (plist-get autodoc--end-of-defun-pattern :jsts) nil t))))
 
 (defun autodoc--search-backward-defun ()
   "Search forward for defun."
   (cond
    ((eq major-mode 'python-mode)
     (search-backward-regexp (plist-get autodoc--defun-regex :python)))
-   ((eq major-mode 'java-mode)
-    (search-backward-regexp (plist-get autodoc--defun-regex :cc)))))
+   ((memq major-mode '(java-mode c-mode c++-mode))
+    (search-backward-regexp (plist-get autodoc--defun-regex :cc)))
+   ((memq major-mode '(js-mode typescript-mode))
+    (search-backward-regexp (plist-get autodoc--defun-regex :jsts)))))
 
 ;;;###autoload
 (defun autodoc-generate-docstring ()
@@ -149,8 +185,7 @@ function."
   (let ((initial-pos (point)))
     (autodoc--goto-end-of-defun-pattern)
     (if (autodoc--search-backward-defun)
-        (let* ((docstring-template (autodoc--generate-docstring-template))
-               (docstring-existing (autodoc--get-docstring-existing)))
+        (let ((docstring-template (autodoc--generate-docstring-template)))
           (autodoc--goto-docstring-insertion-point)
           (yas-expand-snippet docstring-template))
       (goto-char initial-pos))))

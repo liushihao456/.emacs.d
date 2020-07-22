@@ -284,13 +284,6 @@ split; vice versa."
 ;; Expand region
 (global-set-key (kbd "C-\\") 'er/expand-region)
 
-;; Ivy
-;; (ivy-mode t)
-;; (ivy-prescient-mode t)
-;; (with-eval-after-load 'ivy
-;;   (define-key ivy-minibuffer-map (kbd "C-@") 'ivy-mark)
-;; )
-
 ;; Selectrum
 (selectrum-mode t)
 (selectrum-prescient-mode t)
@@ -302,6 +295,49 @@ split; vice versa."
   ;; (load-theme 'terminal-silver-aerogel t)
   (load-theme 'terminal-zenburn t)
   )
+
+;; Tidy mode line
+(defun tidy-modeline--fill (reserve)
+  "Return empty space leaving RESERVE space on the right.  Adapted from powerline.el."
+  (let ((real-reserve (if (and window-system (eq 'right (get-scroll-bar-mode)))
+                          (- reserve 3)
+                        reserve)))
+    (propertize " "
+                'display `((space :align-to (- (+ right right-fringe right-margin) ,real-reserve))))))
+
+
+(defun tidy-modeline--fill-center (reserve)
+  "Return empty space leaving RESERVE space on the right in order to center a string.  Adapted from powerline.el."
+  (propertize " "
+              'display `((space :align-to (- (+ center (0.5 . right-margin)) ,reserve
+                                             (0.5 . left-margin))))))
+
+
+(setq-default mode-line-format
+  (list "%e"
+        '(:eval (cond (buffer-read-only " %*")
+                      ((buffer-modified-p) " *")
+                      (t " -")))
+        '(:eval (propertize " %P" 'help-echo "Position in buffer"))
+        '(:eval (when (file-remote-p default-directory)
+                  (propertize " %1@"
+                              'mouse-face 'mode-line-highlight
+                              'help-echo (concat "remote: " default-directory))))
+        '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
+        " "
+        vc-mode
+        " "
+        '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
+                  (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
+        '(:eval (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
+                       (col (format-mode-line (list " : " (propertize "%c " 'help-echo "Column number"))))
+                       (col-length (max 5 (+ (length col))))
+                       (row-length (+ col-length (length row))))
+                  (list
+                   (tidy-modeline--fill row-length)
+                   row
+                   (tidy-modeline--fill col-length)
+                   col)))))
 
 ;; Flycheck
 (add-hook 'prog-mode-hook 'flycheck-mode)
@@ -532,13 +568,21 @@ split; vice versa."
   (setq ess-eval-visibly 'nowait) ; Allow asynchronous executing
   (add-hook 'ess-r-mode-hook 'lsp))
 
-;; Lsp Python
+;; Autodoc: insert docstring template
 (add-to-list 'load-path "~/.config/emacs/packages/autodoc")
-(add-hook 'python-mode-hook 'lsp)
+(with-eval-after-load 'cc-mode
+  (require 'autodoc)
+  (add-hook 'c-mode-common-hook 'autodoc-mode))
 (with-eval-after-load 'python
   (require 'autodoc)
-  (add-hook 'python-mode-hook 'autodoc-mode)
+  (add-hook 'python-mode-hook 'autodoc-mode))
+(with-eval-after-load 'typescript-mode
+  (require 'autodoc)
+  (add-hook 'typescript-mode-hook 'autodoc-mode))
 
+;; Lsp Python
+(add-hook 'python-mode-hook 'lsp)
+(with-eval-after-load 'python
   (defun my/format-buffer ()
     "Format buffer using yapf."
     (interactive)
@@ -564,8 +608,7 @@ list and their compilation command lines."
     (let ((default-directory (cdr (project-current))))
       (shell-command
        (concat "\ncmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
-               "\nln -s Debug/compile_commands.json")))
-    )
+               "\nln -s Debug/compile_commands.json"))))
   (dolist (m (list c-mode-map c++-mode-map objc-mode-map))
     (define-key m (kbd "C-c l s") 'my/cmake-project-generate-compile-commands)))
 
@@ -599,10 +642,7 @@ list and their compilation command lines."
                           "." file-class-name "\"")
                 "mvn compile"))))
       (call-interactively 'compile)))
-  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class)
-
-  (require 'autodoc)
-  (add-hook 'c-mode-common-hook 'autodoc-mode))
+  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class))
 
 (add-hook 'java-mode-hook (lambda ()
                             (lsp)
