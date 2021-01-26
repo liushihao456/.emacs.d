@@ -62,6 +62,9 @@
  '(indent-tabs-mode nil)
  '(js-indent-align-list-continuation nil)
  '(lsp-before-save-edits nil)
+ '(lsp-clients-kotlin-server-executable
+   "~/.config/emacs/.cache/lsp/kotlin-language-server/server/build/install/server/bin/kotlin-language-server")
+ '(lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-verbosity=off"))
  '(lsp-enable-file-watchers nil)
  '(lsp-enable-indentation nil)
  '(lsp-enable-on-type-formatting nil)
@@ -103,7 +106,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(company-prescient lsp-python-ms deadgrep wgrep selectrum selectrum-prescient typescript-mode json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(swift-mode kotlin-mode cdlatex lsp-python-ms writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -114,6 +117,10 @@ Entered on %T")
  '(tab-width 4)
  '(tool-bar-mode nil)
  '(truncate-lines t)
+ '(web-mode-enable-auto-closing t)
+ '(web-mode-enable-auto-pairing t)
+ '(web-mode-enable-css-colorization t)
+ '(web-mode-enable-current-element-highlight t)
  '(yas-triggers-in-field t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -125,7 +132,7 @@ Entered on %T")
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(web-mode-html-tag-bracket-face ((t (:inherit default)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
@@ -188,7 +195,8 @@ Entered on %T")
            (yas-minor-mode nil "yasnippet")
            (auto-revert-mode nil "autorevert")
            (hi-lock-mode nil "hi-lock")
-           (auto-fill-function nil "simple")))
+           (auto-fill-function nil "simple")
+           (emmet-mode nil "emmet-mode")))
 
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
@@ -275,10 +283,13 @@ split; vice versa."
 (add-hook 'process-menu-mode-hook (lambda () (pop-to-buffer "*Process List*")))
 
 ;; Wgrep
+;; C-c C-p to enable editing in the grep result buffer
+;; C-c C-e to apply the changes
 (add-to-list 'load-path "~/.config/emacs/packages/wgrep")
-(require 'wgrep) ; C-c C-p to enable editing in the grep result buffer
+(require 'wgrep)
 (autoload 'wgrep-deadgrep-setup "wgrep-deadgrep")
 (add-hook 'deadgrep-finished-hook 'wgrep-deadgrep-setup)
+;; (define-key deadgrep-mode-map "C-c C-s" 'wgrep-save-all-buffers)
 
 
 ;; Expand region
@@ -326,10 +337,10 @@ split; vice versa."
                       ((buffer-modified-p) " *")
                       (t " -")))
         '(:eval (propertize " %P" 'help-echo "Position in buffer"))
-        '(:eval (when (file-remote-p default-directory)
-                  (propertize " %1@"
-                              'mouse-face 'mode-line-highlight
-                              'help-echo (concat "remote: " default-directory))))
+        ;; '(:eval (when (file-remote-p default-directory)
+        ;;           (propertize " %1@"
+        ;;                       'mouse-face 'mode-line-highlight
+        ;;                       'help-echo (concat "remote: " default-directory))))
         '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
         " "
         vc-mode
@@ -404,8 +415,8 @@ split; vice versa."
     "Enable yasnippet but disable it inline."
     (if (eq command 'prefix)
         (when-let ((prefix (funcall fun 'prefix)))
-          (unless (eq (char-before (- (point) (length prefix)))
-                      ?.)
+          (unless (memq (char-before (- (point) (length prefix)))
+                        '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?` ?/))
             prefix))
       (progn
         (when (and arg
@@ -432,6 +443,28 @@ split; vice versa."
 ;; Gnuplot mode
 (add-to-list 'auto-mode-alist '("\\.gnuplot\\'" . gnuplot-mode))
 (add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot-mode))
+(with-eval-after-load 'gnuplot-mode
+ (defun gnuplot-epslatex-generate-eps ()
+  "Generate eps output in a epslatex terminal in gnuplot using dvips."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (when (search-forward-regexp "set \\(?:terminal\\|term\\) epslatex[^\n]+standalone" nil t)
+      (when (search-forward-regexp "set output \"\\([^\"]+\\)\.tex\"")
+        (let ((output-file (match-string 1))
+              (buffer (and (if (get-buffer "*shell-output*") (kill-buffer "*shell-output*") t)
+                           (get-buffer-create "*shell-output*"))))
+          (gnuplot-run-buffer)
+          (pop-to-buffer buffer)
+          (help-mode)
+          (setq-local buffer-read-only nil)
+          (erase-buffer)
+          (shell-command
+           (concat "latex " output-file ".tex && dvips -E "
+                   output-file ".dvi -o " output-file ".eps")
+           t)
+          (setq-local buffer-read-only t))))))
+(define-key gnuplot-mode-map (kbd "C-c C-e") 'gnuplot-epslatex-generate-eps))
 
 ;; Matlab: octave-mode
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
@@ -547,10 +580,11 @@ split; vice versa."
 ;; LSP mode
 (with-eval-after-load 'lsp-mode
   (defun my/lsp-ui-doc--make-request (fun &rest args)
-    (when (and (not company-pseudo-tooltip-overlay)
-               (not (eq this-command 'self-insert-command))
-               (not (eq this-command 'company-complete-selection)))
-        (funcall fun)))
+    (if (and (not company-pseudo-tooltip-overlay)
+             (not (eq this-command 'self-insert-command))
+             (not (eq this-command 'company-complete-selection)))
+        (funcall fun)
+      (lsp-ui-doc--hide-frame)))
   (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
 
   (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
@@ -583,9 +617,6 @@ split; vice versa."
 (with-eval-after-load 'python
   (require 'autodoc)
   (add-hook 'python-mode-hook 'autodoc-mode))
-(with-eval-after-load 'typescript-mode
-  (require 'autodoc)
-  (add-hook 'typescript-mode-hook 'autodoc-mode))
 
 ;; Lsp Python
 (add-hook 'python-mode-hook 'lsp)
@@ -651,6 +682,8 @@ list and their compilation command lines."
       (call-interactively 'compile)))
   (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class))
 
+(add-hook 'kotlin-mode-hook (lambda () (lsp)))
+
 (add-hook 'java-mode-hook (lambda ()
                             (lsp)
                             (setq comment-start "/* "
@@ -658,29 +691,37 @@ list and their compilation command lines."
                             (c-set-offset 'arglist-intro '+)
                             (c-set-offset 'arglist-close '0)))
 
-;; Lsp javascript/typescript
-(add-hook 'js-mode-hook (lambda ()
-                          (lsp)
-                          (setq comment-start "/* "
-	                            comment-end " */")))
-(add-hook 'typescript-mode-hook (lambda ()
-                                  (lsp)
-                                  (setq comment-start "/* "
-	                                    comment-end " */")))
+;; Web mode and emmet mode
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+(add-hook 'web-mode-hook (lambda ()
+                           (setq-local electric-pair-pairs (append electric-pair-pairs '((?\' . ?\'))))
+                           (setq-local electric-pair-text-pairs electric-pair-pairs)
+                           (cond
+                            ((string-match-p "\\.\\(ts\\|js\\)\\'" (buffer-name))
+                             (lsp)
+                             (yas-activate-extra-mode 'js-mode))
+                            ((string-match-p "\\.\\(jsx\\|tsx\\)\\'" (buffer-name))
+                             (lsp)
+                             (emmet-mode)
+                             (setq-local emmet-expand-jsx-className? t)
+                             (yas-activate-extra-mode 'js-mode))
+                            ((string-match-p "\\.html?\\'" (buffer-name))
+                             (lsp)
+                             (emmet-mode)))))
+
+;; Prettier
 (add-to-list 'load-path "~/.config/emacs/packages/prettier-js")
-(with-eval-after-load 'js
+(with-eval-after-load 'web-mode
   (require 'prettier-js)
-  (define-key js-mode-map (kbd "C-c l F") 'prettier-js))
-(with-eval-after-load 'typescript-mode
-  (require 'prettier-js)
-  (define-key typescript-mode-map (kbd "C-c l F") 'prettier-js))
+  (define-key web-mode-map (kbd "<f5>") 'prettier-js))
 
-;; Emmet mode
-(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
-
-;; Lsp html
-(add-hook 'mhtml-mode-hook 'lsp)
+;; Writeroom mode
+(global-set-key (kbd "M-`") 'writeroom-mode)
 
 ;; (setq gc-cons-threshold (* 800 1000))
 

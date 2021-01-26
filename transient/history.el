@@ -1,4 +1,6 @@
 ((magit-branch nil)
+ (magit-cherry-pick
+  ("--ff"))
  (magit-commit nil
                ("--verbose"))
  (magit-diff
@@ -10,4 +12,5 @@
   ("-n256" "--decorate"))
  (magit-merge nil)
  (magit-push nil)
+ (magit-rebase nil)
  (magit-worktree nil))

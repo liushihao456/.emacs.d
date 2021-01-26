@@ -67,7 +67,7 @@ applying ``autodoc--defun-regex'' when calling this function."
         (rtype (match-string 1))
         (doc-lines (list " \* ${1:[Summary]}" "/\*\*"))
         (n 1))
-    (when params
+    (when (and params (not (string-blank-p params)))
       (!cons " \*" doc-lines)
       (dolist (param-type (mapcar 'string-trim (split-string params ",")))
         (let* ((param-type-list (mapcar 'string-trim (split-string param-type "[ \f\t\n\r\v]+")))
@@ -90,7 +90,7 @@ applying ``autodoc--defun-regex'' when calling this function."
         (rtype (match-string 3))
         (doc-lines (list " \* ${1:[Summary]}" "/\*\*"))
         (n 1))
-    (when params
+    (when (and params (not (string-blank-p params)))
       (!cons " \*" doc-lines)
       (dolist (param-type (mapcar 'string-trim (split-string params ",")))
         (let* ((param-type-list (mapcar 'string-trim (split-string param-type ":")))
@@ -113,7 +113,7 @@ applying ``autodoc--defun-regex'' when calling this function."
         (rtype (match-string 3))
         (doc-lines (list "${1:[Summary]}" "\"\"\""))
         (n 1))
-    (when (and params (not (string= (string-trim params) "self")))
+    (when (and params (not (string-blank-p params)) (not (string= (string-trim params) "self")))
       (!cons "" doc-lines)
       (dolist (param-type (mapcar 'string-trim (split-string params ",")))
         (let* ((param-type-list (mapcar 'string-trim (split-string param-type ":")))
