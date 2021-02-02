@@ -106,7 +106,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(swift-mode kotlin-mode cdlatex lsp-python-ms writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode lsp-ui expand-region ess gnuplot-mode lsp-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(lsp-ui swift-mode kotlin-mode cdlatex lsp-python-ms writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region ess gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -390,7 +390,7 @@ split; vice versa."
   (company-tip-mode t)
 
   ;; Better sorting and filtering
-  (company-prescient-mode t)
+  ;; (company-prescient-mode t)
 
   ;; Yasnippet integration
   (require 'yasnippet)
@@ -578,6 +578,7 @@ split; vice versa."
 
 
 ;; LSP mode
+(add-to-list 'load-path "~/.config/emacs/packages/lsp-mode")
 (with-eval-after-load 'lsp-mode
   (defun my/lsp-ui-doc--make-request (fun &rest args)
     (if (and (not company-pseudo-tooltip-overlay)
