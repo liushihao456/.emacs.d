@@ -69,6 +69,7 @@
  '(lsp-enable-indentation nil)
  '(lsp-enable-on-type-formatting nil)
  '(lsp-enable-semantic-highlighting t)
+ '(lsp-headerline-breadcrumb-enable nil)
  '(lsp-idle-delay 0.5)
  '(lsp-java-autobuild-enabled nil)
  '(lsp-java-code-generation-generate-comments t)
@@ -76,6 +77,7 @@
  '(lsp-java-format-on-type-enabled nil)
  '(lsp-java-save-action-organize-imports nil)
  '(lsp-modeline-code-actions-enable nil)
+ '(lsp-semantic-tokens-enable t)
  '(lsp-signature-render-documentation nil)
  '(lsp-ui-sideline-show-hover t)
  '(lsp-ui-sideline-update-mode 'line)
@@ -106,7 +108,7 @@ Entered on %T")
       "* %? %^g")))
  '(org-log-done 'time)
  '(package-selected-packages
-   '(lsp-ui swift-mode kotlin-mode cdlatex lsp-python-ms writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region ess gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
+   '(lsp-mode typescript-mode lsp-ui swift-mode kotlin-mode cdlatex lsp-python-ms writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region ess gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet))
  '(python-shell-interpreter "python3")
  '(read-process-output-max (* 1024 1024) t)
  '(reftex-plug-into-AUCTeX t)
@@ -578,7 +580,6 @@ split; vice versa."
 
 
 ;; LSP mode
-(add-to-list 'load-path "~/.config/emacs/packages/lsp-mode")
 (with-eval-after-load 'lsp-mode
   (defun my/lsp-ui-doc--make-request (fun &rest args)
     (if (and (not company-pseudo-tooltip-overlay)
