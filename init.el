@@ -168,6 +168,33 @@ Entered on %T")
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
+(defun generate-recursive-autoloads (pkg-name pkg-dir)
+  "Update a package's recursive autoloads.
+
+The first ARG PKG-NAME is the name of the package.  The second ARG PKG-DIR is
+the directory path of the package.
+
+This is needed because the package.el infrastructure doesn't
+process autoloads in subdirectories; instead we create an
+additional autoloads file of our own, and we load it from an
+autoloaded form."
+  (interactive "sPackage name: \nDPackage directory: ")
+  (let* ((auto-name (format "%s-autoloads.el" pkg-name))
+         (generated-autoload-file (expand-file-name auto-name pkg-dir))
+         (autoload-timestamps nil)
+         (backup-inhibited t)
+         (version-control 'never))
+    (when (file-exists-p generated-autoload-file)
+      (delete-file generated-autoload-file)
+      (require 'autoload)
+      (write-region (autoload-rubric generated-autoload-file "package" nil) nil generated-autoload-file nil 'silent))
+    (dolist (name (with-no-warnings
+                    (directory-files-recursively pkg-dir "" t)))
+      (when (file-directory-p name)
+        (message "Generating autoloads for %s..." name)
+        (update-directory-autoloads name)))
+    (let ((buf (find-buffer-visiting generated-autoload-file)))
+      (when buf (kill-buffer buf)))))
 
 (if (display-graphic-p)
     (progn
@@ -641,13 +668,12 @@ split; vice versa."
                       comment-end " */"))))
 (with-eval-after-load 'cc-mode
   (defun my/cmake-project-generate-compile-commands ()
-    "ccls typically indexes an entire project. In order for this
-to work properly, ccls needs to be able to obtain the source file
-list and their compilation command lines."
+    "Generate the compile_commands.json file containing build flags in a cmake
+project in order for clangd to understand the project code."
     (interactive)
     (let ((default-directory (cdr (project-current))))
       (shell-command
-       (concat "\ncmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+       (concat "cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
                "\nln -s Debug/compile_commands.json"))))
   (dolist (m (list c-mode-map c++-mode-map objc-mode-map))
     (define-key m (kbd "C-c l s") 'my/cmake-project-generate-compile-commands)))
