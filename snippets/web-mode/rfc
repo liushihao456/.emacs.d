@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: React functional component
+# key: rfc
+# contributor: Shihao Liu
+# --
+${1:import React from 'react';
+
+}${2:type ${3:Props} = {
+    $4
+};
+
+}export default (${5:{${4:$(seq-map (lambda (s) (string-remove-suffix "?" s))
+         (seq-map (lambda (s) (string-remove-suffix ":" (string-trim s)))
+                  (seq-filter (lambda (s) (and (not (string-empty-p s)) (string-suffix-p ":" s)))
+                              (split-string yas-text "[;\n\s]+"))))}}: $3}) => {
+    $0
+}
