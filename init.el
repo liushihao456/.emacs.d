@@ -15,6 +15,10 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
+(add-to-list 'load-path "~/.config/emacs/config")
+
+(require 'init-custom-packages)
+
 ;; (require 'benchmark-init)
 ;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
@@ -169,35 +173,6 @@ Entered on %T")
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
-(defun generate-recursive-autoloads (pkg-name pkg-dir)
-  "Update a package's recursive autoloads.
-
-The first ARG PKG-NAME is the name of the package.  The second ARG PKG-DIR is
-the directory path of the package.
-
-This is needed because the package.el infrastructure doesn't
-process autoloads in subdirectories; instead we create an
-additional autoloads file of our own, and we load it from an
-autoloaded form."
-  (interactive "sPackage name: \nDPackage directory: ")
-  (let* ((auto-name (format "%s-autoloads.el" pkg-name))
-         (generated-autoload-file (expand-file-name auto-name pkg-dir))
-         (autoload-timestamps nil)
-         (backup-inhibited t)
-         (version-control 'never))
-    (when (file-exists-p generated-autoload-file)
-      (delete-file generated-autoload-file))
-    (message "Generating autoloads to file: %s" generated-autoload-file)
-    (require 'autoload)
-    (write-region (autoload-rubric generated-autoload-file "package" nil) nil generated-autoload-file nil 'silent)
-    (dolist (name (with-no-warnings
-                    (append (list pkg-dir) (directory-files-recursively pkg-dir "" t))))
-      (when (file-directory-p name)
-        (message "Generating autoloads for directory: %s..." name)
-        (update-directory-autoloads name)))
-    (let ((buf (find-buffer-visiting generated-autoload-file)))
-      (when buf (kill-buffer buf)))))
-
 (if (display-graphic-p)
     (progn
       (setq initial-frame-alist '((fullscreen . maximized)))
@@ -316,8 +291,7 @@ split; vice versa."
 ;; Wgrep
 ;; C-c C-p to enable editing in the grep result buffer
 ;; C-c C-e to apply the changes
-(add-to-list 'load-path "~/.config/emacs/packages/wgrep")
-(require 'wgrep)
+;; (require 'wgrep)
 (autoload 'wgrep-deadgrep-setup "wgrep-deadgrep")
 (add-hook 'deadgrep-finished-hook 'wgrep-deadgrep-setup)
 ;; (define-key deadgrep-mode-map "C-c C-s" 'wgrep-save-all-buffers)
@@ -341,7 +315,6 @@ split; vice versa."
 ;; Powerline
 ;; In terminal version of emacs, transparency must be set to 0 for the
 ;; separators' color to match
-;; (add-to-list 'load-path "~/.config/emacs/packages/powerline")
 ;; (require 'powerline)
 ;; (powerline-center-theme)
 
@@ -408,57 +381,7 @@ split; vice versa."
 (add-hook 'org-mode-hook 'yas-minor-mode)
 
 ;; Company mode
-(add-hook 'prog-mode-hook 'company-mode)
-(add-hook 'LaTeX-mode-hook 'company-mode)
-(add-hook 'org-mode-hook 'company-mode)
-(add-hook 'inferior-python-mode-hook 'company-mode)
-(add-to-list 'load-path "~/.config/emacs/packages/company-tip")
-(with-eval-after-load 'company
-  (setq company-backends '(company-capf company-files))
-  (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (require 'company-tip)
-  (company-tip-mode t)
-
-  ;; Better sorting and filtering
-  (company-prescient-mode t)
-
-  ;; Yasnippet integration
-  (require 'yasnippet)
-  (global-set-key (kbd "C-]") 'company-yasnippet)
-  (defun company-backend-with-yas (backend)
-    "Add `yasnippet' to company backend."
-    (if (and (listp backend) (member 'company-yasnippet backend))
-        backend
-      (append (if (consp backend) backend (list backend))
-              '(:with company-yasnippet))))
-
-  (defun my-company-enbale-yas (&rest _)
-    "Enable `yasnippet' in `company'."
-    (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
-  ;; Enable in current backends
-  (my-company-enbale-yas)
-  ;; Enable in `lsp-mode'
-  (with-eval-after-load 'lsp-mode
-    (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas))
-
-  (defun my-company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
-    "Enable yasnippet but disable it inline."
-    (if (eq command 'prefix)
-        (when-let ((prefix (funcall fun 'prefix)))
-          (unless (memq (char-before (- (point) (length prefix)))
-                        '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?` ?/))
-            prefix))
-      (progn
-        (when (and arg
-                   (not (get-text-property 0 'yas-annotation-patch arg)))
-          (let* ((name (get-text-property 0 'yas-annotation arg))
-                 (snip (format "-> %s (Snippet)" name))
-                 (len (length arg)))
-            (put-text-property 0 len 'yas-annotation snip arg)
-            (put-text-property 0 len 'yas-annotation-patch t arg)))
-        (funcall fun command arg))))
-  (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline))
+(require 'init-company)
 
 ;; Magit
 (global-set-key (kbd "C-c g") 'magit-status)
@@ -501,105 +424,7 @@ split; vice versa."
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
 ;; Org mode
-(add-hook 'org-mode-hook 'auto-fill-mode)
-;; (setq org-startup-with-inline-images t) ; Display inline images by default
-;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-(defun add-pcomplete-to-capf ()
-  (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-(add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
-;; (add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
-;; Sunrise and Sunset
-(defun diary-sunrise ()
-  (let ((dss (diary-sunrise-sunset)))
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ",")
-      (buffer-substring (point-min) (match-beginning 0)))))
-
-(defun diary-sunset ()
-  (let ((dss (diary-sunrise-sunset))
-        start end)
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ", ")
-      (setq start (match-end 0))
-      (search-forward " at")
-      (setq end (match-beginning 0))
-      (goto-char start)
-      (capitalize-word 1)
-      (buffer-substring start end))))
-(global-set-key (kbd "C-c c") 'org-capture)
-(global-set-key (kbd "C-c a") 'org-agenda)
-(with-eval-after-load 'org
-;;   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-;;   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
-;;   (add-to-list 'image-file-name-extensions "eps")
-;;   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
-;;   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
-  (require 'ox-md)
-  (require 'ox-beamer)
-  (setq org-highlight-latex-and-related '(native))
-;;   (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
-  (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
-  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-  (add-to-list 'org-latex-packages-alist '("" "color")) ; Use listings package to export code blocks
-  (setq org-latex-listings 'listings)
-  (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
-\\ctexset{section/format=\\Large\\bfseries}"
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
-\\ctexset{section/format=\\Large\\bfseries}"
-                                    ("\\part{%s}" . "\\part*{%s}")
-                                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-  (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
-                                    ("\\part{%s}" . "\\part*{%s}")
-                                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-  (setq org-latex-compiler "xelatex")
-  (setq org-latex-pdf-process
-        '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          ))
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (C . t)
-     (js . t)
-     (ditaa . t)
-     (dot . t)
-     (org . t)
-     (shell . t)
-     (latex . t)
-     (R . t)
-     (gnuplot . t)
-     ))
-  ;; (setq org-preview-latex-default-process 'imagemagick)
-  ;; (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-  ;;                                              ("begin" "$1" "$" "$$" "\\(" "\\[")))
-  (setq org-src-window-setup 'current-window)
-  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
-  (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
-  (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-  )
+(require 'init-org-mode)
 
 (with-eval-after-load 'xref
   (setq xref-prompt-for-identifier '(not xref-find-definitions
@@ -641,12 +466,11 @@ split; vice versa."
   (add-hook 'ess-r-mode-hook 'lsp))
 
 ;; Autodoc: insert docstring template
-(add-to-list 'load-path "~/.config/emacs/packages/autodoc")
 (with-eval-after-load 'cc-mode
-  (require 'autodoc)
+  ;; (require 'autodoc)
   (add-hook 'c-mode-common-hook 'autodoc-mode))
 (with-eval-after-load 'python
-  (require 'autodoc)
+  ;; (require 'autodoc)
   (add-hook 'python-mode-hook 'autodoc-mode))
 
 ;; Lsp Python
@@ -745,13 +569,16 @@ project in order for clangd to understand the project code."
                              (emmet-mode)))))
 
 ;; Prettier
-(add-to-list 'load-path "~/.config/emacs/packages/prettier-js")
 (with-eval-after-load 'web-mode
-  (require 'prettier-js)
+  ;; (require 'prettier-js)
   (define-key web-mode-map (kbd "<f5>") 'prettier-js))
 
 ;; Writeroom mode
 (global-set-key (kbd "M-`") 'writeroom-mode)
+
+;; Cheat.sh
+(global-set-key (kbd "C-c M-s") 'cheat-sh-search)
+
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
