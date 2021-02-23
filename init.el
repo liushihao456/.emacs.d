@@ -65,6 +65,7 @@
  '(lsp-clients-kotlin-server-executable
    "~/.config/emacs/.cache/lsp/kotlin-language-server/server/build/install/server/bin/kotlin-language-server")
  '(lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-verbosity=off"))
+ '(lsp-completion-show-detail nil)
  '(lsp-enable-file-watchers nil)
  '(lsp-enable-indentation nil)
  '(lsp-enable-on-type-formatting nil)
@@ -419,7 +420,7 @@ split; vice versa."
   (company-tip-mode t)
 
   ;; Better sorting and filtering
-  ;; (company-prescient-mode t)
+  (company-prescient-mode t)
 
   ;; Yasnippet integration
   (require 'yasnippet)

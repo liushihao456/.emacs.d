@@ -9,9 +9,9 @@ ${1:import React from 'react';
     $4
 };
 
-}export default (${5:{${4:$(seq-map (lambda (s) (string-remove-suffix "?" s))
-         (seq-map (lambda (s) (string-remove-suffix ":" (string-trim s)))
+}export default (${5:{${4:$(string-join (mapcar (lambda (s) (string-remove-suffix "?" s))
+         (mapcar (lambda (s) (string-remove-suffix ":" (string-trim s)))
                   (seq-filter (lambda (s) (and (not (string-empty-p s)) (string-suffix-p ":" s)))
-                              (split-string yas-text "[;\n\s]+"))))}}: $3}) => {
+                              (split-string yas-text "[;\n\s]+")))) ", ")}}: $3}) => {
     $0
 }

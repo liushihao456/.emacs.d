@@ -2,6 +2,6 @@
 # name: useCallback
 # key: uc
 # --
-const $1 = useCallback(($2) => {
-    $3$0
-}, [$4]);
+const $1 = ${2:React.}useCallback(($3) => {
+    $4$0
+}, [$5]);

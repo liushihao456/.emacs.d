@@ -2,6 +2,6 @@
 # name: useEffect
 # key: ue
 # --
-useEffect(() => {
-    $1$0
-}, [$2]);
+${1:React.}useEffect(() => {
+    $2$0
+}, [$3]);

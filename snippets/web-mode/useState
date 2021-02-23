@@ -2,4 +2,4 @@
 # name: useState
 # key: us
 # --
-const [$1, set${1:$(upcase-initials yas-text)}] = useState($2);$0
+const [$1, set${1:$(upcase-initials yas-text)}] = ${2:React.}useState($3);$0
