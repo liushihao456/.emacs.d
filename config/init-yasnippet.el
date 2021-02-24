@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-yasnippet.el --- Configurations for yasnippet	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,18 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; Configurations for yasnippet
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+(with-eval-after-load 'yasnippet
+  (setq yas-triggers-in-field t)
+  (yas-reload-all))
+(add-hook 'prog-mode-hook 'yas-minor-mode)
+(add-hook 'LaTeX-mode-hook 'yas-minor-mode)
+(add-hook 'org-mode-hook 'yas-minor-mode)
 
-(provide '$1)
+(provide 'init-yasnippet)
 
-;;; $1.el ends here
+;;; init-yasnippet.el ends here

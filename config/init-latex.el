@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-latex.el --- Configurations for LaTeX	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,25 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; Configurations for LaTeX
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+(with-eval-after-load 'latex
+  (setq TeX-auto-save t)
+  (setq TeX-command-extra-options "-shell-escape")
+  (setq TeX-engine 'xetex)
+  (setq TeX-parse-self t)
+  (setq reftex-plug-into-AUCTeX t)
+  (add-hook 'LaTeX-mode-hook 'reftex-mode)
+  ;; (add-hook 'LaTeX-mode-hook 'cdlatex-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (setq-default TeX-master nil))
 
-(provide '$1)
 
-;;; $1.el ends here
+(provide 'init-latex)
+
+;;; init-latex.el ends here

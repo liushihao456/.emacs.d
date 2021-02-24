@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-python.el --- Configurations for Python	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,23 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; Configurations for Python
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+(add-hook 'python-mode-hook 'lsp)
+(with-eval-after-load 'python
+  (setq python-shell-interpreter "python3")
+  (defun my/format-buffer ()
+    "Format buffer using yapf."
+    (interactive)
+    (let ((old-point (point)))
+      (erase-buffer)
+      (insert (shell-command-to-string (concat "yapf " (buffer-name))))
+      (goto-char old-point)))
+  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer))
 
-(provide '$1)
+(provide 'init-python)
 
-;;; $1.el ends here
+;;; init-python.el ends here

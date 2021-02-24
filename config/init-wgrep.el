@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-wgrep.el --- Configurations for wgrep	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,20 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; Configurations for wgrep.
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+;; Deadgrep
+(global-set-key (kbd "C-c s") 'deadgrep)
 
-(provide '$1)
+;; wgrep-deadgrep
+;; C-c C-p to enable editing in the grep result buffer
+;; C-c C-e to apply the changes
+(add-hook 'deadgrep-finished-hook 'wgrep-deadgrep-setup)
+;; (define-key deadgrep-mode-map "C-c C-s" 'wgrep-save-all-buffers)
 
-;;; $1.el ends here
+(provide 'init-wgrep)
+
+;;; init-wgrep.el ends here

@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-theme.el --- Configurations for theme	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,18 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; Configurations for theme.
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+;; Zenburn theme
+(if (display-graphic-p)
+    (load-theme 'zenburn t)
+  ;; (load-theme 'terminal-pro t)
+  ;; (load-theme 'terminal-silver-aerogel t)
+  (load-theme 'terminal-zenburn t))
 
-(provide '$1)
+(provide 'init-theme)
 
-;;; $1.el ends here
+;;; init-theme.el ends here

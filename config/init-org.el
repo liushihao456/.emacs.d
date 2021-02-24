@@ -1,4 +1,4 @@
-;;; init-org-mode.el --- Initialize org configurations.	-*- lexical-binding: t -*-
+;;; init-org.el --- Initialize org configurations.	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -33,33 +33,37 @@
 (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
 ;; (add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
 ;; Sunrise and Sunset
-(defun diary-sunrise ()
-  (let ((dss (diary-sunrise-sunset)))
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ",")
-      (buffer-substring (point-min) (match-beginning 0)))))
+(with-eval-after-load 'solar
+  (setq calendar-latitude 32.0105)
+  (setq calendar-longitude 112.0856))
+;; (defun diary-sunrise ()
+;;   (let ((dss (diary-sunrise-sunset)))
+;;     (with-temp-buffer
+;;       (insert dss)
+;;       (goto-char (point-min))
+;;       (while (re-search-forward " ([^)]*)" nil t)
+;;         (replace-match "" nil nil))
+;;       (goto-char (point-min))
+;;       (search-forward ",")
+;;       (buffer-substring (point-min) (match-beginning 0)))))
 
-(defun diary-sunset ()
-  (let ((dss (diary-sunrise-sunset))
-        start end)
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ", ")
-      (setq start (match-end 0))
-      (search-forward " at")
-      (setq end (match-beginning 0))
-      (goto-char start)
-      (capitalize-word 1)
-      (buffer-substring start end))))
+;; (defun diary-sunset ()
+;;   (let ((dss (diary-sunrise-sunset))
+;;         start end)
+;;     (with-temp-buffer
+;;       (insert dss)
+;;       (goto-char (point-min))
+;;       (while (re-search-forward " ([^)]*)" nil t)
+;;         (replace-match "" nil nil))
+;;       (goto-char (point-min))
+;;       (search-forward ", ")
+;;       (setq start (match-end 0))
+;;       (search-forward " at")
+;;       (setq end (match-beginning 0))
+;;       (goto-char start)
+;;       (capitalize-word 1)
+;;       (buffer-substring start end))))
+
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (with-eval-after-load 'org
@@ -68,6 +72,31 @@
 ;;   (add-to-list 'image-file-name-extensions "eps")
 ;;   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
 ;;   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
+  (setq org-adapt-indentation nil)
+  (setq org-agenda-files
+        '("~/Documents/Org-mode/capture/journals.org" "~/Documents/Org-mode/capture/tasks.org" "~/Documents/Org-mode/src/agenda-expressions.org"))
+  (setq org-agenda-span 'day)
+  (setq org-agenda-time-grid
+        '((daily today require-timed)
+          (300 600 900 1200 1500 1800 2100 2400)
+          "......" "----------------"))
+  (setq org-capture-templates
+        '(("t" "Todo list item" entry
+           (file "~/Documents/Org-mode/capture/tasks.org")
+           "* TODO %?
+SCHEDULED: %^T")
+          ("j" "Journals" entry
+           (file+olp+datetree "~/Documents/Org-mode/capture/journals.org")
+           "* %?
+Entered on %T")
+          ("n" "Notes" entry
+           (file "~/Documents/Org-mode/notes/notes.org")
+           "* %?")
+          ("p" "Programming notes" entry
+           (file "~/Documents/Org-mode/notes/prog-notes.org")
+           "* %? %^g")))
+  (setq org-log-done 'time)
+
   (require 'ox-md)
   (require 'ox-beamer)
   (setq org-highlight-latex-and-related '(native))
@@ -125,6 +154,6 @@
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
   )
 
-(provide 'init-org-mode)
+(provide 'init-org)
 
-;;; init-org-mode.el ends here
+;;; init-org.el ends here

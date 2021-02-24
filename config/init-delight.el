@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-delight.el --- De-light package mode-line lighters	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,23 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; De-light package mode-line lighters
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+(delight '((eldoc-mode nil "eldoc")
+           (emacs-lisp-mode "Elisp" :major)
+           (which-key-mode nil "which-key")
+           (abbrev-mode nil "abbrev")
+           (lsp-mode nil "lsp-mode")
+           (company-mode nil "company")
+           (yas-minor-mode nil "yasnippet")
+           (auto-revert-mode nil "autorevert")
+           (hi-lock-mode nil "hi-lock")
+           (auto-fill-function nil "simple")
+           (emmet-mode nil "emmet-mode")))
 
-(provide '$1)
+(provide 'init-delight)
 
-;;; $1.el ends here
+;;; init-delight.el ends here

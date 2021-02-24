@@ -35,6 +35,12 @@
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   ;; (require 'company-tip)
   (company-tip-mode t)
+  (setq company-dabbrev-downcase nil)
+  (setq company-frontends
+        '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
+  (setq company-idle-delay 0.2)
+  (setq company-selection-wrap-around t)
+  (setq company-tooltip-align-annotations t)
 
   ;; Better sorting and filtering
   (company-prescient-mode t)

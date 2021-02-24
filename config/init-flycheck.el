@@ -1,8 +1,4 @@
-# -*- mode: snippet -*-
-# name: package-skeleton
-# key: pac
-# --
-;;; ${1:`(file-name-nondirectory (file-name-sans-extension (buffer-name)))`}.el --- ${2: Package summary}	-*- lexical-binding: t -*-
+;;; init-flycheck.el --- Configurations for flycheck	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -24,13 +20,18 @@
 
 ;;; Commentary:
 ;;
-;; ${3:commentary}
+;; Configurations for flycheck
 ;; --------------------------------------
 
 ;;; Code:
 
-$0
+(add-hook 'prog-mode-hook 'flycheck-mode)
+(with-eval-after-load 'flycheck
+  (define-key flycheck-mode-map (kbd "C-c f p") 'flycheck-previous-error)
+  (define-key flycheck-mode-map (kbd "C-c f n") 'flycheck-next-error)
+  (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
+)
 
-(provide '$1)
+(provide 'init-flycheck)
 
-;;; $1.el ends here
+;;; init-flycheck.el ends here
