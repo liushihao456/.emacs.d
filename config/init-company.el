@@ -36,7 +36,7 @@
   ;; (require 'company-tip)
   (company-tip-mode t)
   (setq company-dabbrev-downcase nil)
-  (setq company-frontends
+  (setq-default company-frontends
         '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (setq company-idle-delay 0.2)
   (setq company-selection-wrap-around t)
