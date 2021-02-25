@@ -33,7 +33,6 @@
   (setq company-backends '(company-capf company-files))
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  ;; (require 'company-tip)
   (company-tip-mode t)
   (setq company-dabbrev-downcase nil)
   (setq-default company-frontends
