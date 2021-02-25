@@ -29,3 +29,4 @@ python-language-server/
 /ccls/
 /diary
 /org-clock-save.el
+/.dap-breakpoints
