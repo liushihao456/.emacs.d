@@ -35,7 +35,8 @@
            (auto-revert-mode nil "autorevert")
            (hi-lock-mode nil "hi-lock")
            (auto-fill-function nil "simple")
-           (emmet-mode nil "emmet-mode")))
+           (emmet-mode nil "emmet-mode")
+           (anzu-mode nil "anzu")))
 
 (provide 'init-delight)
 

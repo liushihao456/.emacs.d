@@ -137,7 +137,7 @@ split; vice versa."
 (blink-cursor-mode -1)
 (setq c-basic-offset 4)
 (setq column-number-mode t)
-(setq scroll-margin 8)
+(setq scroll-margin 4)
 (setq scroll-conservatively 101)
 
 ;; Global key bindings
