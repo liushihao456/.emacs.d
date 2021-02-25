@@ -41,6 +41,16 @@
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
+(defun scroll-half-page-down ()
+  "Scroll down half the page."
+  (interactive)
+  (scroll-down (/ (window-body-height) 2)))
+
+(defun scroll-half-page-up ()
+  "Scroll up half the page."
+  (interactive)
+  (scroll-up (/ (window-body-height) 2)))
+
 (defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
   (interactive)
@@ -127,8 +137,12 @@ split; vice versa."
 (blink-cursor-mode -1)
 (setq c-basic-offset 4)
 (setq column-number-mode t)
+(setq scroll-margin 8)
+(setq scroll-conservatively 101)
 
 ;; Global key bindings
+(global-set-key (kbd "C-v") 'scroll-half-page-up)
+(global-set-key (kbd "M-v") 'scroll-half-page-down)
 (global-set-key (kbd "C-c |") 'toggle-window-split)
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 (global-set-key (kbd "C-c f r") 'recentf-open-files)
