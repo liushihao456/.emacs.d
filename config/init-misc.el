@@ -170,6 +170,8 @@ split; vice versa."
 ;; Cheat.sh
 (global-set-key (kbd "C-c M-s") 'cheat-sh-search)
 
+;; Anzu - show match counts in mode line
+(global-anzu-mode t)
 ;; Occur
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
