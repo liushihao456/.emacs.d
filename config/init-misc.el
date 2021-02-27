@@ -192,6 +192,10 @@ split; vice versa."
 (which-key-mode)
 (which-key-setup-side-window-bottom)
 
+;; C indentation style
+(setq c-default-style
+      '((java-mode . "java") (other . "awk")))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

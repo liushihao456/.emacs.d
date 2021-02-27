@@ -63,7 +63,7 @@
 (with-eval-after-load 'lsp-ui
   (defun my/lsp-ui-doc--make-request (fun &rest args)
     "Wrapper around lsp-ui-doc--make-request that prevents showing doc when
-company is active."
+typing or company is active."
     (if (and (not company-pseudo-tooltip-overlay)
              (not (eq this-command 'self-insert-command)))
         (funcall fun)
