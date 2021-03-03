@@ -42,7 +42,8 @@
   (setq company-tooltip-align-annotations t)
 
   ;; Better sorting and filtering
-  (company-prescient-mode t)
+  ;; Disable it because it gave worse sorting in lsp typescript completions
+  ;; (company-prescient-mode t)
 
   ;; Yasnippet integration
   (require 'yasnippet)
