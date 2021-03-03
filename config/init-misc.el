@@ -131,7 +131,7 @@ split; vice versa."
 (set-scroll-bar-mode nil)
 (show-paren-mode t)
 (setq split-width-threshold 120)
-(setq tab-width 4)
+(setq-default tab-width 4)
 (tool-bar-mode -1)
 (setq-default truncate-lines t)
 (blink-cursor-mode -1)

@@ -9,6 +9,9 @@
 ;;;### (autoloads nil "prettier-js" "prettier-js.el" (0 0 0 0))
 ;;; Generated autoloads from prettier-js.el
 
+(autoload 'prettier-js "prettier-js" "\
+Format the current buffer according to the prettier tool." t nil)
+
 (autoload 'prettier-js-mode "prettier-js" "\
 Runs prettier on file save when this mode is turned on
 
@@ -19,7 +22,7 @@ toggle it if ARG is `toggle'; disable the mode otherwise.
 
 \(fn &optional ARG)" t nil)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "prettier-js" '("prettier-js")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "prettier-js" '("prettier-js-")))
 
 ;;;***
 
