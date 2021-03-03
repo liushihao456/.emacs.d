@@ -54,7 +54,10 @@
   (setq web-mode-enable-css-colorization t)
   (setq web-mode-enable-current-element-highlight t)
   ;; Prettier
-  (define-key web-mode-map (kbd "<f5>") 'prettier-js))
+  (define-key web-mode-map (kbd "<f5>")
+    (lambda () (interactive)
+      (lsp-organize-imports)
+      (prettier-js))))
 
 (provide 'init-web)
 

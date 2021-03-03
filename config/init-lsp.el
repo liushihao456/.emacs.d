@@ -35,6 +35,7 @@
   (define-key lsp-mode-map (kbd "C-c l o") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l r") 'lsp-rename)
   (define-key lsp-mode-map (kbd "C-c l f") 'lsp-format-buffer)
+  (define-key lsp-mode-map (kbd "C-c l m") 'lsp-organize-imports)
   ;; (define-key lsp-mode-map (kbd "C-c l m") 'lsp-ui-imenu)
   (define-key lsp-mode-map (kbd "C-c l x") 'lsp-execute-code-action)
   (define-key lsp-mode-map (kbd "C-c l M-s") 'lsp-describe-session)
