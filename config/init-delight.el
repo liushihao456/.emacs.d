@@ -36,7 +36,8 @@
            (hi-lock-mode nil "hi-lock")
            (auto-fill-function nil "simple")
            (emmet-mode nil "emmet-mode")
-           (anzu-mode nil "anzu")))
+           (anzu-mode nil "anzu")
+           (tree-sitter-mode nil "tree-sitter")))
 
 (provide 'init-delight)
 

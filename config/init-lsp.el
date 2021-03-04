@@ -69,7 +69,10 @@ typing or company is active."
              (not (eq this-command 'self-insert-command)))
         (funcall fun)
       (lsp-ui-doc--hide-frame)))
-  (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request))
+  (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
+
+  (set-face-background 'lsp-ui-sideline-code-action "unspecified-bg")
+  (set-face-background 'lsp-ui-sideline-symbol "unspecified-bg"))
 
 (provide 'init-lsp)
 
