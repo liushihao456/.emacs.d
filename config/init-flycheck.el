@@ -33,6 +33,8 @@
   (define-key flycheck-mode-map (kbd "C-c f n") 'flycheck-next-error)
   (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
 
+  (setq-default flycheck-emacs-lisp-load-path 'inherit)
+
   (unless (display-graphic-p)
     (set-face-background 'flycheck-warning "unspecified-bg")
     (set-face-background 'flycheck-error "unspecified-bg")
