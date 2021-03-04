@@ -172,6 +172,9 @@ split; vice versa."
 
 ;; Anzu - show match counts in mode line
 (global-anzu-mode t)
+(global-set-key [remap query-replace] 'anzu-query-replace)
+(global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
+(global-set-key (kbd "M-s r") 'anzu-query-replace-at-cursor)
 ;; Occur
 (define-key occur-mode-map "n" 'occur-next)
 (define-key occur-mode-map "p" 'occur-prev)
