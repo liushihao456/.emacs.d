@@ -52,10 +52,10 @@
 
 (require 'init-custom-packages)
 (require 'init-misc)
+(require 'init-theme)
 (require 'init-delight)
 (require 'init-compile)
 (require 'init-wgrep)
-(require 'init-theme)
 (require 'init-modeline)
 (require 'init-flycheck)
 (require 'init-yasnippet)

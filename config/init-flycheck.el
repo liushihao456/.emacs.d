@@ -32,6 +32,10 @@
   (define-key flycheck-mode-map (kbd "C-c f p") 'flycheck-previous-error)
   (define-key flycheck-mode-map (kbd "C-c f n") 'flycheck-next-error)
   (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
+
+  (set-face-background 'flycheck-warning "unspecified-bg")
+  (set-face-background 'flycheck-error "unspecified-bg")
+  (set-face-background 'flycheck-info "unspecified-bg")
 )
 
 (provide 'init-flycheck)
