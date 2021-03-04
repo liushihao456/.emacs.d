@@ -26,38 +26,31 @@
 ;;; Code:
 
 ;; Web mode and emmet mode
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
-(add-hook 'web-mode-hook (lambda ()
-                           (setq-local electric-pair-pairs (append electric-pair-pairs '((?\' . ?\'))))
-                           (setq-local electric-pair-text-pairs electric-pair-pairs)
-                           (cond
-                            ((string-match-p "\\.\\(ts\\|js\\)\\'" (buffer-name))
-                             (lsp)
-                             (yas-activate-extra-mode 'js-mode))
-                            ((string-match-p "\\.\\(jsx\\|tsx\\)\\'" (buffer-name))
-                             (lsp)
-                             (emmet-mode)
-                             (setq-local emmet-expand-jsx-className? t)
-                             (yas-activate-extra-mode 'js-mode))
-                            ((string-match-p "\\.html?\\'" (buffer-name))
-                             (lsp)
-                             (emmet-mode)))))
 
-(with-eval-after-load 'web-mode
-  (setq web-mode-enable-auto-closing t)
-  (setq web-mode-enable-auto-pairing t)
-  (setq web-mode-enable-css-colorization t)
-  (setq web-mode-enable-current-element-highlight t)
-  ;; Prettier
-  (define-key web-mode-map (kbd "<f5>")
-    (lambda () (interactive)
-      (lsp-organize-imports)
-      (prettier-js))))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+(defun setup-ts-js ()
+  "Setup development environment for ts(x) and js(x) files."
+  (setq-local electric-pair-pairs (append electric-pair-pairs '((?\' . ?\')) '((?\` . ?\`))))
+  (setq-local electric-pair-text-pairs electric-pair-pairs)
+  (lsp)
+  (emmet-mode)
+  (setq-local emmet-expand-jsx-className? t)
+  ;; (yas-activate-extra-mode 'js-mode)
+  )
+(add-hook 'typescript-mode-hook 'setup-ts-js)
+(add-hook 'js-mode-hook 'setup-ts-js)
+(add-hook 'mhtml-mode-hook (lambda () (lsp) (emmet-mode)))
+
+(defun prettier-buffer ()
+  "Organize imports and call prettier to format buffer."
+  (interactive)
+  (lsp-organize-imports)
+  (prettier-js))
+
+(with-eval-after-load 'typescript-mode
+  (define-key typescript-mode-map (kbd "<f5>") 'prettier-buffer))
+(with-eval-after-load 'js-mode
+  (define-key js-mode-map (kbd "<f5>") 'prettier-buffer))
 
 (provide 'init-web)
 

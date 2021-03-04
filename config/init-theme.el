@@ -61,7 +61,7 @@
   ;; Use less bolding
   ;; (setq solarized-use-less-bold t)
   ;; Use more italics
-  (setq solarized-use-more-italic t)
+  ;; (setq solarized-use-more-italic t)
   ;; Use less colors for indicators such as git:gutter, flycheck and similar
   (setq solarized-emphasize-indicators nil)
   ;; Don't change size of org-mode headlines (but keep other size-changes)
