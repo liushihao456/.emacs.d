@@ -28,7 +28,7 @@
 (with-eval-after-load 'tree-sitter
   (require 'tree-sitter-langs))
 
-(add-hook 'cc-mode-hook 'tree-sitter-mode)
+(add-hook 'c-mode-common-hook 'tree-sitter-mode)
 (add-hook 'python-mode-hook 'tree-sitter-mode)
 (add-hook 'java-mode-hook 'tree-sitter-mode)
 (add-hook 'js-mode-hook 'tree-sitter-mode)

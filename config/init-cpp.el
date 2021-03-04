@@ -25,12 +25,7 @@
 
 ;;; Code:
 
-(dolist (m (list 'c-mode-hook 'c++-mode-hook 'objc-mode-hook))
-  (add-hook m (lambda ()
-                (lsp)
-                (setq-local company-backends (delete 'company-clang company-backends))
-                (setq comment-start "/* "
-                      comment-end " */"))))
+(add-hook 'c-mode-common-hook 'lsp)
 (with-eval-after-load 'cc-mode
   (defun my/cmake-project-generate-compile-commands ()
     "Generate the compile_commands.json file containing build flags in a cmake
@@ -40,8 +35,7 @@ project in order for clangd to understand the project code."
       (shell-command
        (concat "cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
                "\nln -s Debug/compile_commands.json"))))
-  (dolist (m (list c-mode-map c++-mode-map objc-mode-map))
-    (define-key m (kbd "C-c l s") 'my/cmake-project-generate-compile-commands)))
+  (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands))
 
 ;; Cmake
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/cmake")

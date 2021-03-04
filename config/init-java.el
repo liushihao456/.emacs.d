@@ -52,12 +52,7 @@
 
 (add-hook 'kotlin-mode-hook (lambda () (lsp)))
 
-(add-hook 'java-mode-hook (lambda ()
-                            (lsp)
-                            (setq comment-start "/* "
-                                  comment-end " */")
-                            (c-set-offset 'arglist-intro '+)
-                            (c-set-offset 'arglist-close '0)))
+(add-hook 'java-mode-hook 'lsp)
 (with-eval-after-load 'lsp-java
   (setq lsp-java-autobuild-enabled nil)
   (setq lsp-java-code-generation-generate-comments t)
