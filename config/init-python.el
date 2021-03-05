@@ -35,7 +35,7 @@
       (erase-buffer)
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
       (goto-char old-point)))
-  (define-key python-mode-map (kbd "C-c l F") 'my/format-buffer))
+  (define-key python-mode-map (kbd "<f5>") 'my/format-buffer))
 
 (provide 'init-python)
 

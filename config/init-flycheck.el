@@ -27,8 +27,9 @@
 
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (with-eval-after-load 'flycheck
-  (define-key flycheck-mode-map (kbd "<C-left>") 'flycheck-previous-error)
-  (define-key flycheck-mode-map (kbd "<C-right>") 'flycheck-next-error)
+  (define-key flycheck-mode-map (kbd "<f6>") 'flycheck-list-errors)
+  (define-key flycheck-mode-map (kbd "<f7>") 'flycheck-previous-error)
+  (define-key flycheck-mode-map (kbd "<f8>") 'flycheck-next-error)
   (define-key flycheck-mode-map (kbd "C-c f p") 'flycheck-previous-error)
   (define-key flycheck-mode-map (kbd "C-c f n") 'flycheck-next-error)
   (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
