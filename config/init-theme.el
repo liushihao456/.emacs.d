@@ -68,8 +68,14 @@
   (setq solarized-scale-org-headlines nil)
   (load-theme 'solarized-dark t))
 
+(defun load-zenburn ()
+  "Load zenburn theme."
+  (load-theme 'zenburn t)
+  (custom-set-faces
+   `(lsp-ui-doc-background ((t (:background "#272A36"))))))
+
 (if (time-before (get-current-time) (get-sunset-time))
-    (load-theme 'zenburn t)
+    (load-zenburn)
   (load-solarized-dark))
 
 (unless (display-graphic-p)
