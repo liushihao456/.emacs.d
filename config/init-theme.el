@@ -74,9 +74,11 @@
   (custom-set-faces
    `(lsp-ui-doc-background ((t (:background "#272A36"))))))
 
-(if (time-before (get-current-time) (get-sunset-time))
-    (load-zenburn)
-  (load-solarized-dark))
+;; (if (time-before (get-current-time) (get-sunset-time))
+;;     (load-zenburn)
+;;   (load-solarized-dark))
+
+(load-solarized-dark)
 
 (unless (display-graphic-p)
   (set-face-background 'default "unspecified-bg"))

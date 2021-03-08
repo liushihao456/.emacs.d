@@ -26,7 +26,8 @@
 ;;; Code:
 
 (with-eval-after-load 'tree-sitter
-  (require 'tree-sitter-langs))
+  (require 'tree-sitter-langs)
+  (setq tree-sitter-major-mode-language-alist (cons '(typescript-mode . tsx) tree-sitter-major-mode-language-alist)))
 
 (add-hook 'c-mode-common-hook 'tree-sitter-mode)
 (add-hook 'python-mode-hook 'tree-sitter-mode)
@@ -36,7 +37,9 @@
 (add-hook 'css-mode-hook 'tree-sitter-mode)
 (add-hook 'mhtml-mode-hook 'tree-sitter-mode)
 
-(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+(add-hook 'tree-sitter-after-on-hook (lambda ()
+                                       (setq font-lock-defaults '(nil))
+                                       (tree-sitter-hl-mode)))
 
 (provide 'init-treesitter)
 
