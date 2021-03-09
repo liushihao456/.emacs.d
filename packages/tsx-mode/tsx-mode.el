@@ -139,10 +139,10 @@ Key bindings:
   (setq-local tree-sitter-indent-current-scopes tsx-mode-indent-scopes)
   (setq-local indent-line-function #'tree-sitter-indent-line)
 
-  (setq-local electric-indent-chars
-	          (append "{}():;," electric-indent-chars))
-  (setq-local electric-layout-rules
-	          '((?\; . after) (?\{ . after) (?\} . before)))
+  ;; (setq-local electric-indent-chars
+  ;;             (append "{}():;," electric-indent-chars))
+  ;; (setq-local electric-layout-rules
+  ;;             '((?\; . after) (?\{ . after) (?\} . before)))
 
   ;; Comments
   (setq-local comment-start "// ")

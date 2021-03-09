@@ -478,15 +478,25 @@ See `tree-sitter-indent-line'.  ORIGINAL-COLUMN is forwarded to
              (back-to-indentation)
              (point))))
          (parentwise-path (tree-sitter-indent--parentwise-path indenting-node))
+         (first-char-white-space-p
+          (memq (save-excursion
+                    (back-to-indentation)
+                    (char-after (point)))
+                '(?\s ?\C-j ?\C-i)))
          (indents-in-path
-          (tree-sitter-indent--indents-in-path parentwise-path
-                                               original-column))
+          (tree-sitter-indent--indents-in-path
+           parentwise-path original-column))
          ;; (readable-parentwise-path
          ;;  (seq-map #'tsc-node-type parentwise-path))
          ;; (readable-indents-path
          ;;  (seq-map (lambda (i) (tree-sitter-indent--updated-column 0 i))
          ;;           indents-in-path))
          )
+    (when (and
+           first-char-white-space-p
+           indenting-node
+           (tree-sitter-indent--node-is-indent-body indenting-node))
+      (push `indent (cdr (last indents-in-path))))
     ;; (message "Parentwise path of %s" readable-parentwise-path)
     ;; (message "Indents in path: %s" indents-in-path)
     ;; (message "Readable indents in path: %s" readable-indents-path)
@@ -513,14 +523,8 @@ See `tree-sitter-indent-line'.  ORIGINAL-COLUMN is forwarded to
          (original-column
           (abs (- (line-beginning-position)
                   first-non-blank-pos)))
-         (line-str (thing-at-point 'line t))
-         (line-empty-p (not (tree-sitter-indent--string-nonempty-p (thing-at-point 'line t))))
          (new-column
-          (tree-sitter-indent--indent-column original-column))
-         (new-column
-          (if line-empty-p
-              (+ new-column tree-sitter-indent-offset)
-            new-column)))
+          (tree-sitter-indent--indent-column original-column)))
     (when (numberp new-column)
       (if should-save-excursion
           (save-excursion (indent-line-to new-column))

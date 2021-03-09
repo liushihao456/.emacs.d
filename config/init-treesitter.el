@@ -37,9 +37,16 @@
 (add-hook 'css-mode-hook 'tree-sitter-mode)
 (add-hook 'mhtml-mode-hook 'tree-sitter-mode)
 
-(add-hook 'tree-sitter-after-on-hook (lambda ()
-                                       (setq font-lock-defaults '(nil))
-                                       (tree-sitter-hl-mode)))
+(add-hook 'tree-sitter-after-on-hook
+          (lambda ()
+            (setq font-lock-defaults '(nil))
+            (tree-sitter-hl-mode)))
+(add-hook 'yas-after-exit-snippet-hook
+          (lambda ()
+            (when tree-sitter-mode
+              (setq tree-sitter-tree nil)
+              (tree-sitter--do-parse))))
+
 
 (provide 'init-treesitter)
 

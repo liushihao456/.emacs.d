@@ -2,4 +2,4 @@
 # name: useRef
 # key: ur
 # --
-const $1 = ${2:React.}useRef<$3>($4);$0
+const ${1:ref} = ${2:React.}useRef<$3>($4);$0
