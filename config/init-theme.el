@@ -78,7 +78,8 @@
 ;;     (load-zenburn)
 ;;   (load-solarized-dark))
 
-(load-solarized-dark)
+;; (load-solarized-dark)
+(load-theme 'solarized-light t)
 
 (unless (display-graphic-p)
   (set-face-background 'default "unspecified-bg"))

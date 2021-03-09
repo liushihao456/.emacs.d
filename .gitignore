@@ -30,3 +30,5 @@ python-language-server/
 /diary
 /org-clock-save.el
 /.dap-breakpoints
+*.elc
+*.eln

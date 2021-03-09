@@ -27,17 +27,18 @@
 
 ;; Web mode and emmet mode
 
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-mode))
 (defun setup-ts-js ()
   "Setup development environment for ts(x) and js(x) files."
   (setq-local electric-pair-pairs (append electric-pair-pairs '((?\' . ?\')) '((?\` . ?\`))))
   (setq-local electric-pair-text-pairs electric-pair-pairs)
-  (lsp)
+  ;; (lsp)
   (emmet-mode)
   (setq-local emmet-expand-jsx-className? t)
   ;; (yas-activate-extra-mode 'js-mode)
   )
 (add-hook 'typescript-mode-hook 'setup-ts-js)
+(add-hook 'tsx-mode-hook 'setup-ts-js)
 (add-hook 'js-mode-hook 'setup-ts-js)
 (add-hook 'mhtml-mode-hook (lambda () (lsp) (emmet-mode)))
 
@@ -49,6 +50,8 @@
 
 (with-eval-after-load 'typescript-mode
   (define-key typescript-mode-map (kbd "<f5>") 'prettier-buffer))
+(with-eval-after-load 'tsx-mode
+  (define-key tsx-mode-map (kbd "<f5>") 'prettier-buffer))
 (with-eval-after-load 'js-mode
   (define-key js-mode-map (kbd "<f5>") 'prettier-buffer))
 
