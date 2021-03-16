@@ -30,26 +30,26 @@
   (setq calendar-longitude 112.0856))
 
 (defun hour-fraction-to-time (time)
-  "Convert decimal fraction TIME like 18.555 to time string HH:mm."
+  "Convert decimal fraction TIME like 18.555 to list of (hours minutes)."
   (let* ((time (round (* 60 time)))
          (24-hours (/ time 60))
          (minutes (% time 60)))
     (list 24-hours minutes)))
 
 (defun get-sunset-time ()
-  "Return the sunset time as list (hours, minutes)."
+  "Return the sunset time as list (hours minutes)."
   (let ((l (solar-sunrise-sunset (calendar-current-date))))
     (hour-fraction-to-time (caadr l))))
 
 (defun get-current-time ()
-  "Return the current time as list (hours, minutes)."
+  "Return the current time as list (hours minutes)."
   (let ((str (current-time-string)))
     (list
      (string-to-number (substring str -13 -11))
      (string-to-number (substring str -10 -8)))))
 
 (defun time-before (time1 time2)
-  "Compare TIME1 and TIME2, both in the form of list (hours, minutes)."
+  "Compare TIME1 and TIME2, both in the form of list (hours minutes)."
   (if (= (car time1) (car time2))
       (< (cadr time1) (cadr time2))
     (< (car time1) (car time2))))
@@ -74,11 +74,15 @@
   (custom-set-faces
    `(lsp-ui-doc-background ((t (:background "#272A36"))))))
 
-;; (if (time-before (get-current-time) (get-sunset-time))
-;;     (load-zenburn)
-;;   (load-solarized-dark))
+(let ((current-time (get-current-time))
+      (sunset-time (get-sunset-time)))
+  (setcar sunset-time (- (car sunset-time) 2))
+  (if (time-before current-time sunset-time)
+      (load-zenburn)
+    (load-solarized-dark)))
 
-(load-solarized-dark)
+
+;; (load-solarized-dark)
 ;; (load-theme 'solarized-light t)
 
 (unless (display-graphic-p)

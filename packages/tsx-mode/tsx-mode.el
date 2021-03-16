@@ -32,19 +32,9 @@
 (defvar tsx-mode-indent-scopes
   '((indent-all . ;; these nodes are always indented
                 (
-                 break_statement
+                 ;; break_statement
                  ))
-    (indent-rest . ;; if parent node is one of these and node is not first → indent
-                 (
-                  variable_declarator
-                  member_expression
-                  pair
-                  unary_expression
-                  binary_expression
-                  ternary_expression
-                  jsx_self_closing_element
-                  ))
-    (indent-body . ;; if parent node is one of these and current node is in middle → indent
+    (indent-body . ;; if parent node is one of these → indent
                  (
                   array
                   object
@@ -57,6 +47,16 @@
                   jsx_opening_element
                   jsx_expression
                   switch_body
+                  member_expression
+                  formal_parameters
+
+                  ;; unary_expression
+                  ;; binary_expression
+                  ternary_expression
+
+                  variable_declarator
+                  pair
+                  jsx_self_closing_element
 
                   named_imports
                   object_pattern
@@ -64,38 +64,37 @@
                   if_statement
                   switch_case
 
+                  arrow_function
+                  assignment_expression
+                  else_clause
+                  return_statement
+
                   ;; comment
                   ;; subscript_expression
                   ;; lexical_declaration
-                  ;; assignment_expression
-                  ;; expression_statement
-                  ;; return_statement
-                  ;; arrow_function
                   ;; call_expression
                   ;; formal_parameters
                   ))
 
-    (paren-indent . ;; if parent node is one of these → indent to paren opener
-                  ())
-    (align-char-to . ;; chaining char → node types we move parentwise to find the first chaining char
-                   (;; "."
-                    ))
-    (aligned-siblings . ;; siblings (nodes with same parent) should be aligned to the first child
+    (indent-relative-to-parent . ;; if parent node is one of these -> indent to parent start column + offset
+                               (arrow_function))
+    (no-nesting . ;; if parent's node is same type as parent's parent, no indent
+                (ternary_expression
+                 ;; binary_expression
+                 ))
+    (aligned-siblings . ;; siblings (nodes with same parent and of same type) should be aligned to the first child
                       (jsx_attribute
-                       jsx_closing_element
-                       "<"
                        ))
-
-    (multi-line-text . ;; if node is one of these, then don't modify the indent
-                     ;; this is basically a peaceful way out by saying "this looks like something
-                     ;; that cannot be indented using AST, so best I leave it as-is"
-                     ())
     (outdent . ;; these nodes always outdent (1 shift in opposite direction)
              (
+              jsx_closing_element
+              else_clause
+              "<"
+              ">"
               "/"
-              ;; ")"
-              ;; "}"
-              ;; "]"
+              ")"
+              "}"
+              "]"
               ))
     )
   "Scopes for indenting in typescript-react.")
@@ -125,7 +124,7 @@
   :group 'tsx)
 
 ;;;###autoload
-(define-derived-mode tsx-mode prog-mode "Typescript(tsx)"
+(define-derived-mode tsx-mode prog-mode "TypeScript[TSX]"
   "Major mode for editing typescript-react (.tsx).
 
 Key bindings:
@@ -139,10 +138,10 @@ Key bindings:
   (setq-local tree-sitter-indent-current-scopes tsx-mode-indent-scopes)
   (setq-local indent-line-function #'tree-sitter-indent-line)
 
-  ;; (setq-local electric-indent-chars
-  ;;             (append "{}():;," electric-indent-chars))
-  ;; (setq-local electric-layout-rules
-  ;;             '((?\; . after) (?\{ . after) (?\} . before)))
+  (setq-local electric-indent-chars
+              (append "{}():;," electric-indent-chars))
+  (setq-local electric-layout-rules
+              '((?\; . after) (?\{ . after) (?\} . before)))
 
   ;; Comments
   (setq-local comment-start "// ")

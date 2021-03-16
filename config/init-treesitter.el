@@ -27,7 +27,9 @@
 
 (with-eval-after-load 'tree-sitter
   (require 'tree-sitter-langs)
-  (setq tree-sitter-major-mode-language-alist (cons '(tsx-mode . tsx) tree-sitter-major-mode-language-alist)))
+  (setq tree-sitter-major-mode-language-alist (cons '(tsx-mode . tsx) tree-sitter-major-mode-language-alist))
+  (setq tree-sitter-debug-highlight-jump-region t)
+  (setq tree-sitter-debug-jump-buttons t))
 
 (add-hook 'c-mode-common-hook 'tree-sitter-mode)
 (add-hook 'python-mode-hook 'tree-sitter-mode)
