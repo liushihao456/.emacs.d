@@ -27,9 +27,21 @@
 
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (with-eval-after-load 'flycheck
-  (define-key flycheck-mode-map (kbd "<f6>") 'flycheck-list-errors)
-  (define-key flycheck-mode-map (kbd "<f7>") 'flycheck-previous-error)
-  (define-key flycheck-mode-map (kbd "<f8>") 'flycheck-next-error)
+  (defun transient/flycheck-navigate-error (fun &rest args)
+    "Wrapper around flycheck-previous/next-error that allows repeating with
+single keystrokes."
+    (interactive)
+    (let ((echo-keystrokes nil))
+      (funcall fun args)
+      (message "Goto flycheck error: [n]ext [p]revious")
+      (set-transient-map
+       (let ((map (make-sparse-keymap)))
+         (define-key map [?n] 'flycheck-next-error)
+         (define-key map [?p] 'flycheck-previous-error)
+         map)
+       t)))
+  (advice-add 'flycheck-previous-error :around 'transient/flycheck-navigate-error)
+  (advice-add 'flycheck-next-error :around 'transient/flycheck-navigate-error)
   (define-key flycheck-mode-map (kbd "C-c f p") 'flycheck-previous-error)
   (define-key flycheck-mode-map (kbd "C-c f n") 'flycheck-next-error)
   (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)

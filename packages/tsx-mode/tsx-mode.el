@@ -24,6 +24,7 @@
 ;; --------------------------------------
 
 ;;; Code:
+(require 'cl-lib)
 (require 'cc-mode)
 (require 'tree-sitter)
 (require 'tree-sitter-langs)
@@ -49,26 +50,21 @@
                   switch_body
                   member_expression
                   formal_parameters
-
-                  ;; unary_expression
-                  ;; binary_expression
                   ternary_expression
-
                   variable_declarator
                   pair
                   jsx_self_closing_element
-
                   named_imports
                   object_pattern
                   array_pattern
                   if_statement
                   switch_case
-
-                  arrow_function
                   assignment_expression
                   else_clause
                   return_statement
+                  object_type
 
+                  ;; arrow_function
                   ;; comment
                   ;; subscript_expression
                   ;; lexical_declaration
@@ -80,11 +76,12 @@
                                (arrow_function))
     (no-nesting . ;; if parent's node is same type as parent's parent, no indent
                 (ternary_expression
-                 ;; binary_expression
                  ))
+    (align-to-parent . ;; if parent node is one of these -> align to parent node's start column
+                     (binary_expression
+                      unary_expression))
     (aligned-siblings . ;; siblings (nodes with same parent and of same type) should be aligned to the first child
-                      (jsx_attribute
-                       ))
+                      (jsx_attribute))
     (outdent . ;; these nodes always outdent (1 shift in opposite direction)
              (
               jsx_closing_element
@@ -98,6 +95,36 @@
               ))
     )
   "Scopes for indenting in typescript-react.")
+
+(defun tsx-mode-goto-prev-tag ()
+  "Go to the previous JSX tag."
+  (interactive)
+  (let ((echo-keystrokes nil))
+    (unless
+        (save-match-data
+          (search-backward-regexp "\\(?:<>\\|<[^/>]+\\)" nil t))
+      (message "No previous tag found"))
+    (message "Goto tag: [n]ext [p]revious")
+    (set-transient-map
+     (let ((map (make-sparse-keymap)))
+       (define-key map [?n] 'tsx-mode-goto-next-tag)
+       (define-key map [?p] 'tsx-mode-goto-prev-tag)
+       map))))
+
+(defun tsx-mode-goto-next-tag ()
+  "Go to the next JSX tag."
+  (interactive)
+  (let ((echo-keystrokes nil))
+    (unless
+      (save-match-data
+        (search-forward-regexp "\\(?:/>\\|</[[:alnum:][:space:]]*>\\)" nil t))
+      (message "No next tag found"))
+    (message "Goto tag: [n]ext [p]revious")
+    (set-transient-map
+     (let ((map (make-sparse-keymap)))
+       (define-key map [?n] 'tsx-mode-goto-next-tag)
+       (define-key map [?p] 'tsx-mode-goto-prev-tag)
+       map))))
 
 ;;; Syntax table and parsing
 
@@ -137,6 +164,9 @@ Key bindings:
   (tree-sitter-hl-mode)
   (setq-local tree-sitter-indent-current-scopes tsx-mode-indent-scopes)
   (setq-local indent-line-function #'tree-sitter-indent-line)
+
+  (define-key tsx-mode-map (kbd "C-c C-n") 'tsx-mode-goto-next-tag)
+  (define-key tsx-mode-map (kbd "C-c C-p") 'tsx-mode-goto-prev-tag)
 
   (setq-local electric-indent-chars
               (append "{}():;," electric-indent-chars))

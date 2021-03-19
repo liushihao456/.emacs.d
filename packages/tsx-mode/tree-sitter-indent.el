@@ -40,9 +40,11 @@
 ;;    are both one of these, will not be indented forward, even if its parent
 ;;    node is one of indent-body's nodes.
 ;;    This is used for situations such as nested ternary_expressions.
-;; 5. aligned-siblings, whose nodes will be aligned to their siblings (nodes
+;; 5. align-to-parent, meaning any node whose parent node is one of these will
+;;    be aligned to the parent node's start column.
+;; 6. aligned-siblings, whose nodes will be aligned to their siblings (nodes
 ;;    with the same parent and of the same type).
-;; 6. outdent, whose nodes will be outdented one ``tree-sitter-indent-offset''
+;; 7. outdent, whose nodes will be outdented one ``tree-sitter-indent-offset''
 ;;    backward relative to what they would otherwise.
 ;;
 ;; And the indent scopes alist's values are node types, e.g.,
@@ -113,6 +115,15 @@ Nodes in this group will be always +1 indentend."
          (member (tsc-node-type (tsc-get-parent node))
                  .no-nesting))))
 
+(defun tree-sitter-indent--node-is-align-to-parent (node)
+  "Non-nil if NODE type is in align-to-parent group.
+
+Nodes in this group will indent to parent's start column."
+  (let-alist tree-sitter-indent-current-scopes
+    (and node
+         (member (tsc-node-type node)
+                 .align-to-parent))))
+
 (defun tree-sitter-indent--node-is-aligned-sibling (node)
   "Non-nil if NODE type is in aligned-siblings group.
 
@@ -140,13 +151,13 @@ POSITION is a byte position in buffer like \\(point-min\\)."
       ;; move upwards until we either don't have aparent node
       ;; or we moved out of line
       (while (and
-	      current-node
-	      (when-let* ((parent-node (tsc-get-parent current-node)))
+	          current-node
+	          (when-let* ((parent-node (tsc-get-parent current-node)))
                 (when (and ;; parent and current share same position
                        (eq (tsc-node-start-byte parent-node)
                            (tsc-node-start-byte current-node)))
-		  ;; move upwards to the parent node
-		  (setq current-node parent-node)))))
+		          ;; move upwards to the parent node
+		          (setq current-node parent-node)))))
       current-node)))
 
 (defun tree-sitter-indent--first-sibling-column (current-node parent-node)
@@ -237,22 +248,20 @@ e.g., ``jsx_text''."
          (current-node-must-indent
           (tree-sitter-indent--node-is-indent-all current-node))
          (current-node-must-outdent
-          ;; Removed requirement for outdent node being the last node in parentwise path
-          ;; (and
-          ;;  (eq last-node current-node)
           (tree-sitter-indent--node-is-outdent current-node))
-         ;; )
          (sibling-column
           (tree-sitter-indent--first-sibling-column
            current-node
            parent-node))
          (parent-line-column
           (tree-sitter-indent--get-node-start-line-first-char-col parent-node))
+         (parent-column
+          (cdr (tsc-node-start-point parent-node)))
          (relative-to-parent-column
           (when (and
                  parent-node
                  (tree-sitter-indent--node-is-indent-relative-to-parent parent-node))
-            (+ (cdr (tsc-node-start-point parent-node))
+            (+ parent-column
                (if (or
                     current-node-must-outdent
                     (tree-sitter-indent--node-is-no-nesting parent-node))
@@ -275,6 +284,8 @@ e.g., ``jsx_text''."
       parent-line-column)
      (same-line-with-prev-node-p
       parent-line-column)
+     ((tree-sitter-indent--node-is-align-to-parent parent-node)
+      parent-column)
      ((numberp sibling-column)
       sibling-column)
      ((numberp relative-to-parent-column)
@@ -288,22 +299,13 @@ e.g., ``jsx_text''."
      (t
       parent-line-column))))
 
-(cl-defun tree-sitter-indent--indent-column (original-column)
-  "Return the column the first non-whitespace char at POSITION should indent to.
-
-Collect indent instruction per AST with
-`tree-sitter-indent--indents-in-path', then apply instructions
-with `tree-sitter-indent--updated-column' using
-TREE-SITTER-INDENT-OFFSET as step.
-
-See `tree-sitter-indent-line'.  ORIGINAL-COLUMN is forwarded to
-`tree-sitter-indent--indents-in-path'"
+(cl-defun tree-sitter-indent--indent-column ()
+  "Return the column the current line should indent to."
   (let* ((indent-node
           (tree-sitter-indent--highest-node-at-position
            (save-excursion
              (back-to-indentation)
              (point))))
-         ;; (parentwise-path (tree-sitter-indent--parentwise-path indent-node))
          (indent-col
           (if indent-node
               (tree-sitter-indent--indent-node indent-node)
@@ -335,11 +337,8 @@ See `tree-sitter-indent-line'.  ORIGINAL-COLUMN is forwarded to
             (point)))
          (should-save-excursion
           (< first-non-blank-pos original-position))
-         (original-column
-          (abs (- (line-beginning-position)
-                  first-non-blank-pos)))
          (new-column
-          (tree-sitter-indent--indent-column original-column)))
+          (tree-sitter-indent--indent-column)))
     (when (numberp new-column)
       (if should-save-excursion
           (save-excursion (indent-line-to new-column))

@@ -37,7 +37,7 @@
   (setq company-dabbrev-downcase nil)
   (setq-default company-frontends
         '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
-  ;; (setq company-idle-delay 0.2)
+  (setq company-idle-delay 0.3)
   (setq company-selection-wrap-around t)
   (setq company-tooltip-align-annotations t)
 

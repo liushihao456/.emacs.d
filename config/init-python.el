@@ -27,6 +27,7 @@
 
 (add-hook 'python-mode-hook 'lsp)
 (with-eval-after-load 'python
+  ;; (require 'lsp-pyright)
   (setq python-shell-interpreter "python3")
   (defun my/format-buffer ()
     "Format buffer using yapf."
@@ -36,6 +37,12 @@
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
       (goto-char old-point)))
   (define-key python-mode-map (kbd "<f5>") 'my/format-buffer))
+
+(with-eval-after-load 'lsp-python-ms
+  (setq lsp-python-ms-cache "Library"))
+
+(with-eval-after-load 'lsp-pyright
+  (setq lsp-pyright-use-library-code-for-types nil))
 
 (provide 'init-python)
 

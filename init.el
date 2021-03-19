@@ -33,7 +33,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(lsp-python-ms benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode typescript-mode lsp-ui swift-mode kotlin-mode cdlatex writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet)))
+   '(lsp-pyright lsp-python-ms benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode typescript-mode lsp-ui swift-mode kotlin-mode cdlatex writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
@@ -44,6 +44,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(lsp-ui-doc-background ((t (:background "#272A36"))))
  '(web-mode-html-tag-bracket-face ((t (:inherit default)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
