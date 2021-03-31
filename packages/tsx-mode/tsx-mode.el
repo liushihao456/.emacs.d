@@ -1,5 +1,10 @@
 ;;; tsx-mode.el --- Mode for typescript and tsx	-*- lexical-binding: t -*-
 
+;; Author: Shihao Liu
+;; Keywords: company popup documentation tip
+;; Version: 1.0.0
+;; Package-Requires: ((emacs "24.3") (s "1.9.0") (cl-lib "0.5") (dash "2.10.0") (company "0.8.9"))
+
 ;; This file is not part of GNU Emacs.
 ;;
 ;; This program is free software; you can redistribute it and/or
@@ -32,10 +37,8 @@
 
 (defvar tsx-mode-indent-scopes
   '((indent-all . ;; these nodes are always indented
-                (
-                 ;; break_statement
-                 ))
-    (indent-body . ;; if parent node is one of these → indent
+                ())
+    (indent-body . ;; if parent node is one of these → indent to parent line's start col + offset
                  (
                   array
                   object
@@ -62,38 +65,26 @@
                   assignment_expression
                   else_clause
                   return_statement
-                  object_type
-
-                  ;; arrow_function
-                  ;; comment
-                  ;; subscript_expression
-                  ;; lexical_declaration
-                  ;; call_expression
-                  ;; formal_parameters
-                  ))
+                  object_type))
 
     (indent-relative-to-parent . ;; if parent node is one of these -> indent to parent start column + offset
                                (arrow_function))
     (no-nesting . ;; if parent's node is same type as parent's parent, no indent
-                (ternary_expression
-                 ))
+                (ternary_expression))
     (align-to-parent . ;; if parent node is one of these -> align to parent node's start column
                      (binary_expression
                       unary_expression))
     (aligned-siblings . ;; siblings (nodes with same parent and of same type) should be aligned to the first child
                       (jsx_attribute))
     (outdent . ;; these nodes always outdent (1 shift in opposite direction)
-             (
-              jsx_closing_element
+             (jsx_closing_element
               else_clause
               "<"
               ">"
               "/"
               ")"
               "}"
-              "]"
-              ))
-    )
+              "]")))
   "Scopes for indenting in typescript-react.")
 
 (defun tsx-mode-goto-prev-tag ()

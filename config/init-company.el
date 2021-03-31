@@ -43,7 +43,7 @@
 
   ;; Better sorting and filtering
   ;; Disable it because it gave worse sorting in lsp typescript completions
-  ;; (company-prescient-mode t)
+  (company-prescient-mode t)
 
   ;; Yasnippet integration
   (require 'yasnippet)

@@ -74,15 +74,15 @@
   (custom-set-faces
    `(lsp-ui-doc-background ((t (:background "#272A36"))))))
 
-;; (let ((current-time (get-current-time))
-;;       (sunset-time (get-sunset-time)))
-;;   (message "Sunset time: %s: %s" (car sunset-time) (cadr sunset-time))
-;;   (setcar sunset-time (- (car sunset-time) 1))
-;;   (if (time-before current-time sunset-time)
-;;       (load-zenburn)
-;;     (load-solarized-dark)))
+(let ((current-time (get-current-time))
+      (sunset-time (get-sunset-time)))
+  (message "Sunset time: %s: %s" (car sunset-time) (cadr sunset-time))
+  (setcar sunset-time (- (car sunset-time) 1))
+  (if (time-before current-time sunset-time)
+      (load-zenburn)
+    (load-solarized-dark)))
 
-(load-solarized-dark)
+;; (load-solarized-dark)
 
 ;; (load-theme 'solarized-light t)
 
