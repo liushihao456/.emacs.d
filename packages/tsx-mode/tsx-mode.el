@@ -41,6 +41,7 @@
     (indent-body . ;; if parent node is one of these → indent to parent line's start col + offset
                  (
                   array
+                  subscript_expression
                   object
                   arguments
                   statement_block
