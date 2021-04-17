@@ -32,3 +32,4 @@ python-language-server/
 /.dap-breakpoints
 *.elc
 *.eln
+transient/
