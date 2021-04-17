@@ -164,12 +164,13 @@ split; vice versa."
 (global-set-key (kbd "M-p") 'scroll-down-line)
 (global-set-key (kbd "M-'") 'switch-to-other-buffer)
 (global-set-key (kbd "M-o") 'other-window)
+(global-set-key (kbd "M-`") 'kill-this-buffer)
 ;; Magit
 (global-set-key (kbd "C-c g") 'magit-status)
 ;; Expand region
 (global-set-key (kbd "C-\\") 'er/expand-region)
 ;; Writeroom mode
-(global-set-key (kbd "M-`") 'writeroom-mode)
+;; (global-set-key (kbd "M-`") 'writeroom-mode)
 ;; Cheat.sh
 (global-set-key (kbd "C-c M-s") 'cheat-sh-search)
 
