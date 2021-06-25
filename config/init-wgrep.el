@@ -28,6 +28,9 @@
 ;; Deadgrep
 (global-set-key (kbd "C-c s") 'deadgrep)
 
+(with-eval-after-load 'wgrep
+  (setq wgrep-auto-save-buffer t))
+
 ;; wgrep-deadgrep
 ;; C-c C-p to enable editing in the grep result buffer
 ;; C-c C-e to apply the changes

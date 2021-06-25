@@ -41,6 +41,26 @@
      (message "Copied line")
      (list (line-beginning-position) (line-beginning-position 2)))))
 
+(defun my/delete-word (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument ARG, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (delete-region
+   (point)
+   (progn
+     (forward-word arg)
+     (point))))
+
+(defun my/backward-delete-word (arg)
+  "Delete characters backward until encountering the beginning of a word.
+With argument ARG, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (my/delete-word (- arg)))
+(global-set-key (kbd "M-d") 'my/delete-word)
+(global-set-key (kbd "M-DEL") 'my/backward-delete-word)
+
 (defun scroll-half-page-down ()
   "Scroll down half the page."
   (interactive)
