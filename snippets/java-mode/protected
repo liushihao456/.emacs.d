@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: print
+# name: protected
 # key: pt
 # --
-System.out.print($1);$0
+protected $0
