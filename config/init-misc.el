@@ -164,6 +164,7 @@ split; vice versa."
 (setq scroll-conservatively 101)
 
 ;; Global key bindings
+(global-set-key (kbd "C--") 'undo)
 (global-set-key (kbd "C-v") 'scroll-half-page-up)
 (global-set-key (kbd "M-v") 'scroll-half-page-down)
 (global-set-key (kbd "C-c |") 'toggle-window-split)

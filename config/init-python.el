@@ -27,7 +27,7 @@
 
 (add-hook 'python-mode-hook 'lsp)
 (with-eval-after-load 'python
-  ;; (require 'lsp-pyright)
+  (require 'lsp-pyright)
   (setq python-shell-interpreter "python3")
   (defun my/format-buffer ()
     "Format buffer using yapf."
