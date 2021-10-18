@@ -111,6 +111,9 @@ split; vice versa."
       (select-window first-win)
       (if this-win-is-2nd (other-window 1)))))
 
+(when (display-graphic-p)
+  (setq mac-command-modifier 'meta))
+
 ;; Hide the startup message
 (setq inhibit-startup-message t)
 ;; Change all prompts to y or n
@@ -127,19 +130,19 @@ split; vice versa."
 (add-hook 'help-mode-hook 'visual-line-mode)
 ;; When in GUI, set fonts
 (when (display-graphic-p)
-      (setq initial-frame-alist '((fullscreen . maximized)))
-      ;; (setq
-      ;;  mac-command-modifier 'meta
-      ;;  mac-option-modifier 'none)
-      ;; Transparent frame
-      ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
-      ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
-      (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
-      (set-face-attribute 'default nil :font "Source Code Pro-16")
-      ;; (set-face-attribute 'default nil :font "Ubuntu Mono-20")
-      (setq-default line-spacing 0.2)
-      (set-fontset-font t 'han      (font-spec :family "STkaiti"))
-      (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
+  (setq initial-frame-alist '((fullscreen . maximized)))
+  ;; (setq
+  ;;  mac-command-modifier 'meta
+  ;;  mac-option-modifier 'none)
+  ;; Transparent frame
+  ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
+  ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
+  (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
+  (set-face-attribute 'default nil :font "Source Code Pro-16")
+  ;; (set-face-attribute 'default nil :font "Ubuntu Mono-20")
+  (setq-default line-spacing 0.2)
+  (set-fontset-font t 'han      (font-spec :family "STkaiti"))
+  (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
 ;; Open recent files list at Emacs start up
 (recentf-mode t)
 (setq initial-buffer-choice 'recentf-open-files)
