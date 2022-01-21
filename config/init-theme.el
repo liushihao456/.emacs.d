@@ -83,6 +83,7 @@
 ;;     (load-solarized-dark)))
 
 (load-solarized-dark)
+;; (load-zenburn)
 
 ;; (load-theme 'solarized-light t)
 
