@@ -33,7 +33,8 @@
   (setq company-backends '(company-capf company-files))
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (company-tip-mode t)
+  (add-hook 'company-mode-hook 'company-box-mode)
+  ;; (company-tip-mode t)
   (setq completion-ignore-case t)
   (setq company-dabbrev-downcase nil)
   (setq-default company-frontends

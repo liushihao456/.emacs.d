@@ -31,6 +31,7 @@
            (abbrev-mode nil "abbrev")
            (lsp-mode nil "lsp-mode")
            (company-mode nil "company")
+           (company-box-mode nil "company-box")
            (yas-minor-mode nil "yasnippet")
            (auto-revert-mode nil "autorevert")
            (hi-lock-mode nil "hi-lock")

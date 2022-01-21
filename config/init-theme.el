@@ -74,6 +74,10 @@
   (custom-set-faces
    `(lsp-ui-doc-background ((t (:background "#272A36"))))))
 
+(defun load-spacemacs-theme ()
+  "Load spacemacs theme."
+  (load-theme 'spacemacs-dark t))
+
 ;; (let ((current-time (get-current-time))
 ;;       (sunset-time (get-sunset-time)))
 ;;   (message "Sunset time: %s: %s" (car sunset-time) (cadr sunset-time))
@@ -82,8 +86,9 @@
 ;;       (load-zenburn)
 ;;     (load-solarized-dark)))
 
-(load-solarized-dark)
+;; (load-solarized-dark)
 ;; (load-zenburn)
+(load-spacemacs-theme)
 
 ;; (load-theme 'solarized-light t)
 
