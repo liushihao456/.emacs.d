@@ -138,9 +138,9 @@ split; vice versa."
   ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
   ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
-  (set-face-attribute 'default nil :font "Source Code Pro-16")
-  ;; (set-face-attribute 'default nil :font "Ubuntu Mono-20")
-  ;; (setq-default line-spacing 0.2)
+  ;; (set-face-attribute 'default nil :font "Source Code Pro-16")
+  (set-face-attribute 'default nil :font "Ubuntu Mono-17")
+  (setq-default line-spacing 0.2)
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
   (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
 ;; Open recent files list at Emacs start up
@@ -219,6 +219,8 @@ split; vice versa."
 ;; Selectrum
 (selectrum-mode t)
 (selectrum-prescient-mode t)
+;; Marginalia mode
+(marginalia-mode t)
 ;; Which-key: show key bindings below
 (which-key-mode)
 (which-key-setup-side-window-bottom)
