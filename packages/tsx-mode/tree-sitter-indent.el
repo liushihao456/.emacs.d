@@ -346,7 +346,7 @@ e.g., ``jsx_text''."
 
 (define-minor-mode tree-sitter-indent-mode
   "Use Tree-sitter as backend for indenting buffer."
-  nil nil nil
+  :init-value nil :lighter nil :keymap nil
   (cond
    (tree-sitter-indent-mode
     (unless tree-sitter-mode
