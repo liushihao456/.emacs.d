@@ -1,4 +1,4 @@
-;;; tsx-mode.el --- Mode for typescript and tsx	-*- lexical-binding: t -*-
+;;; react-mode.el --- Mode for typescript and react	-*- lexical-binding: t -*-
 
 ;; Author: Shihao Liu
 ;; Keywords: company popup documentation tip
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 ;;
-;; Mode for typescript and tsx
+;; Mode for typescript and react
 ;; --------------------------------------
 
 ;;; Code:
@@ -35,7 +35,7 @@
 (require 'tree-sitter-langs)
 (require 'tree-sitter-indent)
 
-(defvar tsx-mode-indent-scopes
+(defvar react-mode-indent-scopes
   '((indent-all . ;; these nodes are always indented
                 ())
     (indent-body . ;; if parent node is one of these → indent to parent line's start col + offset
@@ -88,7 +88,7 @@
               "]")))
   "Scopes for indenting in typescript-react.")
 
-(defun tsx-mode-goto-prev-tag ()
+(defun react-mode-goto-prev-tag ()
   "Go to the previous JSX tag."
   (interactive)
   (let ((echo-keystrokes nil))
@@ -99,11 +99,11 @@
     (message "Goto tag: [n]ext [p]revious")
     (set-transient-map
      (let ((map (make-sparse-keymap)))
-       (define-key map [?n] 'tsx-mode-goto-next-tag)
-       (define-key map [?p] 'tsx-mode-goto-prev-tag)
+       (define-key map [?n] 'react-mode-goto-next-tag)
+       (define-key map [?p] 'react-mode-goto-prev-tag)
        map))))
 
-(defun tsx-mode-goto-next-tag ()
+(defun react-mode-goto-next-tag ()
   "Go to the next JSX tag."
   (interactive)
   (let ((echo-keystrokes nil))
@@ -114,51 +114,51 @@
     (message "Goto tag: [n]ext [p]revious")
     (set-transient-map
      (let ((map (make-sparse-keymap)))
-       (define-key map [?n] 'tsx-mode-goto-next-tag)
-       (define-key map [?p] 'tsx-mode-goto-prev-tag)
+       (define-key map [?n] 'react-mode-goto-next-tag)
+       (define-key map [?p] 'react-mode-goto-prev-tag)
        map))))
 
 ;;; Syntax table and parsing
 
-(defvar tsx-mode-syntax-table
+(defvar react-mode-syntax-table
   (let ((table (make-syntax-table)))
     (c-populate-syntax-table table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?` "\"" table)
     table)
-  "Syntax table for `tsx-mode'.")
+  "Syntax table for `react-mode'.")
 
 ;;; KeyMap
 
-(defvar tsx-mode-map
+(defvar react-mode-map
   (let ((keymap (make-sparse-keymap)))
     keymap)
-  "Keymap for `tsx-mode'.")
+  "Keymap for `react-mode'.")
 
 ;;; Mode hook
 
-(defcustom tsx-mode-hook nil
-  "*Hook called by `tsx-mode'."
+(defcustom react-mode-hook nil
+  "*Hook called by `react-mode'."
   :type 'hook
-  :group 'tsx)
+  :group 'react)
 
 ;;;###autoload
-(define-derived-mode tsx-mode prog-mode "TypeScript[TSX]"
-  "Major mode for editing typescript-react (.tsx).
+(define-derived-mode react-mode prog-mode (if (string-suffix-p ".react" (buffer-file-name)) "TypeScript[REACT]" "JavaScript[JSX]")
+  "Major mode for editing typescript-react (.react).
 
 Key bindings:
 
-\\{tsx-mode-map}"
+\\{react-mode-map}"
 
-  :group 'tsx
-  :syntax-table tsx-mode-syntax-table
+  :group 'react
+  :syntax-table react-mode-syntax-table
 
   (tree-sitter-hl-mode)
-  (setq-local tree-sitter-indent-current-scopes tsx-mode-indent-scopes)
+  (setq-local tree-sitter-indent-current-scopes react-mode-indent-scopes)
   (setq-local indent-line-function #'tree-sitter-indent-line)
 
-  (define-key tsx-mode-map (kbd "C-c C-n") 'tsx-mode-goto-next-tag)
-  (define-key tsx-mode-map (kbd "C-c C-p") 'tsx-mode-goto-prev-tag)
+  (define-key react-mode-map (kbd "C-c C-n") 'react-mode-goto-next-tag)
+  (define-key react-mode-map (kbd "C-c C-p") 'react-mode-goto-prev-tag)
 
   (setq-local electric-indent-chars
               (append "{}():;," electric-indent-chars))
@@ -179,6 +179,6 @@ Key bindings:
         comment-start-skip "\\(//+\\|/\\*+\\)\\s *")
   )
 
-(provide 'tsx-mode)
+(provide 'react-mode)
 
-;;; tsx-mode.el ends here
+;;; react-mode.el ends here

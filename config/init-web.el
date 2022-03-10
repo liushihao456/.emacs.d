@@ -27,10 +27,10 @@
 
 ;; Web mode and emmet mode
 
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-mode))
-;; Use tsx mode for .jsx files as the builtin js-mode has bugs:
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . react-mode))
+;; Use react mode for .jsx files as the builtin js-mode has bugs:
 ;; ``internal--syntax-propertize did not move syntax-propertize--done''
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . react-mode))
 (defun setup-ts-js ()
   "Setup development environment for ts(x) and js(x) files."
   (setq-local electric-pair-pairs (append electric-pair-pairs '((?\' . ?\')) '((?\` . ?\`))))
@@ -42,7 +42,7 @@
 (add-hook 'typescript-mode-hook (lambda ()
                                   (setup-ts-js)
                                   (yas-activate-extra-mode 'js-mode)))
-(add-hook 'tsx-mode-hook (lambda ()
+(add-hook 'react-mode-hook (lambda ()
                            (setup-ts-js)
                            (yas-activate-extra-mode 'js-mode)
                            (yas-activate-extra-mode 'typescript-mode)))
@@ -58,8 +58,8 @@
 
 (with-eval-after-load 'typescript-mode
   (define-key typescript-mode-map (kbd "<f5>") 'prettier-buffer))
-(with-eval-after-load 'tsx-mode
-  (define-key tsx-mode-map (kbd "<f5>") 'prettier-buffer))
+(with-eval-after-load 'react-mode
+  (define-key react-mode-map (kbd "<f5>") 'prettier-buffer))
 (with-eval-after-load 'js-mode
   (define-key js-mode-map (kbd "<f5>") 'prettier-buffer))
 

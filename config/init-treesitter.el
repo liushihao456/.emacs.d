@@ -27,7 +27,7 @@
 
 (with-eval-after-load 'tree-sitter
   (require 'tree-sitter-langs)
-  (setq tree-sitter-major-mode-language-alist (cons '(tsx-mode . tsx) tree-sitter-major-mode-language-alist))
+  (add-to-list 'tree-sitter-major-mode-language-alist '(react-mode . tsx))
   (setq tree-sitter-debug-highlight-jump-region t)
   (setq tree-sitter-debug-jump-buttons t))
 

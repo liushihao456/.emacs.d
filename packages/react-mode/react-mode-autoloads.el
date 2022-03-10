@@ -1,4 +1,4 @@
-;;; tsx-mode-autoloads.el --- automatically extracted autoloads
+;;; react-mode-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
 
@@ -17,19 +17,19 @@ Use Tree-sitter as backend to indent current line." nil nil)
 
 ;;;***
 
-;;;### (autoloads nil "tsx-mode" "tsx-mode.el" (0 0 0 0))
-;;; Generated autoloads from tsx-mode.el
+;;;### (autoloads nil "react-mode" "react-mode.el" (0 0 0 0))
+;;; Generated autoloads from react-mode.el
 
-(autoload 'tsx-mode "tsx-mode" "\
-Major mode for editing typescript-react (.tsx).
+(autoload 'react-mode "react-mode" "\
+Major mode for editing typescript-react (.react).
 
 Key bindings:
 
-\\{tsx-mode-map}
+\\{react-mode-map}
 
 \(fn)" t nil)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "tsx-mode" '("tsx-mode-")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "react-mode" '("react-mode-")))
 
 ;;;***
 
@@ -39,4 +39,4 @@ Key bindings:
 ;; no-update-autoloads: t
 ;; coding: utf-8
 ;; End:
-;;; tsx-mode-autoloads.el ends here
+;;; react-mode-autoloads.el ends here

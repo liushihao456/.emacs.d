@@ -21,10 +21,10 @@
 ;; Use Tree-sitter as backend to indent source code.
 ;;
 ;; Provide an `indent-line-function` using the emacs-tree-sitter package
-;; Usage (e.g., for TSX):
+;; Usage (e.g., for JSX and TSX):
 ;;
 ;; (require 'tree-sitter-indent)
-;; (setq-local tree-sitter-indent-current-scopes tsx-mode-indent-scopes)
+;; (setq-local tree-sitter-indent-current-scopes react-mode-indent-scopes)
 ;; (setq-local indent-line-function #'tree-sitter-indent-line)
 ;;
 ;; The indent scopes is an alist, whose keys include:
