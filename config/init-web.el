@@ -28,6 +28,9 @@
 ;; Web mode and emmet mode
 
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-mode))
+;; Use tsx mode for .jsx files as the builtin js-mode has bugs:
+;; ``internal--syntax-propertize did not move syntax-propertize--done''
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-mode))
 (defun setup-ts-js ()
   "Setup development environment for ts(x) and js(x) files."
   (setq-local electric-pair-pairs (append electric-pair-pairs '((?\' . ?\')) '((?\` . ?\`))))
@@ -44,6 +47,8 @@
                            (yas-activate-extra-mode 'js-mode)
                            (yas-activate-extra-mode 'typescript-mode)))
 (add-hook 'mhtml-mode-hook (lambda () (lsp) (emmet-mode)))
+(with-eval-after-load 'sgml-mode
+  (setq sgml-basic-offset 4))
 
 (defun prettier-buffer ()
   "Organize imports and call prettier to format buffer."

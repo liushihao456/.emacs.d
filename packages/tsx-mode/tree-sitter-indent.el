@@ -278,7 +278,6 @@ e.g., ``jsx_text''."
                     (tree-sitter-indent--node-is-no-nesting parent-node))
                    0
                  tree-sitter-indent-offset)))))
-    ;; (message "prev, current, next node: %s %s %s, sibling-column: %s, sameline: %s %s" (when previous-node (tsc-node-type previous-node)) (tsc-node-type current-node) (when next-node (tsc-node-type next-node)) sibling-column same-line-with-parent-node-p same-line-with-prev-node-p)
     (cond
      (same-line-with-parent-node-p
       parent-line-column)
