@@ -130,6 +130,18 @@ split; vice versa."
 (add-hook 'help-mode-hook 'visual-line-mode)
 ;; When in GUI, set fonts
 (when (display-graphic-p)
+  (defun set-font (font-name font-size)
+    "Set font.
+
+FONT-NAME is the font name (string); FONT-SIZE is the font size (number).
+
+Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
+    (let ((font (concat font-name "-" (number-to-string font-size) ":weight=medium")))
+      (add-to-list 'default-frame-alist `(font . ,font))
+      (set-face-attribute 'fixed-pitch nil :family "unspecified" :font font)
+      (set-face-attribute 'fixed-pitch-serif nil :family "unspecified" :font font)
+      (set-face-attribute 'variable-pitch nil :family "unspecified" :font font)
+      ))
   (setq initial-frame-alist '((fullscreen . maximized)))
   ;; (setq
   ;;  mac-command-modifier 'meta
@@ -137,10 +149,11 @@ split; vice versa."
   ;; Transparent frame
   ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
   ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
+  ;; (add-to-list 'default-frame-alist '(alpha-background . 90))
+  ;; (set-font "Source Code Pro" 16)
+  (set-font "Ubuntu Mono" 21)
+  ;; (setq-default line-spacing 0.2)
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
-  ;; (set-face-attribute 'default nil :font "Source Code Pro-16")
-  (set-face-attribute 'default nil :font "Ubuntu Mono-17")
-  (setq-default line-spacing 0.2)
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
   (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
 ;; Open recent files list at Emacs start up
@@ -162,9 +175,10 @@ split; vice versa."
 (setq c-basic-offset 4)
 (c-set-offset 'arglist-intro '+)
 (c-set-offset 'arglist-close '0)
-(setq column-number-mode t)
+(column-number-mode t)
 (setq scroll-margin 4)
 (setq scroll-conservatively 101)
+(pixel-scroll-precision-mode t)
 
 ;; Global key bindings
 (global-set-key (kbd "C--") 'undo)
