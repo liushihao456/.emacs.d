@@ -31,48 +31,104 @@
 ;; (require 'powerline)
 ;; (powerline-center-theme)
 
+;; Delight modeline lighters
+(delight '((eldoc-mode nil "eldoc")
+           (emacs-lisp-mode "Elisp" :major)
+           (which-key-mode nil "which-key")
+           (abbrev-mode nil "abbrev")
+           (lsp-mode nil "lsp-mode")
+           (company-mode nil "company")
+           (company-box-mode nil "company-box")
+           (yas-minor-mode nil "yasnippet")
+           (auto-revert-mode nil "autorevert")
+           (hi-lock-mode nil "hi-lock")
+           (auto-fill-function nil "simple")
+           (emmet-mode nil "emmet-mode")
+           (anzu-mode nil "anzu")
+           (tree-sitter-mode nil "tree-sitter")
+           (flycheck-mode nil "flycheck")))
+
 ;; Tidy mode line
 (defun tidy-modeline--fill (reserve)
   "Return empty space leaving RESERVE space on the right.  Adapted from powerline.el."
   (let ((real-reserve (if (and window-system (eq 'right (get-scroll-bar-mode)))
                           (- reserve 3)
                         reserve)))
-    (propertize " "
-                'display `((space :align-to (- (+ right right-fringe right-margin) ,real-reserve))))))
+    (propertize
+     " "
+     'display `((space :align-to (- (+ right right-fringe right-margin) ,real-reserve))))))
 
 
 (defun tidy-modeline--fill-center (reserve)
   "Return empty space leaving RESERVE space on the right in order to center a string.  Adapted from powerline.el."
-  (propertize " "
-              'display `((space :align-to (- (+ center (0.5 . right-margin)) ,reserve
-                                             (0.5 . left-margin))))))
+  (propertize
+   " "
+   'display `((space :align-to (- (+ center (0.5 . right-margin)) ,reserve
+                                  (0.5 . left-margin))))))
 
+
+(defun buffer-encoding-abbrev ()
+  "The line ending convention used in the buffer."
+  (let ((buf-coding (format "%s" buffer-file-coding-system)))
+    (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
+        (match-string 1 buf-coding)
+      buf-coding)))
+
+(setq my/flycheck-mode-line
+      '(:eval
+        (pcase flycheck-last-status-change
+          (`not-checked nil)
+          (`no-checker (propertize " -" 'face 'warning))
+          (`running (propertize " ✷" 'face 'success))
+          (`errored (propertize " !" 'face 'error))
+          (`finished
+           (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
+                  (no-errors (cdr (assq 'error error-counts)))
+                  (no-warnings (cdr (assq 'warning error-counts)))
+                  (face (cond (no-errors 'error)
+                              (no-warnings 'warning)
+                              (t 'success))))
+             (if error-counts
+                 (propertize (format "[%s/%s]" (or no-errors 0) (or no-warnings 0))
+                             'face face)
+               nil
+             )))
+          (`interrupted " -")
+          (`suspicious '(propertize " ?" 'face 'warning)))))
 
 (setq-default mode-line-format
               (list "%e"
                     '(:eval (cond (buffer-read-only " %*")
                                   ((buffer-modified-p) " *")
                                   (t " -")))
-                    '(:eval (propertize " %P" 'help-echo "Position in buffer"))
-                    ;; '(:eval (when (file-remote-p default-directory)
-                    ;;           (propertize " %1@"
-                    ;;                       'mouse-face 'mode-line-highlight
-                    ;;                       'help-echo (concat "remote: " default-directory))))
+                    '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
                     '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
                     " "
-                    vc-mode
+                    `(vc-mode vc-mode)
+                    " "
+                    my/flycheck-mode-line
                     " "
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
                               (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
                     '(:eval (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
                                    (col (format-mode-line (list " : " (propertize "%c " 'help-echo "Column number"))))
+                                   (encoding (buffer-encoding-abbrev))
                                    (col-length (max 5 (+ (length col))))
-                                   (row-length (+ col-length (length row))))
+                                   (row-length (+ col-length (length row)))
+                                   (encoding-length (+ row-length 1 (length encoding))))
                               (list
+                               (tidy-modeline--fill encoding-length)
+                               encoding
                                (tidy-modeline--fill row-length)
                                row
                                (tidy-modeline--fill col-length)
                                col)))))
+
+;; (doom-modeline-mode t)
+;; (with-eval-after-load 'doom-modeline
+;;   (setq doom-modeline-icon nil)
+;;   (setq doom-modeline-env-version nil))
+
 
 (provide 'init-modeline)
 

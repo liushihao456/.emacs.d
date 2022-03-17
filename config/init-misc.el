@@ -74,8 +74,8 @@ This command does not push text to `kill-ring'."
 (defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
   (interactive)
-  (if (cdr (project-current))
-      (let ((default-directory (cdr (project-current))))
+  (if (car (last (project-current)))
+      (let ((default-directory (car (last (project-current)))))
         (shell-command "open -a Terminal ."))
     (shell-command "open -a Terminal .")))
 
@@ -130,7 +130,7 @@ split; vice versa."
 (add-hook 'help-mode-hook 'visual-line-mode)
 ;; When in GUI, set fonts
 (when (display-graphic-p)
-  (defun set-font (font-name font-size)
+  (defun my/set-font (font-name font-size)
     "Set font.
 
 FONT-NAME is the font name (string); FONT-SIZE is the font size (number).
@@ -150,15 +150,20 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
   ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
   ;; (add-to-list 'default-frame-alist '(alpha-background . 90))
-  ;; (set-font "Source Code Pro" 16)
-  (set-font "Ubuntu Mono" 21)
+  ;; (my/set-font "Source Code Pro" 16)
+  (my/set-font "Ubuntu Mono" 21)
   ;; (setq-default line-spacing 0.2)
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
   (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
+
 ;; Open recent files list at Emacs start up
+(defun my/command-line-args-has-file-p ()
+  "Check if Emacs is called with a file name in command line args."
+  (> (length command-line-args) 1))
 (recentf-mode t)
-(setq initial-buffer-choice 'recentf-open-files)
+(unless (my/command-line-args-has-file-p)
+  (setq initial-buffer-choice 'recentf-open-files))
 (with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)
 (setq enable-recursive-minibuffers t)

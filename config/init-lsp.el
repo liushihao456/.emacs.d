@@ -53,9 +53,10 @@
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-idle-delay 0.5)
   (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-semantic-tokens-enable nil)
   (setq lsp-signature-render-documentation nil)
-  ;; (setq lsp-ui-sideline-show-hover t)
+  (setq lsp-ui-sideline-show-hover t)
   (setq lsp-ui-sideline-show-code-actions nil)
   (setq lsp-ui-sideline-update-mode 'line)
 
