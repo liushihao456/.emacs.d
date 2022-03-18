@@ -104,25 +104,24 @@
                     '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
                     '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
                     " "
-                    `(vc-mode vc-mode)
+                    '(:eval (format "[%s]" (substring vc-mode 1)))
                     " "
                     my/flycheck-mode-line
                     " "
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
                               (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
                     '(:eval (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
-                                   (col (format-mode-line (list " : " (propertize "%c " 'help-echo "Column number"))))
-                                   (encoding (buffer-encoding-abbrev))
-                                   (col-length (max 5 (+ (length col))))
-                                   (row-length (+ col-length (length row)))
-                                   (encoding-length (+ row-length 1 (length encoding))))
+                                   (col (format-mode-line (list (propertize "%c" 'help-echo "Column number"))))
+                                   (row-col (format "[%s : %s] " row col))
+                                   (encoding (format "[%s]" (buffer-encoding-abbrev)))
+                                   (row-col-length (length row-col))
+                                   (encoding-length (+ row-col-length 1 (length encoding))))
                               (list
                                (tidy-modeline--fill encoding-length)
                                encoding
-                               (tidy-modeline--fill row-length)
-                               row
-                               (tidy-modeline--fill col-length)
-                               col)))))
+                               (tidy-modeline--fill row-col-length)
+                               row-col
+                               )))))
 
 ;; (doom-modeline-mode t)
 ;; (with-eval-after-load 'doom-modeline
