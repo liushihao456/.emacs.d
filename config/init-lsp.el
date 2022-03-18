@@ -77,7 +77,7 @@ typing or company is active."
     (set-face-background 'lsp-ui-sideline-code-action "unspecified-bg")
     (set-face-background 'lsp-ui-sideline-symbol "unspecified-bg")))
 
-(add-hook 'emacs-lisp-hook 'lsp-ui-mode)
+(add-hook 'emacs-lisp-mode-hook 'lsp-ui-mode)
 
 
 (provide 'init-lsp)
