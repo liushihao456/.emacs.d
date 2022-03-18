@@ -45,7 +45,7 @@
             (tree-sitter-hl-mode)))
 (add-hook 'yas-after-exit-snippet-hook
           (lambda ()
-            (when tree-sitter-mode
+            (when (bound-and-true-p tree-sitter-mode)
               (setq tree-sitter-tree nil)
               (tree-sitter--do-parse))))
 
