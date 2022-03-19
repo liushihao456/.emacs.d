@@ -104,7 +104,8 @@
                     '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
                     '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
                     " "
-                    '(:eval (format "[%s]" (substring vc-mode 1)))
+                    '(:eval (cond (vc-mode (format "[%s]" (substring vc-mode 1)))
+                                  (t nil)))
                     " "
                     my/flycheck-mode-line
                     " "
