@@ -172,12 +172,12 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (menu-bar-mode -1)
 (when (functionp 'set-scroll-bar-mode) (set-scroll-bar-mode nil))
 (show-paren-mode t)
-(define-advice show-paren-function (:around (fn) fix)
-  "Highlight enclosing parens."
-  (cond ((looking-at-p "\\s(") (funcall fn))
-        (t (save-excursion
-             (ignore-errors (backward-up-list))
-             (funcall fn)))))
+;; (define-advice show-paren-function (:around (fn) fix)
+;;   "Highlight enclosing parens."
+;;   (cond ((looking-at-p "\\s(") (funcall fn))
+;;         (t (save-excursion
+;;              (ignore-errors (backward-up-list))
+;;              (funcall fn)))))
 (setq split-width-threshold 120)
 (setq-default tab-width 4)
 (tool-bar-mode -1)
