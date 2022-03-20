@@ -61,15 +61,18 @@ This command does not push text to `kill-ring'."
 (global-set-key (kbd "M-d") 'my/delete-word)
 (global-set-key (kbd "M-DEL") 'my/backward-delete-word)
 
-(defun scroll-half-page-down ()
-  "Scroll down half the page."
+(defun scroll-half-page-down (fun &rest args)
+  "Wrapper around scroll-down-command: scroll down half the page."
   (interactive)
   (scroll-down (/ (window-body-height) 2)))
 
-(defun scroll-half-page-up ()
-  "Scroll up half the page."
+(defun scroll-half-page-up (fun &rest args)
+  "Wrapper around scroll-up-command: scroll up half the page."
   (interactive)
   (scroll-up (/ (window-body-height) 2)))
+
+(advice-add 'scroll-up-command :around 'scroll-half-page-up)
+(advice-add 'scroll-down-command :around 'scroll-half-page-down)
 
 (defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
@@ -193,14 +196,12 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 
 ;; Global key bindings
 (global-set-key (kbd "C--") 'undo)
-(global-set-key (kbd "C-v") 'scroll-half-page-up)
-(global-set-key (kbd "M-v") 'scroll-half-page-down)
 (global-set-key (kbd "C-c |") 'toggle-window-split)
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 (global-set-key (kbd "C-c f r") 'recentf-open-files)
 (global-set-key (kbd "C-c f f") 'find-file-at-point)
 (global-set-key (kbd "C-c p f") 'project-find-file)
-(global-set-key (kbd "C-c p s") 'project-search)
+;; (global-set-key (kbd "C-c p s") 'project-search)
 (global-set-key (kbd "C-c p r") 'project-find-regexp)
 (global-set-key (kbd "C-c p q") 'project-query-replace-regexp)
 (global-set-key (kbd "C-c `") 'fileloop-continue)
@@ -241,9 +242,6 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
                                          xref-find-definitions-other-window
                                          xref-find-definitions-other-frame
                                          xref-find-references)))
-;; Selectrum
-(selectrum-mode t)
-(selectrum-prescient-mode t)
 ;; Marginalia mode
 (marginalia-mode t)
 ;; Which-key: show key bindings below
