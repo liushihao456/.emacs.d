@@ -165,8 +165,14 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   "Check if Emacs is called with a file name in command line args."
   (> (length command-line-args) 1))
 (recentf-mode t)
-(unless (my/command-line-args-has-file-p)
-  (setq initial-buffer-choice 'recentf-open-files))
+;; (unless (my/command-line-args-has-file-p)
+;;   (setq initial-buffer-choice 'recentf-open-files))
+(dashboard-setup-startup-hook)
+(with-eval-after-load 'dashboard
+  (setq dashboard-center-content t)
+  (setq dashboard-set-heading-icons t)
+  (define-key dashboard-mode-map (kbd "n") 'widget-forward)
+  (define-key dashboard-mode-map (kbd "p") 'widget-backward))
 (with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)
 (setq enable-recursive-minibuffers t)
