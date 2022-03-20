@@ -74,27 +74,49 @@
         (match-string 1 buf-coding)
       buf-coding)))
 
-(setq my/flycheck-mode-line
-      '(:eval
-        (pcase flycheck-last-status-change
-          (`not-checked nil)
-          (`no-checker (propertize " -" 'face 'warning))
-          (`running (propertize " ✷" 'face 'success))
-          (`errored (propertize " !" 'face 'error))
-          (`finished
-           (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
-                  (no-errors (cdr (assq 'error error-counts)))
-                  (no-warnings (cdr (assq 'warning error-counts)))
-                  (face (cond (no-errors 'error)
-                              (no-warnings 'warning)
-                              (t 'success))))
-             (if error-counts
-                 (propertize (format "[%s/%s]" (or no-errors 0) (or no-warnings 0))
-                             'face face)
-               nil
+(defun my/vc-mode-line ()
+  "Render version control information in mode line."
+  (cond (vc-mode (format "[%s]" (substring vc-mode 1)))
+        (t nil)))
+
+(defun my/flycheck-mode-line ()
+  "Render flycheck information in mode line."
+  (if (boundp 'flycheck-last-status-change)
+      (pcase flycheck-last-status-change
+        (`not-checked nil)
+        (`no-checker (propertize " -" 'face 'warning))
+        (`running (propertize " ✷" 'face 'success))
+        (`errored (propertize " !" 'face 'error))
+        (`finished
+         (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
+                (no-errors (cdr (assq 'error error-counts)))
+                (no-warnings (cdr (assq 'warning error-counts)))
+                (face (cond (no-errors 'error)
+                            (no-warnings 'warning)
+                            (t 'success))))
+           (if error-counts
+               (propertize (format "[%s/%s]" (or no-errors 0) (or no-warnings 0))
+                           'face face)
+             nil
              )))
-          (`interrupted " -")
-          (`suspicious '(propertize " ?" 'face 'warning)))))
+        (`interrupted " -")
+        (`suspicious '(propertize " ?" 'face 'warning)))
+    nil))
+
+(defun my/row-col-mode-line ()
+  "Render row and col information in mode line."
+  (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
+         (col (format-mode-line (list (propertize "%c" 'help-echo "Column number"))))
+         (row-col (format "[%s : %s] " row col))
+         (encoding (format "[%s]" (buffer-encoding-abbrev)))
+         (row-col-length (length row-col))
+         (encoding-length (+ row-col-length 1 (length encoding))))
+    (list
+     (tidy-modeline--fill encoding-length)
+     encoding
+     (tidy-modeline--fill row-col-length)
+     row-col
+     )))
 
 (setq-default mode-line-format
               (list "%e"
@@ -104,25 +126,13 @@
                     '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
                     '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
                     " "
-                    '(:eval (cond (vc-mode (format "[%s]" (substring vc-mode 1)))
-                                  (t nil)))
+                    '(:eval (my/vc-mode-line))
                     " "
-                    my/flycheck-mode-line
+                    '(:eval (my/flycheck-mode-line))
                     " "
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
                               (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
-                    '(:eval (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
-                                   (col (format-mode-line (list (propertize "%c" 'help-echo "Column number"))))
-                                   (row-col (format "[%s : %s] " row col))
-                                   (encoding (format "[%s]" (buffer-encoding-abbrev)))
-                                   (row-col-length (length row-col))
-                                   (encoding-length (+ row-col-length 1 (length encoding))))
-                              (list
-                               (tidy-modeline--fill encoding-length)
-                               encoding
-                               (tidy-modeline--fill row-col-length)
-                               row-col
-                               )))))
+                    '(:eval (my/row-col-mode-line))))
 
 ;; (doom-modeline-mode t)
 ;; (with-eval-after-load 'doom-modeline
