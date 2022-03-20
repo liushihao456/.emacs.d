@@ -16,8 +16,18 @@
 
 (add-to-list 'load-path (concat user-emacs-directory "config"))
 
+;; Work around a bug where esup tries to step into the byte-compiled
+;; version of `cl-lib', and fails horribly.
+(setq esup-depth 0)
+
+;; (define-advice define-obsolete-function-alias (:filter-args (ll) fix-obsolete)
+;;   (let ((obsolete-name (pop ll))
+;;         (current-name (pop ll))
+;;         (when (if ll (pop ll) "1"))
+;;         (docstring (if ll (pop ll) nil)))
+;;     (list obsolete-name current-name when docstring)))
 ;; (require 'benchmark-init)
-;; (benchmark-init/activate)
+;; ;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 ;; BASIC CUSTOMIZATION
@@ -33,7 +43,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(embark embark-consult consult doom-modeline marginalia company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode typescript-mode lsp-ui swift-mode kotlin-mode cdlatex writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet)))
+   '(esup dashboard embark embark-consult consult doom-modeline marginalia company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode typescript-mode lsp-ui swift-mode kotlin-mode cdlatex writeroom-mode web-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
