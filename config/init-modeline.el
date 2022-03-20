@@ -66,7 +66,6 @@
    'display `((space :align-to (- (+ center (0.5 . right-margin)) ,reserve
                                   (0.5 . left-margin))))))
 
-
 (defun buffer-encoding-abbrev ()
   "The line ending convention used in the buffer."
   (let ((buf-coding (format "%s" buffer-file-coding-system)))
@@ -85,7 +84,7 @@
       (pcase flycheck-last-status-change
         (`not-checked nil)
         (`no-checker (propertize " -" 'face 'warning))
-        (`running (propertize " ✷" 'face 'success))
+        (`running (propertize " ?" 'face 'success))
         (`errored (propertize " !" 'face 'error))
         (`finished
          (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
