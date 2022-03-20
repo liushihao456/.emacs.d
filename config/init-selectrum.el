@@ -1,0 +1,72 @@
+;;; init-selectrum.el --- Selectrum configurations	-*- lexical-binding: t -*-
+
+;; This file is not part of GNU Emacs.
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
+;;
+
+;;; Commentary:
+;;
+;; Miscellaneous configurations
+;; --------------------------------------
+
+;;; Code:
+
+(selectrum-mode t)
+(selectrum-prescient-mode t)
+
+(with-eval-after-load 'prescient
+  (setq prescient-filter-method '(literal regexp initialism fuzzy))
+  (setq prescient-sort-full-matches-first t))
+
+(global-set-key (kbd "C-.") 'embark-act)
+(global-set-key (kbd "C-q") 'embark-export)
+(with-eval-after-load 'embark
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
+  (eval-when-compile
+    (defmacro my/embark-split-action (fn split-type)
+      `(defun ,(intern (concat "my/embark-"
+                               (symbol-name fn)
+                               "-"
+                               (car (last  (split-string
+                                            (symbol-name split-type) "-"))))) ()
+         (interactive)
+         (funcall #',split-type)
+         (call-interactively #',fn))))
+
+  (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
+  (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
+  (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
+
+  (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
+  (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
+  (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
+  )
+
+(global-set-key (kbd "C-c p s") 'consult-ripgrep)
+(with-eval-after-load 'consult
+  (with-eval-after-load 'embark
+    (require 'embark-consult))
+  (setq consult-preview-key (kbd "C-o")))
+
+
+(provide 'init-selectrum)
+
+;;; init-selectrum.el ends here
