@@ -32,7 +32,10 @@
   (setq prescient-filter-method '(literal regexp initialism fuzzy))
   (setq prescient-sort-full-matches-first t))
 
-(global-set-key (kbd "C-.") 'embark-act)
+(with-eval-after-load 'selectrum
+  (define-key selectrum-minibuffer-map (kbd "C-j") 'embark-act))
+
+(global-set-key (kbd "C-j") 'embark-act)
 (global-set-key (kbd "C-q") 'embark-export)
 (with-eval-after-load 'embark
   ;; Hide the mode line of the Embark live/completions buffers
