@@ -88,9 +88,32 @@
 
 ;; (load-solarized-dark)
 ;; (load-zenburn)
-(load-spacemacs-theme)
+;; (load-spacemacs-theme)
 
-;; (load-theme 'solarized-light t)
+(defun load-base16-theme (&optional theme)
+  "Load base16 theme.
+
+If called with the optional arg THEME, then THEME is loaded, otherwise the theme
+in ``~/.vimrc_background'' which base16-shell produces is loaded.
+
+THEME could be a string or a symbol."
+  (if theme
+      (cond ((symbolp theme)
+             (load-theme theme t))
+            ((stringp theme)
+             (load-theme (intern theme) t)))
+    (with-temp-buffer
+      (insert-file-contents "~/.vimrc_background")
+      (save-match-data
+        (let ((theme1 (buffer-substring-no-properties (search-forward "colorscheme ") (point-at-eol))))
+          (message "Loaded %s theme" theme1)
+          (load-theme (intern theme1) t)))
+      )))
+
+(setq base16-theme-256-color-source 'base16-shell)
+(load-base16-theme)
+;; (load-base16-theme 'base16-zenburn)
+;; (load-base16-theme 'base16-solarized-dark)
 
 (unless (display-graphic-p)
   (set-face-background 'default "unspecified-bg"))

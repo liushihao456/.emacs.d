@@ -115,7 +115,10 @@ split; vice versa."
       (if this-win-is-2nd (other-window 1)))))
 
 (when (display-graphic-p)
-  (setq mac-command-modifier 'meta))
+  ;;; I prefer cmd key for meta
+  ;; (setq mac-command-modifier 'meta)
+  ;; (setq mac-option-modifier 'none)
+  )
 
 ;; Hide the startup message
 (setq inhibit-startup-message t)
@@ -139,13 +142,14 @@ split; vice versa."
 FONT-NAME is the font name (string); FONT-SIZE is the font size (number).
 
 Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
-    (let ((font (concat font-name "-" (number-to-string font-size) ":weight=medium")))
-      (add-to-list 'default-frame-alist `(font . ,font))
+    (let ((font (concat font-name "-" (number-to-string font-size))))
+      (set-frame-font font)
       (set-face-attribute 'fixed-pitch nil :family "unspecified" :font font)
       (set-face-attribute 'fixed-pitch-serif nil :family "unspecified" :font font)
       (set-face-attribute 'variable-pitch nil :family "unspecified" :font font)
       ))
-  (setq initial-frame-alist '((fullscreen . maximized)))
+  (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight)))
+  ;; (setq initial-frame-alist '((fullscreen . maximized)))
   ;; (setq
   ;;  mac-command-modifier 'meta
   ;;  mac-option-modifier 'none)
@@ -153,12 +157,14 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
   ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
   ;; (add-to-list 'default-frame-alist '(alpha-background . 90))
-  ;; (my/set-font "Source Code Pro" 16)
+  ;; (my/set-font "Source Code Pro" 18)
+  ;; (my/set-font "Monaco" 18)
   (my/set-font "Ubuntu Mono" 21)
-  ;; (setq-default line-spacing 0.2)
-  (setq face-font-rescale-alist `(("STkaiti" . ,(/ 16.0 13))))
+  ;; (require 'cnfonts)
+  (setq face-font-rescale-alist `(("STkaiti" . ,(/ 20.0 21))))
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
-  (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
+  (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
+  )
 
 ;; Open recent files list at Emacs start up
 (defun my/command-line-args-has-file-p ()
@@ -167,12 +173,16 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (recentf-mode t)
 ;; (unless (my/command-line-args-has-file-p)
 ;;   (setq initial-buffer-choice 'recentf-open-files))
+
 (dashboard-setup-startup-hook)
 (with-eval-after-load 'dashboard
+  (setq dashboard-items '((recents . 5) (bookmarks . 5)))
   (setq dashboard-center-content t)
   (setq dashboard-set-heading-icons t)
+  (setq dashboard-startup-banner 2)
   (define-key dashboard-mode-map (kbd "n") 'widget-forward)
   (define-key dashboard-mode-map (kbd "p") 'widget-backward))
+
 (with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)
 (setq enable-recursive-minibuffers t)
@@ -261,8 +271,16 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 ;; Markdown mode
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
+(with-eval-after-load 'markdown-mode
+  ;; (setq markdown-command "pandoc")
+  )
 
-
+;; Imenu-list mode
+(with-eval-after-load 'imenu-list
+  (setq imenu-list-idle-update-delay 0.1)
+  (setq imenu-list-auto-resize t)
+  (setq imenu-list-position 'left))
+(global-set-key (kbd "C-c l i") 'imenu-list-smart-toggle)
 
 (provide 'init-misc)
 
