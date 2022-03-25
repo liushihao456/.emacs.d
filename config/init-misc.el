@@ -208,7 +208,8 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (column-number-mode t)
 (setq scroll-margin 4)
 (setq scroll-conservatively 101)
-(pixel-scroll-precision-mode t)
+(if (display-graphic-p)
+    (pixel-scroll-precision-mode t))
 
 ;; Global key bindings
 (global-set-key (kbd "C--") 'undo)
@@ -217,6 +218,7 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (global-set-key (kbd "C-c f r") 'recentf-open-files)
 (global-set-key (kbd "C-c f f") 'find-file-at-point)
 (global-set-key (kbd "C-c p f") 'project-find-file)
+(global-set-key (kbd "C-c p p") 'project-switch-project)
 ;; (global-set-key (kbd "C-c p s") 'project-search)
 (global-set-key (kbd "C-c p r") 'project-find-regexp)
 (global-set-key (kbd "C-c p q") 'project-query-replace-regexp)
