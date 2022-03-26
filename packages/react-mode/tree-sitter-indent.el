@@ -56,11 +56,12 @@
 (require 'subr-x)
 (require 'tree-sitter)
 
-(defgroup tree-sitter-indent nil "Indent lines using Tree-sitter as backend"
+(defgroup tree-sitter-indent nil
+  "Indent lines using Tree-sitter as backend."
   :group 'tree-sitter)
 
 (defvar-local tree-sitter-indent-offset 4
-  "Indent offset to be used by major modes")
+  "Indent offset to be used by major modes.")
 
 (defvar-local tree-sitter-indent-current-scopes nil
   "Current scopes in use for tree-sitter-indent.")
@@ -147,7 +148,7 @@ POSITION is a byte position in buffer like \\(point-min\\)."
   (save-excursion
     (goto-char position)
     ;; maybe implement this as a cl-loop
-    (let* ((current-node (tree-sitter-node-at-point)))
+    (let* ((current-node (tree-sitter-node-at-pos)))
       ;; move upwards until we either don't have aparent node
       ;; or we moved out of line
       (while (and
