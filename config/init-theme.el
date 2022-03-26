@@ -110,10 +110,12 @@ THEME could be a string or a symbol."
           (load-theme (intern theme1) t)))
       )))
 
+;; (load-theme 'doom-one t)
 (setq base16-theme-256-color-source 'base16-shell)
 (load-base16-theme)
 ;; (load-base16-theme 'base16-zenburn)
 ;; (load-base16-theme 'base16-solarized-dark)
+(setq frame-background-mode 'dark)
 
 (unless (display-graphic-p)
   (set-face-background 'default "unspecified-bg"))

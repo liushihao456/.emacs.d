@@ -61,12 +61,12 @@ This command does not push text to `kill-ring'."
 (global-set-key (kbd "M-d") 'my/delete-word)
 (global-set-key (kbd "M-DEL") 'my/backward-delete-word)
 
-(defun scroll-half-page-down (fun &rest args)
+(defun scroll-half-page-down (&rest _)
   "Wrapper around scroll-down-command: scroll down half the page."
   (interactive)
   (scroll-down (/ (window-body-height) 2)))
 
-(defun scroll-half-page-up (fun &rest args)
+(defun scroll-half-page-up (&rest _)
   "Wrapper around scroll-up-command: scroll up half the page."
   (interactive)
   (scroll-up (/ (window-body-height) 2)))
@@ -77,8 +77,9 @@ This command does not push text to `kill-ring'."
 (defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
   (interactive)
-  (if (car (last (project-current)))
-      (let ((default-directory (car (last (project-current)))))
+  (require 'project)
+  (if (project-root (project-current))
+      (let ((default-directory (project-root (project-current))))
         (shell-command "open -a Terminal ."))
     (shell-command "open -a Terminal .")))
 
@@ -283,6 +284,27 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   (setq imenu-list-auto-resize t)
   (setq imenu-list-position 'left))
 (global-set-key (kbd "C-c l i") 'imenu-list-smart-toggle)
+
+;; Treemacs
+(global-set-key (kbd "M-z") 'treemacs)
+(with-eval-after-load 'treemacs
+  ;; Fixes compatibility with emacs trunk, where an additional item was added to the project-current list.
+  (defun my/treemacs--current-builtin-project-function (&rest _)
+    "Find the current project.el project."
+    (declare (side-effect-free t))
+    (-some-> (project-current) (project-root) (file-truename) (treemacs-canonical-path)))
+  ;; (advice-add 'treemacs--current-builtin-project-function :around #'my/treemacs--current-builtin-project-function)
+  (setq treemacs--find-user-project-functions (list #'my/treemacs--current-builtin-project-function))
+
+  (treemacs-follow-mode)
+  (treemacs-tag-follow-mode)
+  (treemacs-project-follow-mode)
+  (setq treemacs-tag-follow-delay 0.1)
+  (setq treemacs-project-follow-cleanup t)
+
+  (require 'doom-themes)
+  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config))
 
 (provide 'init-misc)
 
