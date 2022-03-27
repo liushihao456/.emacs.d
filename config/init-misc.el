@@ -292,9 +292,12 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   (setq treemacs-tag-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
 
-  (require 'doom-themes)
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config))
+  (if (display-graphic-p)
+    (progn
+      (require 'doom-themes)
+      (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+      (doom-themes-treemacs-config))
+    (treemacs-nerd-config)))
 
 (provide 'init-misc)
 

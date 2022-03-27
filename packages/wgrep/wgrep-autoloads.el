@@ -1,4 +1,4 @@
-;;; wgrep-autoloads.el --- automatically extracted autoloads
+;;; wgrep-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
 
@@ -14,7 +14,7 @@ Setup wgrep preparation." nil nil)
 
 (add-hook 'grep-setup-hook 'wgrep-setup)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep" '("wgrep-")))
+(register-definition-prefixes "wgrep" '("wgrep-"))
 
 ;;;***
 
@@ -29,7 +29,7 @@ Setup wgrep preparation." nil nil)
 
 (add-hook 'ack-mode-hook 'wgrep-ack-setup)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-ack" '("wgrep-ack-")))
+(register-definition-prefixes "wgrep-ack" '("wgrep-ack-"))
 
 ;;;***
 
@@ -40,7 +40,7 @@ Setup wgrep preparation." nil nil)
 
 (add-hook 'ag-mode-hook 'wgrep-ag-setup)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-ag" '("wgrep-ag-")))
+(register-definition-prefixes "wgrep-ag" '("wgrep-ag-"))
 
 ;;;***
 
@@ -53,7 +53,7 @@ Setup `wgrep-deadgrep' for `deadgrep'." nil nil)
 
 (add-hook 'deadgrep-finished-hook 'wgrep-deadgrep-setup)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-deadgrep" '("wgrep-deadgrep-")))
+(register-definition-prefixes "wgrep-deadgrep" '("wgrep-deadgrep-"))
 
 ;;;***
 
@@ -66,7 +66,7 @@ Setup `wgrep-deadgrep' for `deadgrep'." nil nil)
 
 (add-hook 'helm-occur-mode-hook 'wgrep-helm-setup)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-helm" '("wgrep-helm-")))
+(register-definition-prefixes "wgrep-helm" '("wgrep-helm-"))
 
 ;;;***
 
@@ -77,21 +77,21 @@ Setup `wgrep-deadgrep' for `deadgrep'." nil nil)
 
 (add-hook 'pt-search-mode-hook 'wgrep-pt-setup)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-pt" '("wgrep-pt-unload-function")))
+(register-definition-prefixes "wgrep-pt" '("wgrep-pt-unload-function"))
 
 ;;;***
 
 ;;;### (autoloads nil "wgrep-subtest" "wgrep-subtest.el" (0 0 0 0))
 ;;; Generated autoloads from wgrep-subtest.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-subtest" '("wgrep-test--ag")))
+(register-definition-prefixes "wgrep-subtest" '("wgrep-test--ag"))
 
 ;;;***
 
 ;;;### (autoloads nil "wgrep-test" "wgrep-test.el" (0 0 0 0))
 ;;; Generated autoloads from wgrep-test.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "wgrep-test" '("wgrep-test")))
+(register-definition-prefixes "wgrep-test" '("wgrep-test"))
 
 ;;;***
 
@@ -99,6 +99,6 @@ Setup `wgrep-deadgrep' for `deadgrep'." nil nil)
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
+;; coding: utf-8-emacs-unix
 ;; End:
 ;;; wgrep-autoloads.el ends here

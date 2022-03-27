@@ -1,4 +1,4 @@
-;;; prettier-js-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
+;;; autodoc-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
 
@@ -6,32 +6,32 @@
                          (or (file-name-directory #$) (car load-path))))
 
 
-;;;### (autoloads nil "prettier-js" "prettier-js.el" (0 0 0 0))
-;;; Generated autoloads from prettier-js.el
+;;;### (autoloads nil "autodoc" "autodoc.el" (0 0 0 0))
+;;; Generated autoloads from autodoc.el
 
-(autoload 'prettier-js "prettier-js" "\
-Format the current buffer according to the prettier tool." t nil)
+(autoload 'autodoc-generate-docstring "autodoc" "\
+Generate docstring skeleton." t nil)
 
-(autoload 'prettier-js-mode "prettier-js" "\
-Runs prettier on file save when this mode is turned on
+(autoload 'autodoc-mode "autodoc" "\
+Generates documentation automatically.
 
 This is a minor mode.  If called interactively, toggle the
-`Prettier-Js mode' mode.  If the prefix argument is positive,
-enable the mode, and if it is zero or negative, disable the mode.
+`Autodoc mode' mode.  If the prefix argument is positive, enable
+the mode, and if it is zero or negative, disable the mode.
 
 If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
 the mode if ARG is nil, omitted, or is a positive number.
 Disable the mode if ARG is a negative number.
 
 To check whether the minor mode is enabled in the current buffer,
-evaluate `prettier-js-mode'.
+evaluate `autodoc-mode'.
 
 The mode's hook is called both when the mode is enabled and when
 it is disabled.
 
 \(fn &optional ARG)" t nil)
 
-(register-definition-prefixes "prettier-js" '("prettier-js-"))
+(register-definition-prefixes "autodoc" '("autodoc-"))
 
 ;;;***
 
@@ -41,4 +41,4 @@ it is disabled.
 ;; no-update-autoloads: t
 ;; coding: utf-8-emacs-unix
 ;; End:
-;;; prettier-js-autoloads.el ends here
+;;; autodoc-autoloads.el ends here
