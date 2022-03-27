@@ -274,16 +274,6 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 ;; Markdown mode
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
-(with-eval-after-load 'markdown-mode
-  ;; (setq markdown-command "pandoc")
-  )
-
-;; Imenu-list mode
-(with-eval-after-load 'imenu-list
-  (setq imenu-list-idle-update-delay 0.1)
-  (setq imenu-list-auto-resize t)
-  (setq imenu-list-position 'left))
-(global-set-key (kbd "C-c l i") 'imenu-list-smart-toggle)
 
 ;; Treemacs
 (global-set-key (kbd "M-z") 'treemacs)
