@@ -41,6 +41,7 @@ process autoloads in subdirectories; instead we create an
 additional autoloads file of our own, and we load it from an
 autoloaded form."
   (interactive "sPackage name: \nDPackage directory: ")
+  (require 'autoload)
   (let* ((auto-name (format "%s-autoloads.el" pkg-name))
          (generated-autoload-file (expand-file-name auto-name pkg-dir))
          (autoload-timestamps nil)
@@ -49,7 +50,6 @@ autoloaded form."
     (when (file-exists-p generated-autoload-file)
       (delete-file generated-autoload-file))
     (message "Generating autoloads to file: %s" generated-autoload-file)
-    (require 'autoload)
     (write-region (autoload-rubric generated-autoload-file "package" nil) nil generated-autoload-file nil 'silent)
     (dolist (name (with-no-warnings
                     (append (list pkg-dir) (directory-files-recursively pkg-dir "" t))))
