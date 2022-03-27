@@ -291,6 +291,7 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   (treemacs-project-follow-mode)
   (setq treemacs-tag-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
+  (setq treemacs-follow-after-init t)
 
   (if (display-graphic-p)
     (progn
