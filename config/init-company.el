@@ -51,7 +51,7 @@
   ;; Yasnippet integration
   (require 'yasnippet)
   (global-set-key (kbd "C-]") 'company-yasnippet)
-  (defun smarter-yas-expand-next-field-complete ()
+  (defun my/smarter-yas-expand-next-field-complete ()
     "Try to `yas-expand' and `yas-next-field' at current cursor position.
 
 If failed try to complete the common part with `company-complete-common'"
@@ -67,8 +67,8 @@ If failed try to complete the common part with `company-complete-common'"
                        (eq old-tick (buffer-chars-modified-tick)))
               (company-complete-common))))
       (company-complete-common)))
-  (define-key company-active-map [tab] 'smarter-yas-expand-next-field-complete)
-  (define-key company-active-map (kbd "TAB") 'smarter-yas-expand-next-field-complete)
+  (define-key company-active-map [tab] 'my/smarter-yas-expand-next-field-complete)
+  (define-key company-active-map (kbd "TAB") 'my/smarter-yas-expand-next-field-complete)
 
   (defun company-backend-with-yas (backend)
     "Add `yasnippet' to company backend."
@@ -77,16 +77,16 @@ If failed try to complete the common part with `company-complete-common'"
       (append (if (consp backend) backend (list backend))
               '(:with company-yasnippet))))
 
-  (defun my-company-enbale-yas (&rest _)
+  (defun my/company-enable-yas (&rest _)
     "Enable `yasnippet' in `company'."
     (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
   ;; Enable in current backends
-  (my-company-enbale-yas)
+  (my/company-enable-yas)
   ;; Enable in `lsp-mode'
   (with-eval-after-load 'lsp-mode
-    (advice-add #'lsp--auto-configure :after #'my-company-enbale-yas))
+    (advice-add #'lsp--auto-configure :after #'my/company-enable-yas))
 
-  (defun my-company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
+  (defun my/company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
     "Enable yasnippet but disable it inline."
     (if (eq command 'prefix)
         (when-let ((prefix (funcall fun 'prefix)))
@@ -102,7 +102,28 @@ If failed try to complete the common part with `company-complete-common'"
             (put-text-property 0 len 'yas-annotation snip arg)
             (put-text-property 0 len 'yas-annotation-patch t arg)))
         (funcall fun command arg))))
-  (advice-add #'company-yasnippet :around #'my-company-yasnippet-disable-inline))
+  (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
+
+  ;; Copilot integration
+  (require 'copilot)
+
+  (defun my/yas-copilot-advice (fun &rest _)
+    "Call copilot first when yasnippet is available."
+    (if (bound-and-true-p copilot-mode)
+        (or (copilot-accept-completion)
+            (funcall fun))
+      (funcall fun)))
+  (advice-add #'yas-expand :around #'my/yas-copilot-advice)
+
+  (defun my/copilot-tab-company ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (my/smarter-yas-expand-next-field-complete)))
+
+  (delq 'company-preview-if-just-one-frontend company-frontends)
+  (define-key company-active-map [tab] 'my/copilot-tab-company)
+  (define-key company-active-map (kbd "TAB") 'my/copilot-tab-company)
+  )
 
 (provide 'init-company)
 

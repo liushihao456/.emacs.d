@@ -292,6 +292,7 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
   (setq treemacs-tag-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
   (setq treemacs-follow-after-init t)
+  (setq treemacs-width 30)
 
   (if (display-graphic-p)
     (progn
@@ -299,6 +300,9 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
       (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
       (doom-themes-treemacs-config))
     (treemacs-nerd-config)))
+
+;; Copilot
+(add-hook 'prog-mode-hook 'copilot-mode)
 
 (provide 'init-misc)
 

@@ -46,7 +46,8 @@
            (emmet-mode nil "emmet-mode")
            (anzu-mode nil "anzu")
            (tree-sitter-mode nil "tree-sitter")
-           (flycheck-mode nil "flycheck")))
+           (flycheck-mode nil "flycheck")
+           (copilot-mode nil "copilot")))
 
 ;; Tidy mode line
 (defun tidy-modeline--fill (reserve)
