@@ -28,7 +28,7 @@
 (defun java-compile-run-current-main-class ()
   "If the current java file contains main method, compile project and run it."
   (interactive)
-  (let* ((default-directory (cdr (project-current)))
+  (let* ((default-directory (project-root (project-current)))
          (file-class-name (file-name-base buffer-file-name))
          (compile-command
           (save-excursion
