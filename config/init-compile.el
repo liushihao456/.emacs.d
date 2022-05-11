@@ -28,7 +28,7 @@
 (defun my/compile-project ()
   "Compile the project."
   (interactive)
-  (let ((default-directory (cdr (project-current))))
+  (let ((default-directory (project-root (project-current))))
     (call-interactively 'compile)))
 (global-set-key (kbd "C-c m") 'my/compile-project)
 
