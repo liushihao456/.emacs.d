@@ -227,6 +227,7 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (global-set-key (kbd "C-c i") 'imenu)
 (global-set-key (kbd "C-x B") 'ibuffer)
 (global-set-key (kbd "C-x p") 'list-processes)
+(global-set-key (kbd "C-;") 'comment-line)
 (global-set-key (kbd "C-x ;") 'comment-line)
 (global-set-key (kbd "C-h F") 'describe-face)
 (global-set-key (kbd "M-n") 'scroll-up-line)
