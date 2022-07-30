@@ -198,7 +198,7 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 ;;         (t (save-excursion
 ;;              (ignore-errors (backward-up-list))
 ;;              (funcall fn)))))
-(setq split-width-threshold 120)
+(setq split-width-threshold 100)
 (setq-default tab-width 4)
 (tool-bar-mode -1)
 (setq-default truncate-lines t)
@@ -235,6 +235,8 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (global-set-key (kbd "M-'") 'switch-to-other-buffer)
 (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "M-`") 'kill-this-buffer)
+(global-set-key (kbd "M-e") 'forward-paragraph)
+(global-set-key (kbd "M-a") 'backward-paragraph)
 ;; Magit
 (global-set-key (kbd "C-c g") 'magit-status)
 ;; Expand region
