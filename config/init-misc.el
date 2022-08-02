@@ -306,6 +306,13 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 ;; Copilot
 (add-hook 'prog-mode-hook 'copilot-mode)
 
+;; Telega
+(with-eval-after-load 'telega
+  (setq telega-proxies
+        (list '(:server "127.0.0.1" :port 7890 :enable t
+                        :type (:@type "proxyTypeSocks5"))))
+  (setq telega-use-docker nil))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
