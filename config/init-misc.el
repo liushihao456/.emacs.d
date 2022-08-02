@@ -209,8 +209,6 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (column-number-mode t)
 (setq scroll-margin 4)
 (setq scroll-conservatively 101)
-(if (display-graphic-p)
-    (pixel-scroll-precision-mode t))
 
 ;; Global key bindings
 (global-set-key (kbd "C--") 'undo)
@@ -233,8 +231,9 @@ Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
 (global-set-key (kbd "M-n") 'scroll-up-line)
 (global-set-key (kbd "M-p") 'scroll-down-line)
 (global-set-key (kbd "M-'") 'switch-to-other-buffer)
+(global-set-key (kbd "C-M-'") 'kill-this-buffer)
 (global-set-key (kbd "M-o") 'other-window)
-(global-set-key (kbd "M-`") 'kill-this-buffer)
+(global-set-key (kbd "M-`") 'save-buffer)
 (global-set-key (kbd "M-e") 'forward-paragraph)
 (global-set-key (kbd "M-a") 'backward-paragraph)
 ;; Magit
