@@ -138,7 +138,7 @@ split; vice versa."
 ;; When in GUI, set fonts
 (when (display-graphic-p)
   (setq initial-frame-alist '((top . 1) (left . 1) (width . 100) (fullscreen . fullheight)))
-  (add-to-list 'default-frame-alist '(font. "Ubuntu Mono-21"))
+  (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-21"))
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 20.0 21))))
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
   (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
@@ -280,8 +280,8 @@ split; vice versa."
       (doom-themes-treemacs-config))
     (treemacs-nerd-config)))
 
-;; Copilot
-(add-hook 'prog-mode-hook 'copilot-mode)
+;; ;; Copilot
+;; (add-hook 'prog-mode-hook 'copilot-mode)
 
 ;; Telega
 (with-eval-after-load 'telega
