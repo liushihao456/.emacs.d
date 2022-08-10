@@ -277,6 +277,7 @@ split; vice versa."
     (progn
       (require 'doom-themes)
       (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+      (setq doom-themes-treemacs-enable-variable-pitch nil)
       (doom-themes-treemacs-config))
     (treemacs-nerd-config)))
 
