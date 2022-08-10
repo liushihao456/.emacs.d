@@ -281,8 +281,8 @@ split; vice versa."
       (doom-themes-treemacs-config))
     (treemacs-nerd-config)))
 
-;; ;; Copilot
-;; (add-hook 'prog-mode-hook 'copilot-mode)
+;; Copilot
+(add-hook 'prog-mode-hook 'copilot-mode)
 
 ;; Telega
 (with-eval-after-load 'telega

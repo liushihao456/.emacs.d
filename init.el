@@ -18,7 +18,6 @@
 
 (add-to-list 'load-path (concat user-emacs-directory "config"))
 
-
 ;; (define-advice define-obsolete-function-alias (:filter-args (ll) fix-obsolete)
 ;;   (let ((obsolete-name (pop ll))
 ;;         (current-name (pop ll))
@@ -53,8 +52,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(lsp-ui-doc-background ((t (:background "#272A36"))))
- '(web-mode-html-tag-bracket-face ((t (:inherit default)))))
+ '(lsp-ui-doc-background ((t (:background "#272A36")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                            Basic customizations                           ;;
