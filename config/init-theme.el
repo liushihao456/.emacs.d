@@ -112,9 +112,9 @@ THEME could be a string or a symbol."
 
 ;; (load-theme 'doom-one t)
 (setq base16-theme-256-color-source 'base16-shell)
-(load-base16-theme)
-;; (load-base16-theme 'base16-zenburn)
-;; (load-base16-theme 'base16-solarized-dark)
+(if (display-graphic-p)
+    (load-base16-theme 'base16-tomorrow-night-eighties)
+  (load-base16-theme))
 (setq frame-background-mode 'dark)
 
 (unless (display-graphic-p)
