@@ -137,31 +137,8 @@ split; vice versa."
 (add-hook 'help-mode-hook 'visual-line-mode)
 ;; When in GUI, set fonts
 (when (display-graphic-p)
-  (defun my/set-font (font-name font-size)
-    "Set font.
-
-FONT-NAME is the font name (string); FONT-SIZE is the font size (number).
-
-Check out https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html"
-    (let ((font (concat font-name "-" (number-to-string font-size))))
-      (set-frame-font font)
-      (set-face-attribute 'fixed-pitch nil :family "unspecified" :font font)
-      (set-face-attribute 'fixed-pitch-serif nil :family "unspecified" :font font)
-      (set-face-attribute 'variable-pitch nil :family "unspecified" :font font)
-      ))
-  (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight)))
-  ;; (setq initial-frame-alist '((fullscreen . maximized)))
-  ;; (setq
-  ;;  mac-command-modifier 'meta
-  ;;  mac-option-modifier 'none)
-  ;; Transparent frame
-  ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 90))
-  ;; (add-to-list 'default-frame-alist '(alpha . (85 . 90)))
-  ;; (add-to-list 'default-frame-alist '(alpha-background . 90))
-  ;; (my/set-font "Source Code Pro" 18)
-  ;; (my/set-font "Monaco" 18)
-  (my/set-font "Ubuntu Mono" 21)
-  ;; (require 'cnfonts)
+  (setq initial-frame-alist '((top . 1) (left . 1) (width . 100) (fullscreen . fullheight)))
+  (add-to-list 'default-frame-alist '(font. "Ubuntu Mono-21"))
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 20.0 21))))
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
   (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti"))
