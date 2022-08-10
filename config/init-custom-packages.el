@@ -26,7 +26,7 @@
 ;;; Code:
 
 (dolist (name (with-no-warnings
-                (append (directory-files-recursively "~/.config/emacs/packages/" "" t))))
+                (append (directory-files-recursively (concat user-emacs-directory "packages") "" t))))
   (when (and (file-regular-p name) (string-suffix-p "-autoloads.el" name))
     (load name)))
 
@@ -62,7 +62,7 @@ autoloaded form."
 (defun generate-autoloads-custom-packages ()
   "Generate autoloads for custom packages."
   (interactive)
-  (dolist (name (directory-files "~/.config/emacs/packages/" t))
+  (dolist (name (directory-files (concat user-emacs-directory "packages") t))
     (when (and (file-directory-p name) (not (string-suffix-p "." name)) (not (string-suffix-p ".." name)))
       (message "Generating autoloads for package %s..." (file-name-nondirectory (directory-file-name name)))
       (generate-recursive-autoloads (file-name-nondirectory (directory-file-name name)) name))))
