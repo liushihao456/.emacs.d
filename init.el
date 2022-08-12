@@ -59,11 +59,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'init-custom-packages)
+(require 'init-selectrum)
 (require 'init-misc)
 (require 'init-theme)
 (require 'init-meow)
 (require 'init-compile)
-(require 'init-selectrum)
 (require 'init-wgrep)
 (require 'init-modeline)
 (require 'init-flycheck)
