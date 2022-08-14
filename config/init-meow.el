@@ -90,7 +90,8 @@
    '("L" . meow-right-expand)
    '("m" . meow-join)
    '("n" . meow-search)
-   '("o" . meow-block)
+   ;; '("o" . meow-block)
+   '("o" . avy-goto-char-2)
    '("O" . meow-to-block)
    '("p" . meow-yank)
    '("q" . meow-quit)
@@ -147,11 +148,9 @@
                 (set-buffer-modified-p modified)
                 (meow--execute-kbd-macro "<escape>"))
             (push event unread-command-events)))))))
-
 (defun meow-two-char-exit-insert-state ()
   (interactive)
   (meow--two-char-exit-insert-state meow-two-char-escape-sequence))
-
 (define-key meow-insert-state-keymap (substring meow-two-char-escape-sequence 0 1)
   #'meow-two-char-exit-insert-state)
 
