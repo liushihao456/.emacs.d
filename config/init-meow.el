@@ -102,7 +102,6 @@
    '("t" . meow-till)
    '("u" . meow-undo)
    '("U" . meow-undo-in-selection)
-   '("v" . meow-visit)
    '("w" . meow-mark-word)
    '("W" . meow-mark-symbol)
    '("x" . meow-line)
@@ -110,7 +109,8 @@
    '("y" . meow-save)
    '("Y" . meow-sync-grab)
    '("z" . meow-reverse)
-   '("'" . repeat)
+   '("v" . scroll-up-command)
+   '("'" . scroll-down-command)
    '("/" . isearch-forward)
    '("<escape>" . ignore)))
 
