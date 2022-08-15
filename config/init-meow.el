@@ -60,7 +60,6 @@
    '("3" . meow-expand-3)
    '("2" . meow-expand-2)
    '("1" . meow-expand-1)
-   '(";" . comment-dwim)
    '("," . meow-inner-of-thing)
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
@@ -112,6 +111,8 @@
    '("'" . scroll-down-command)
    '("/" . isearch-forward)
    '("-" . meow-pop-selection)
+   '(";" . my/comment-dwim)
+   '(":" . comment-kill)
    '("<escape>" . ignore)))
 
 (require 'meow)
@@ -175,6 +176,14 @@
     (isearch-repeat (if isearch-forward 'forward))
     (ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
     (ad-activate 'isearch-search)))
+
+;; Custom comment function
+(defun my/comment-dwim (arg)
+  "If region active, comment the region, else comment the line."
+  (interactive "p")
+  (if mark-active
+      (comment-dwim nil)
+    (comment-line arg)))
 
 (provide 'init-meow)
 
