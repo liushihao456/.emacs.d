@@ -111,6 +111,7 @@
    '("Y" . meow-sync-grab)
    '("z" . meow-pop-selection)
    '("'" . repeat)
+   '("/" . isearch-forward)
    '("<escape>" . ignore)))
 
 (require 'meow)
