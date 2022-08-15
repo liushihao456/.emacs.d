@@ -130,6 +130,7 @@
 (global-set-key (kbd "C-x C-r") nil)
 (setq meow-cursor-type-insert 'box)
 
+;; Use jk to escape from insert state to normal state
 (setq meow-two-char-escape-sequence "jk")
 (setq meow-two-char-escape-delay 0.5)
 (defun meow--two-char-exit-insert-state (s)
@@ -153,6 +154,19 @@
   (meow--two-char-exit-insert-state meow-two-char-escape-sequence))
 (define-key meow-insert-state-keymap (substring meow-two-char-escape-sequence 0 1)
   #'meow-two-char-exit-insert-state)
+
+;; Isearch integration
+(defun meow--post-isearch-function ()
+  (unless isearch-mode-end-hook-quit
+    (when isearch-success
+      (let ((beg (car isearch-match-data))
+	    (end (cadr isearch-match-data)))
+	(thread-first
+	  (meow--make-selection '(select . visit)
+				beg
+				(if isearch-forward end isearch-other-end))
+	  (meow--select (not isearch-forward)))))))
+(add-hook 'isearch-mode-end-hook 'meow--post-isearch-function)
 
 (provide 'init-meow)
 
