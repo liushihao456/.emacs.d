@@ -258,18 +258,10 @@ split; vice versa."
 ;; Treemacs
 (global-set-key (kbd "M-z") 'treemacs)
 (with-eval-after-load 'treemacs
-  ;; Fixes compatibility with emacs trunk, where an additional item was added to the project-current list.
-  (defun my/treemacs--current-builtin-project-function (&rest _)
-    "Find the current project.el project."
-    (declare (side-effect-free t))
-    (-some-> (project-current) (project-root) (file-truename) (treemacs-canonical-path)))
-  ;; (advice-add 'treemacs--current-builtin-project-function :around #'my/treemacs--current-builtin-project-function)
-  (setq treemacs--find-user-project-functions (list #'my/treemacs--current-builtin-project-function))
-
   (treemacs-follow-mode)
-  (treemacs-tag-follow-mode)
   (treemacs-project-follow-mode)
-  (setq treemacs-tag-follow-delay 0.1)
+  (setq treemacs--project-follow-delay 0.1)
+  (setq treemacs-file-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
   (setq treemacs-follow-after-init t)
   (setq treemacs-width 30)
