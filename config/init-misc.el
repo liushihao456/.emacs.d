@@ -266,6 +266,12 @@ split; vice versa."
   (setq treemacs-follow-after-init t)
   (setq treemacs-width 30)
 
+  (defun my/treemacs-ignore-file-predicate (file _)
+    (or (string= file ".gitignore")
+        (string-suffix-p ".pyc" file)
+        (string= file "__pycache__")))
+  (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
+
   (if (display-graphic-p)
     (progn
       (require 'doom-themes)
@@ -275,7 +281,7 @@ split; vice versa."
     (treemacs-nerd-config)))
 
 ;; Copilot
-(add-hook 'prog-mode-hook 'copilot-mode)
+;; (add-hook 'prog-mode-hook 'copilot-mode)
 
 ;; Telega
 (with-eval-after-load 'telega
