@@ -131,6 +131,7 @@
 (global-set-key (kbd "C-h C-w") nil)
 (global-set-key (kbd "C-x C-r") nil)
 (setq meow-cursor-type-insert 'box)
+(setq meow-keypad-leader-dispatch "C-c")
 
 ;; Use jk to escape from insert state to normal state
 (setq meow-two-char-escape-sequence "jk")
