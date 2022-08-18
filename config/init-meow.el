@@ -150,7 +150,7 @@
               (progn
                 (backward-delete-char 1)
                 (set-buffer-modified-p modified)
-                (meow--execute-kbd-macro "<escape>"))
+                (meow-insert-exit))
             (push event unread-command-events)))))))
 (defun meow-two-char-exit-insert-state ()
   (interactive)
@@ -185,6 +185,18 @@
   (if mark-active
       (comment-dwim nil)
     (comment-line arg)))
+
+;; If there are only whitespaces at the current line when escaping from insert
+;; mode, delete them
+(defun my/meow-escape-advice (&rest _)
+  "If there are only whitespaces at the current line when escaping from insert
+mode, delete them."
+  (let* ((bol (line-beginning-position))
+         (eol (line-end-position))
+         (line-string (buffer-substring-no-properties bol eol)))
+    (when (string-blank-p line-string)
+      (delete-horizontal-space))))
+(advice-add #'meow-insert-exit :before #'my/meow-escape-advice)
 
 (provide 'init-meow)
 
