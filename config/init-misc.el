@@ -137,6 +137,8 @@ split; vice versa."
 (add-hook 'help-mode-hook 'visual-line-mode)
 ;; When in GUI, set fonts
 (when (display-graphic-p)
+  (when (fboundp 'pixel-scroll-precision-mode)
+    (pixel-scroll-precision-mode))
   (setq initial-frame-alist '((top . 1) (left . 1) (width . 100) (fullscreen . fullheight)))
   (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-21"))
   (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
