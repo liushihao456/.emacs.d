@@ -151,6 +151,29 @@ Entered on %T")
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
   )
 
+(with-eval-after-load 'org-roam
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "C-c n t") 'org-roam-tag-add)
+    (define-key org-mode-map (kbd "C-c n o") 'org-id-get-create)
+    (define-key org-mode-map (kbd "C-c n a") 'org-roam-alias-add)
+    (define-key org-mode-map (kbd "C-c n i") 'org-roam-node-insert)
+    (define-key org-mode-map (kbd "C-c n l") 'org-roam-buffer-toggle))
+  (org-roam-db-autosync-mode)
+  (setq org-roam-node-display-template
+        (concat "${title:*} "
+                (propertize "${tags:20}" 'face 'org-tag)))
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer))))
+(global-set-key (kbd "C-c n f") 'org-roam-node-find)
+(global-set-key (kbd "C-c n r") 'org-roam-node-random)
+(global-set-key (kbd "C-c n g") 'org-roam-graph)
+(global-set-key (kbd "C-c n c") 'org-roam-capture)
+(global-set-key (kbd "C-c n j") 'org-roam-dailies-capture-today)
+
 (provide 'init-org)
 
 ;;; init-org.el ends here
