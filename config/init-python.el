@@ -36,6 +36,7 @@
       (erase-buffer)
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
       (goto-char old-point)))
+  (define-key python-mode-map (kbd "C-c C-l") nil)
   (define-key python-mode-map (kbd "<f5>") 'my/format-buffer))
 
 (with-eval-after-load 'lsp-python-ms
