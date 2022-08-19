@@ -162,6 +162,10 @@ Entered on %T")
   (setq org-roam-node-display-template
         (concat "${title:*} "
                 (propertize "${tags:20}" 'face 'org-tag)))
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "${slug}.org" "#+title: ${title}\n")
+           :unnarrowed)))
   (add-to-list 'display-buffer-alist
                '("\\*org-roam\\*"
                  (display-buffer-in-direction)

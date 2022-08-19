@@ -36,3 +36,6 @@ transient/
 /projects
 /eln-cache/
 *-autoloads.el
+/server/
+/org-roam.db
+/.org-id-locations
