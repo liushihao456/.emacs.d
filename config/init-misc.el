@@ -25,6 +25,9 @@
 
 ;;; Code:
 
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize))
+
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
   "When called interactively with no active region, kill a single line instead."
@@ -140,7 +143,7 @@ split; vice versa."
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode))
   (setq initial-frame-alist '((top . 1) (left . 1) (width . 100) (fullscreen . fullheight)))
-  (add-to-list 'default-frame-alist '(font . "Ubuntu Mono-21"))
+  (add-to-list 'default-frame-alist '(font . "Operator Mono-21"))
   (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
   (set-face-attribute 'fixed-pitch-serif nil :family "Ubuntu Mono")
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 20.0 21))))

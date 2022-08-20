@@ -36,7 +36,6 @@
   (if (display-graphic-p)
       (add-hook 'company-mode-hook 'company-box-mode)
     (add-hook 'company-mode-hook 'company-tip-mode))
-  ;; (company-tip-mode t)
   (setq completion-ignore-case t)
   (setq company-dabbrev-downcase nil)
   (setq-default company-frontends
