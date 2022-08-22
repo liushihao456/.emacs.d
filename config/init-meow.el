@@ -198,6 +198,17 @@ mode, delete them."
       (delete-horizontal-space))))
 (advice-add #'meow-insert-exit :before #'my/meow-escape-advice)
 
+;; Indent current line if it's empty after entering insert state
+(defun my/meow-indent-after-enter-insert (state &rest _)
+  "Indent current line if it's empty after entering insert STATE."
+  (when (eq state 'insert)
+    (let* ((bol (line-beginning-position))
+           (eol (line-end-position))
+           (line-string (buffer-substring-no-properties bol eol)))
+      (when (string-blank-p line-string)
+        (indent-according-to-mode)))))
+(advice-add #'meow--switch-state :after #'my/meow-indent-after-enter-insert)
+
 (provide 'init-meow)
 
 ;;; init-meow.el ends here
