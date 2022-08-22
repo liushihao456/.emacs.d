@@ -43,7 +43,8 @@
   (setq lsp-python-ms-cache "Library"))
 
 (with-eval-after-load 'lsp-pyright
-  (setq lsp-pyright-use-library-code-for-types nil))
+  ;; (setq lsp-pyright-use-library-code-for-types nil)
+  )
 
 (provide 'init-python)
 
