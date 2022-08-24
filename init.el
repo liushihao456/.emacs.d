@@ -15,6 +15,8 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
+(setq package-check-signature nil)
+
 (add-to-list 'load-path (concat user-emacs-directory "config"))
 
 ;; (define-advice define-obsolete-function-alias (:filter-args (ll) fix-obsolete)
