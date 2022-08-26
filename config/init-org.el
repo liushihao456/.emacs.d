@@ -63,12 +63,19 @@
 
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)
+(add-hook 'org-mode-hook
+          (lambda ()
+            (when (boundp 'electric-pair-inhibit-predicate)
+              (setq-local
+               electric-pair-inhibit-predicate
+               `(lambda (c)
+                  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c)))))))
 (with-eval-after-load 'org
-;;   (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-;;   (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
-;;   (add-to-list 'image-file-name-extensions "eps")
-;;   (setq org-image-actual-width '(400)) ; Prevent inline images being too big
-;;   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
+  ;; (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
+  ;; (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
+  ;; (add-to-list 'image-file-name-extensions "eps")
+  ;; (setq org-image-actual-width '(400)) ; Prevent inline images being too big
+  ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
   (setq org-adapt-indentation nil)
   (setq org-agenda-files
         '("~/Documents/Org-mode/capture/journals.org" "~/Documents/Org-mode/capture/tasks.org" "~/Documents/Org-mode/src/agenda-expressions.org"))
@@ -94,10 +101,10 @@ Entered on %T")
            "* %? %^g")))
   (setq org-log-done 'time)
 
-  (require 'ox-md)
-  (require 'ox-beamer)
+  ;; (require 'ox-md)
+  ;; (require 'ox-beamer)
   (setq org-highlight-latex-and-related '(native))
-;;   (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
+  ;; (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
   (add-to-list 'org-latex-packages-alist '("" "color")) ; Use listings package to export code blocks
