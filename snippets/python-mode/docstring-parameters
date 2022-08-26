@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: docstring-parameters
+# key: dp
+# --
+Parameters
+----------
+$0
