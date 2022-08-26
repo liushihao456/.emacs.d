@@ -24,6 +24,35 @@
 ;; --------------------------------------
 
 ;;; Code:
+(defun my/insert-pair-quotes (&optional arg)
+  "Enclose following ARG sexps in quotes."
+  (interactive "P")
+  (insert-pair arg ?\" ?\"))
+
+(defun my/insert-pair-single-quotes (&optional arg)
+  "Enclose following ARG sexps in single quotes."
+  (interactive "P")
+  (insert-pair arg ?\' ?\'))
+
+(defun my/insert-pair-backtick-quotes (&optional arg)
+  "Enclose following ARG sexps in backtick quotes."
+  (interactive "P")
+  (insert-pair arg ?\` ?\'))
+
+(defun my/insert-pair-square-brackets (&optional arg)
+  "Enclose following ARG sexps in square brackets."
+  (interactive "P")
+  (insert-pair arg ?\[ ?\]))
+
+(defun my/insert-pair-curly-braces (&optional arg)
+  "Enclose following ARG sexps in curly braces."
+  (interactive "P")
+  (insert-pair arg ?{ ?}))
+
+(defun my/insert-pair-chevrons (&optional arg)
+  "Enclose following ARG sexps in chevrons."
+  (interactive "P")
+  (insert-pair arg ?< ?>))
 
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -113,6 +142,17 @@
    '("-" . meow-pop-selection)
    '(";" . my/comment-dwim)
    '(":" . comment-kill)
+   '("P \(" . insert-parentheses)
+   '("P \)" . insert-parentheses)
+   '("P \"" . my/insert-pair-quotes)
+   '("P '" . my/insert-pair-single-quotes)
+   '("P `" . my/insert-pair-backtick-quotes)
+   '("P \[" . my/insert-pair-square-brackets)
+   '("P \]" . my/insert-pair-square-brackets)
+   '("P {" . my/insert-pair-curly-braces)
+   '("P }" . my/insert-pair-curly-braces)
+   '("P <" . my/insert-pair-chevrons)
+   '("P >" . my/insert-pair-chevrons)
    '("<escape>" . ignore)))
 
 (require 'meow)
