@@ -120,7 +120,7 @@
    '("o" . avy-goto-char-2)
    '("O" . meow-block)
    '("p" . meow-yank)
-   '("q" . meow-quit)
+   ;; '("q" . meow-quit)
    '("Q" . meow-goto-line)
    '("r" . meow-replace)
    '("R" . meow-swap-grab)
