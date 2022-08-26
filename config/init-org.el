@@ -61,8 +61,6 @@
       (capitalize-word 1)
       (buffer-substring start end))))
 
-(global-set-key (kbd "C-c c") 'org-capture)
-(global-set-key (kbd "C-c a") 'org-agenda)
 (add-hook 'org-mode-hook
           (lambda ()
             (when (boundp 'electric-pair-inhibit-predicate)
@@ -77,13 +75,32 @@
   ;; (setq org-image-actual-width '(400)) ; Prevent inline images being too big
   ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
   (setq org-adapt-indentation nil)
-  (setq org-agenda-files
-        '("~/Documents/Org-mode/capture/journals.org" "~/Documents/Org-mode/capture/tasks.org" "~/Documents/Org-mode/src/agenda-expressions.org"))
-  (setq org-agenda-span 'day)
-  (setq org-agenda-time-grid
-        '((daily today require-timed)
-          (300 600 900 1200 1500 1800 2100 2400)
-          "......" "----------------"))
+  (setq org-highlight-latex-and-related '(native))
+  ;; (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (C . t)
+     (js . t)
+     (ditaa . t)
+     (dot . t)
+     (org . t)
+     (shell . t)
+     (latex . t)
+     (R . t)
+     (gnuplot . t)))
+  ;; (setq org-preview-latex-default-process 'imagemagick)
+  ;; (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+  ;;                                              ("begin" "$1" "$" "$$" "\\(" "\\[")))
+  (setq org-src-window-setup 'current-window)
+  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
+  (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
+  (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
+  )
+
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(with-eval-after-load 'org-capture
   (setq org-capture-templates
         '(("t" "Todo list item" entry
            (file "~/Documents/Org-mode/capture/tasks.org")
@@ -98,13 +115,24 @@ Entered on %T")
            "* %?")
           ("p" "Programming notes" entry
            (file "~/Documents/Org-mode/notes/prog-notes.org")
-           "* %? %^g")))
-  (setq org-log-done 'time)
+           "* %? %^g"))))
+(with-eval-after-load 'org-agenda
+  (setq org-agenda-files
+        '("~/Documents/Org-mode/capture/journals.org"
+          "~/Documents/Org-mode/capture/tasks.org"
+          "~/Documents/Org-mode/src/agenda-expressions.org"))
+  (setq org-agenda-span 'day)
+  (setq org-agenda-time-grid
+        '((daily today require-timed)
+          (300 600 900 1200 1500 1800 2100 2400)
+          "......" "----------------"))
+  (setq org-log-done 'time))
 
-  ;; (require 'ox-md)
-  ;; (require 'ox-beamer)
-  (setq org-highlight-latex-and-related '(native))
-  ;; (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
+(with-eval-after-load 'ox
+  (require 'ox-md)
+  (require 'ox-beamer))
+
+(with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
   (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
   (add-to-list 'org-latex-packages-alist '("" "color")) ; Use listings package to export code blocks
@@ -135,28 +163,7 @@ Entered on %T")
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          ))
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (C . t)
-     (js . t)
-     (ditaa . t)
-     (dot . t)
-     (org . t)
-     (shell . t)
-     (latex . t)
-     (R . t)
-     (gnuplot . t)
-     ))
-  ;; (setq org-preview-latex-default-process 'imagemagick)
-  ;; (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-  ;;                                              ("begin" "$1" "$" "$$" "\\(" "\\[")))
-  (setq org-src-window-setup 'current-window)
-  (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
-  (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
-  (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-  )
+          )))
 
 (with-eval-after-load 'org-roam
   (with-eval-after-load 'org
