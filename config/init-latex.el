@@ -33,10 +33,17 @@
   (setq reftex-plug-into-AUCTeX t)
   (add-hook 'LaTeX-mode-hook 'reftex-mode)
   ;; (add-hook 'LaTeX-mode-hook 'cdlatex-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (setq font-latex-fontify-sectioning 'color)
   (setq-default TeX-master nil))
+
+(with-eval-after-load 'font-latex
+  (set-face-attribute 'font-latex-slide-title-face
+                      nil
+                      :height 'unspecified
+                      :weight 'unspecified
+                      :inherit 'font-lock-type-face))
 
 
 (provide 'init-latex)
