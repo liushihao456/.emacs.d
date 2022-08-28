@@ -67,6 +67,19 @@
 (with-eval-after-load 'consult
   (with-eval-after-load 'embark
     (require 'embark-consult))
+
+  ;; Start consult-ripgrep search with active region or symbol at point
+  (defun my/consult-ripgrep-initial-input-advice (consult-fn &optional dir given-initial)
+    "Advising function around CONSULT-FN.
+
+DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
+    (interactive)
+    (let ((initial (list (or given-initial
+                             (when (use-region-p)
+                               (buffer-substring-no-properties (region-beginning) (region-end)))
+                             (thing-at-point 'symbol t)))))
+      (apply consult-fn dir initial)))
+  (advice-add #'consult-ripgrep :around #'my/consult-ripgrep-initial-input-advice)
   (setq consult-preview-key (kbd "C-o")))
 
 
