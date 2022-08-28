@@ -150,11 +150,10 @@ split; vice versa."
   (set-fontset-font t 'han      (font-spec :family "STkaiti"))
   (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
 
-;; Open recent files list at Emacs start up
-(defun my/command-line-args-has-file-p ()
-  "Check if Emacs is called with a file name in command line args."
-  (> (length command-line-args) 1))
-(recentf-mode t)
+;; ;; Open recent files list at Emacs start up
+;; (defun my/command-line-args-has-file-p ()
+;;   "Check if Emacs is called with a file name in command line args."
+;;   (> (length command-line-args) 1))
 ;; (unless (my/command-line-args-has-file-p)
 ;;   (setq initial-buffer-choice 'recentf-open-files))
 
@@ -197,11 +196,9 @@ split; vice versa."
 (global-set-key (kbd "C--") 'undo)
 (global-set-key (kbd "C-c |") 'toggle-window-split)
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
-(global-set-key (kbd "C-c f r") 'recentf-open-files)
 (global-set-key (kbd "C-c f f") 'find-file-at-point)
 (global-set-key (kbd "C-c p f") 'project-find-file)
 (global-set-key (kbd "C-c p p") 'project-switch-project)
-;; (global-set-key (kbd "C-c p s") 'project-search)
 (global-set-key (kbd "C-c p r") 'project-find-regexp)
 (global-set-key (kbd "C-c p q") 'project-query-replace-regexp)
 (global-set-key (kbd "C-c `") 'fileloop-continue)
@@ -227,6 +224,17 @@ split; vice versa."
 ;; (global-set-key (kbd "M-`") 'writeroom-mode)
 ;; Cheat.sh
 (global-set-key (kbd "C-c M-s") 'cheat-sh-search)
+
+;; Provide completion for recent files
+(defun recentf-open-files-compl ()
+  "Find recentf files."
+  (interactive)
+  (let* ((tocpl (mapcar (lambda (x) (cons (file-name-nondirectory x) x))
+                        recentf-list))
+         (fname (completing-read "File name: " tocpl nil nil)))
+    (when fname
+      (find-file (cdr (assoc-string fname tocpl))))))
+(global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
 ;; Anzu - show match counts in mode line
 (global-anzu-mode t)
