@@ -27,16 +27,17 @@
 
 (with-eval-after-load 'latex
   (setq TeX-auto-save t)
-  (setq TeX-command-extra-options "-shell-escape")
-  (setq TeX-engine 'xetex)
   (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (setq TeX-complete-expert-commands t)
+  (setq-default TeX-command-extra-options "-shell-escape")
+  (setq-default TeX-engine 'xetex)
   (setq reftex-plug-into-AUCTeX t)
   (add-hook 'LaTeX-mode-hook 'reftex-mode)
   ;; (add-hook 'LaTeX-mode-hook 'cdlatex-mode)
   (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  (setq font-latex-fontify-sectioning 'color)
-  (setq-default TeX-master nil))
+  (setq font-latex-fontify-sectioning 'color))
 
 (with-eval-after-load 'font-latex
   (set-face-attribute 'font-latex-slide-title-face
