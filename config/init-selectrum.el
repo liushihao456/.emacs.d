@@ -65,6 +65,7 @@
   )
 
 (global-set-key (kbd "C-c p s") 'consult-ripgrep)
+(global-set-key (kbd "C-h a") 'consult-apropos)
 (with-eval-after-load 'consult
   (with-eval-after-load 'embark
     (require 'embark-consult))
