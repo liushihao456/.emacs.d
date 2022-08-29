@@ -30,8 +30,7 @@
 
 (with-eval-after-load 'prescient
   ;; Prescient filter method can be toggled during session via M-s a/f/...
-  ;; (setq prescient-filter-method '(literal regexp initialism fuzzy))
-  (setq prescient-filter-method '(literal regexp initialism))
+  (setq prescient-filter-method '(literal regexp initialism fuzzy))
   (setq prescient-sort-full-matches-first t))
 
 (with-eval-after-load 'selectrum
