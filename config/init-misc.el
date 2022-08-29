@@ -227,13 +227,24 @@ split; vice versa."
 
 ;; Provide completion for recent files
 (defun recentf-open-files-compl ()
-  "Find recentf files."
+  "Find recentf files with `completing-read'."
   (interactive)
-  (let* ((tocpl (mapcar (lambda (x) (cons (file-name-nondirectory x) x))
-                        recentf-list))
-         (fname (completing-read "File name: " tocpl nil nil)))
+  (let* ((tocpl (mapcar
+                 (lambda (x)
+                   (propertize
+                    (file-name-nondirectory x)
+                    'selectrum--candidate-full x))
+                 recentf-list))
+         (fname (completing-read "File name: "
+                                 (lambda (str pred action)
+                                   (if (eq action 'metadata)
+                                       '(metadata (category . file))
+                                     (complete-with-action
+                                      action tocpl str pred))))))
     (when fname
-      (find-file (cdr (assoc-string fname tocpl))))))
+      (find-file
+       (or (get-text-property 0 'selectrum--candidate-full fname)
+           fname)))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
 ;; Anzu - show match counts in mode line
