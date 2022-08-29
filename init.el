@@ -17,7 +17,8 @@
 
 (setq package-check-signature nil)
 
-(add-to-list 'load-path (concat user-emacs-directory "config"))
+(add-to-list 'load-path (file-name-concat user-emacs-directory "config"))
+(setq custom-file (file-name-concat user-emacs-directory "config" "init-custom.el"))
 
 ;; (define-advice define-obsolete-function-alias (:filter-args (ll) fix-obsolete)
 ;;   (let ((obsolete-name (pop ll))
@@ -29,36 +30,7 @@
 ;; ;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
-;; BASIC CUSTOMIZATION
-;; --------------------------------------
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                       Variables customized by Custom                      ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(exec-path-from-shell org-roam meow telega all-the-icons editorconfig doom-themes base16-theme dashboard embark embark-consult consult doom-modeline marginalia company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode typescript-mode lsp-ui swift-mode kotlin-mode cdlatex writeroom-mode company-prescient deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company yasnippet-snippets which-key flycheck zenburn-theme yasnippet)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                         Faces customized by Custom                        ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(lsp-ui-doc-background ((t (:background "#272A36")))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                            Basic customizations                           ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(require 'init-custom)
 (require 'init-custom-packages)
 (require 'init-selectrum)
 (require 'init-misc)
