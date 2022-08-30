@@ -50,7 +50,7 @@
                                (yas-activate-extra-mode 'js-mode)
                                (yas-activate-extra-mode 'typescript-mode))))
 
-(add-hook 'mhtml-mode-hook (emmet-mode))
+(add-hook 'mhtml-mode-hook 'emmet-mode)
 (with-eval-after-load 'sgml-mode
   (setq sgml-basic-offset 4))
 
