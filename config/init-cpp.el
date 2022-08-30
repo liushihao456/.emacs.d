@@ -38,12 +38,20 @@ project in order for clangd to understand the project code."
   (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands))
 
 ;; Cmake
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/cmake")
-(autoload 'cmake-mode "/usr/local/share/emacs/site-lisp/cmake/cmake-mode.el" "Cmake mode autoload" t)
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-(with-eval-after-load 'cmake-mode
-  (setq cmake-tab-width 4))
+(when (executable-find "cmake")
+  (require 'dash)
+  (setq cmake-load-path (--> "cmake"
+                             (executable-find it)
+                             (file-truename it)
+                             (file-name-concat it ".." ".." "share" "emacs" "site-lisp")
+                             (file-truename it)))
+  (add-to-list 'load-path cmake-load-path)
+  (autoload 'cmake-mode (file-name-concat cmake-load-path "cmake-mode.el") "Cmake mode autoload" t)
+  (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
+  (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+  (with-eval-after-load 'cmake-mode
+    (setq cmake-tab-width 4))
+  )
 
 (provide 'init-cpp)
 
