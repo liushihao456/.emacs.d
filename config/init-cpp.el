@@ -46,12 +46,11 @@ project in order for clangd to understand the project code."
                              (file-name-concat it ".." ".." "share" "emacs" "site-lisp")
                              (file-truename it)))
   (add-to-list 'load-path cmake-load-path)
-  (autoload 'cmake-mode (file-name-concat cmake-load-path "cmake-mode.el") "Cmake mode autoload" t)
+  (autoload 'cmake-mode (file-name-concat cmake-load-path "cmake-mode.el") "Major mode for editing CMake listfiles." t)
   (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
   (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-  (with-eval-after-load 'cmake-mode
-    (setq cmake-tab-width 4))
-  )
+  (when (executable-find "cmake-language-server")
+    (add-hook 'cmake-mode-hook 'lsp)))
 
 (provide 'init-cpp)
 
