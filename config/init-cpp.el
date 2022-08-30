@@ -33,8 +33,9 @@ project in order for clangd to understand the project code."
     (interactive)
     (let ((default-directory (cdr (project-current))))
       (shell-command
-       (concat "cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
-               "\nln -s Debug/compile_commands.json"))))
+       (concat "cmake -G \"Unix Makefiles\" -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+               " && mv Debug/compile_commands.json compile_commands.json"
+               " && rm -rf Debug"))))
   (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands))
 
 ;; Cmake

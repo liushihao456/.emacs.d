@@ -31,7 +31,7 @@
 (defun add-pcomplete-to-capf ()
   (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
 (add-hook 'org-mode-hook #'add-pcomplete-to-capf) ; Enable org mode completion
-;; (add-hook 'org-mode-hook (lambda () (electric-pair-local-mode -1)))
+
 ;; Sunrise and Sunset
 (defun diary-sunrise ()
   (let ((dss (diary-sunrise-sunset)))
@@ -133,37 +133,14 @@ Entered on %T")
   (require 'ox-beamer))
 
 (with-eval-after-load 'ox-latex
-  (add-to-list 'org-latex-packages-alist '("" "xeCJK"))
-  (add-to-list 'org-latex-packages-alist '("" "listings")) ; Use listings package to export code blocks
-  (add-to-list 'org-latex-packages-alist '("" "color")) ; Use listings package to export code blocks
-  (setq org-latex-listings 'listings)
-  (add-to-list 'org-latex-classes '("ctexart" "\\documentclass[11pt]{ctexart}
-\\ctexset{section/format=\\Large\\bfseries}"
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  (add-to-list 'org-latex-classes '("ctexrep" "\\documentclass[11pt]{ctexrep}
-\\ctexset{section/format=\\Large\\bfseries}"
-                                    ("\\part{%s}" . "\\part*{%s}")
-                                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-  (add-to-list 'org-latex-classes '("ctexbook" "\\documentclass[11pt]{ctexbook}"
-                                    ("\\part{%s}" . "\\part*{%s}")
-                                    ("\\chapter{%s}" . "\\chapter*{%s}")
-                                    ("\\section{%s}" . "\\section*{%s}")
-                                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-packages-alist '("UTF8" "ctex"))
+  (add-to-list 'org-latex-packages-alist '("" "minted")) ; use minted for code blocks
+  (setq org-latex-listings 'minted)
   (setq org-latex-compiler "xelatex")
   (setq org-latex-pdf-process
-        '(;; "latexmk -pdflatex=xelatex -pdf -shell-escape %f"
+        '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          )))
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
 
 (with-eval-after-load 'org-roam
   (with-eval-after-load 'org
