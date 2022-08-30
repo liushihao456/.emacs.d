@@ -40,11 +40,11 @@ project in order for clangd to understand the project code."
 ;; Cmake
 (when (executable-find "cmake")
   (require 'dash)
-  (setq cmake-load-path (--> "cmake"
-                             (executable-find it)
-                             (file-truename it)
-                             (file-name-concat it ".." ".." "share" "emacs" "site-lisp")
-                             (file-truename it)))
+  (setq cmake-load-path (-> "cmake"
+                             (executable-find)
+                             (file-truename)
+                             (file-name-concat ".." ".." "share" "emacs" "site-lisp")
+                             (file-truename)))
   (add-to-list 'load-path cmake-load-path)
   (autoload 'cmake-mode (file-name-concat cmake-load-path "cmake-mode.el") "Major mode for editing CMake listfiles." t)
   (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
