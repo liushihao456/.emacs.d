@@ -75,8 +75,8 @@ typing or company is active."
   (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
 
   (set-face-background 'lsp-ui-doc-background "#272A36")
-  (set-face-background 'lsp-ui-sideline-code-action "unspecified-bg")
-  (set-face-background 'lsp-ui-sideline-symbol "unspecified-bg"))
+  (set-face-background 'lsp-ui-sideline-code-action 'unspecified)
+  (set-face-background 'lsp-ui-sideline-symbol 'unspecified))
 
 (add-hook 'emacs-lisp-mode-hook 'lsp-ui-mode)
 

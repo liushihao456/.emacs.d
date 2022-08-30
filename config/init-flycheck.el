@@ -59,9 +59,9 @@ subsequent movements."
 
   (setq-default flycheck-emacs-lisp-load-path 'inherit)
 
-  (set-face-background 'flycheck-warning "unspecified-bg")
-  (set-face-background 'flycheck-error "unspecified-bg")
-  (set-face-background 'flycheck-info "unspecified-bg"))
+  (set-face-background 'flycheck-warning 'unspecified)
+  (set-face-background 'flycheck-error 'unspecified)
+  (set-face-background 'flycheck-info 'unspecified))
 
 (provide 'init-flycheck)
 

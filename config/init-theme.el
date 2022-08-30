@@ -118,7 +118,7 @@ THEME could be a string or a symbol."
 (setq frame-background-mode 'dark)
 
 (unless (display-graphic-p)
-  (set-face-background 'default "unspecified-bg"))
+  (set-face-background 'default 'unspecified))
 
 (provide 'init-theme)
 
