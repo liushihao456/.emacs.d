@@ -1,4 +1,4 @@
-;;; init-selectrum.el --- Selectrum configurations	-*- lexical-binding: t -*-
+;;; init-minibuffer.el --- Minibuffer configurations	-*- lexical-binding: t -*-
 
 ;; This file is not part of GNU Emacs.
 ;;
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 ;;
-;; Miscellaneous configurations
+;; Minibuffer configurations.
 ;; --------------------------------------
 
 ;;; Code:
@@ -85,6 +85,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (setq consult-preview-key (kbd "C-o")))
 
 
-(provide 'init-selectrum)
+(provide 'init-minibuffer)
 
-;;; init-selectrum.el ends here
+;;; init-minibuffer.el ends here

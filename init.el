@@ -32,7 +32,7 @@
 
 (require 'init-custom)
 (require 'init-custom-packages)
-(require 'init-selectrum)
+(require 'init-minibuffer)
 (require 'init-misc)
 (require 'init-theme)
 (require 'init-meow)
