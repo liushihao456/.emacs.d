@@ -25,9 +25,11 @@
 
 ;;; Code:
 
-(dolist (name (with-no-warnings
-                (append (directory-files-recursively (file-name-concat user-emacs-directory "packages") "" t))))
-  (when (and (file-regular-p name) (string-suffix-p "-autoloads.el" name))
+(dolist (name
+         (with-no-warnings
+           (append (directory-files-recursively
+                    (file-name-concat user-emacs-directory "packages") "" t))))
+  (if (and (file-regular-p name) (string-suffix-p "-autoloads.el" name))
     (load name)))
 
 (defun generate-recursive-autoloads (pkg-name pkg-dir)
@@ -50,9 +52,12 @@ autoloaded form."
     (when (file-exists-p generated-autoload-file)
       (delete-file generated-autoload-file))
     (message "Generating autoloads to file: %s" generated-autoload-file)
-    (write-region (autoload-rubric generated-autoload-file "package" nil) nil generated-autoload-file nil 'silent)
-    (dolist (name (with-no-warnings
-                    (append (list pkg-dir) (directory-files-recursively pkg-dir "" t))))
+    (write-region (autoload-rubric generated-autoload-file "package" nil)
+                  nil generated-autoload-file nil 'silent)
+    (dolist (name
+             (with-no-warnings
+               (append (list pkg-dir)
+                       (directory-files-recursively pkg-dir "" t))))
       (when (file-directory-p name)
         (message "Generating autoloads for directory: %s..." name)
         (update-directory-autoloads name)))
@@ -60,12 +65,18 @@ autoloaded form."
       (when buf (kill-buffer buf)))))
 
 (defun generate-autoloads-custom-packages ()
-  "Generate autoloads for custom packages."
+  "Generate autoloads for all custom packages."
   (interactive)
-  (dolist (name (directory-files (file-name-concat user-emacs-directory "packages") t))
-    (when (and (file-directory-p name) (not (string-suffix-p "." name)) (not (string-suffix-p ".." name)))
-      (message "Generating autoloads for package %s..." (file-name-nondirectory (directory-file-name name)))
-      (generate-recursive-autoloads (file-name-nondirectory (directory-file-name name)) name))))
+  (dolist
+      (name
+       (directory-files (file-name-concat user-emacs-directory "packages") t))
+    (when (and (file-directory-p name)
+               (not (string-suffix-p "." name))
+               (not (string-suffix-p ".." name)))
+      (message "Generating autoloads for package %s..."
+               (file-name-nondirectory (directory-file-name name)))
+      (generate-recursive-autoloads
+       (file-name-nondirectory (directory-file-name name)) name))))
 
 (provide 'init-custom-packages)
 

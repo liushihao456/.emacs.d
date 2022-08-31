@@ -61,6 +61,7 @@ With argument ARG, do this that many times.
 This command does not push text to `kill-ring'."
   (interactive "p")
   (my/delete-word (- arg)))
+
 (global-set-key (kbd "M-d") 'my/delete-word)
 (global-set-key (kbd "M-DEL") 'my/backward-delete-word)
 
@@ -216,8 +217,6 @@ split; vice versa."
 (global-set-key (kbd "C-c g") 'magit-status)
 ;; Expand region
 (global-set-key (kbd "C-\\") 'er/expand-region)
-;; Writeroom mode
-;; (global-set-key (kbd "M-`") 'writeroom-mode)
 
 ;; Anzu - show match counts in mode line
 (global-anzu-mode t)

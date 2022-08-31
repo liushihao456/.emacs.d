@@ -51,7 +51,8 @@
 
 ;; Tidy mode line
 (defun tidy-modeline--fill (reserve)
-  "Return empty space leaving RESERVE space on the right.  Adapted from powerline.el."
+  "Return empty space leaving RESERVE space on the right.
+Adapted from powerline.el."
   (let ((real-reserve (if (and window-system (eq 'right (get-scroll-bar-mode)))
                           (- reserve 3)
                         reserve)))
@@ -61,7 +62,8 @@
 
 
 (defun tidy-modeline--fill-center (reserve)
-  "Return empty space leaving RESERVE space on the right in order to center a string.  Adapted from powerline.el."
+  "Return empty space leaving RESERVE space on the right in order to center a string.
+Adapted from powerline.el."
   (propertize
    " "
    'display `((space :align-to (- (+ center (0.5 . right-margin)) ,reserve
