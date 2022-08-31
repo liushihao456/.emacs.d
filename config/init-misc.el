@@ -64,18 +64,14 @@ This command does not push text to `kill-ring'."
 (global-set-key (kbd "M-d") 'my/delete-word)
 (global-set-key (kbd "M-DEL") 'my/backward-delete-word)
 
-(defun scroll-half-page-down (&rest _)
-  "Wrapper around scroll-down-command: scroll down half the page."
+(defun my/scroll-half-page-advice (fn &rest _)
+  "Wrapper around scroll command to scroll only half the page.
+FN is the original command."
   (interactive)
-  (scroll-down (/ (window-body-height) 2)))
+  (funcall fn (/ (window-body-height) 2)))
 
-(defun scroll-half-page-up (&rest _)
-  "Wrapper around scroll-up-command: scroll up half the page."
-  (interactive)
-  (scroll-up (/ (window-body-height) 2)))
-
-(advice-add 'scroll-up-command :around 'scroll-half-page-up)
-(advice-add 'scroll-down-command :around 'scroll-half-page-down)
+(advice-add #'scroll-up-command :around #'my/scroll-half-page-advice)
+(advice-add #'scroll-down-command :around #'my/scroll-half-page-advice)
 
 (defun my/open-external-terminal-project-root ()
   "Open an external Terminal window under current directory."
