@@ -222,30 +222,6 @@ split; vice versa."
 (global-set-key (kbd "C-\\") 'er/expand-region)
 ;; Writeroom mode
 ;; (global-set-key (kbd "M-`") 'writeroom-mode)
-;; Cheat.sh
-(global-set-key (kbd "C-c M-s") 'cheat-sh-search)
-
-;; Provide completion for recent files
-(defun recentf-open-files-compl ()
-  "Find recentf files with `completing-read'."
-  (interactive)
-  (let* ((tocpl (mapcar
-                 (lambda (x)
-                   (propertize
-                    (file-name-nondirectory x)
-                    'selectrum--candidate-full x))
-                 recentf-list))
-         (fname (completing-read "File name: "
-                                 (lambda (str pred action)
-                                   (if (eq action 'metadata)
-                                       '(metadata (category . file))
-                                     (complete-with-action
-                                      action tocpl str pred))))))
-    (when fname
-      (find-file
-       (or (get-text-property 0 'selectrum--candidate-full fname)
-           fname)))))
-(global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
 ;; Anzu - show match counts in mode line
 (global-anzu-mode t)
@@ -265,8 +241,6 @@ split; vice versa."
                                          xref-find-definitions-other-window
                                          xref-find-definitions-other-frame
                                          xref-find-references)))
-;; Marginalia mode
-(marginalia-mode t)
 ;; Which-key: show key bindings below
 (which-key-mode)
 (which-key-setup-side-window-bottom)

@@ -27,6 +27,7 @@
 
 (selectrum-mode t)
 (selectrum-prescient-mode t)
+(marginalia-mode t)
 
 (with-eval-after-load 'prescient
   ;; Prescient filter method can be toggled during session via M-s a/f/...
@@ -84,6 +85,39 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (advice-add #'consult-ripgrep :around #'my/consult-ripgrep-initial-input-advice)
   (setq consult-preview-key (kbd "C-o")))
 
+;; Provide completion for recent files
+(defun recentf-open-files-compl ()
+  "Find recentf files with `completing-read'."
+  (interactive)
+  (let* ((tocpl (mapcar
+                 (lambda (x)
+                   (propertize
+                    (file-name-nondirectory x)
+                    'selectrum--candidate-full x))
+                 recentf-list))
+         (fname (completing-read "File name: "
+                                 (lambda (str pred action)
+                                   (if (eq action 'metadata)
+                                       '(metadata (category . file))
+                                     (complete-with-action
+                                      action tocpl str pred))))))
+    (when fname
+      (find-file
+       (or (get-text-property 0 'selectrum--candidate-full fname)
+           fname)))))
+(global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
+
+(defun project-switch-to-buffer ()
+  "Switch to buffers of current buffers."
+  (interactive)
+  (read-buffer
+   (format "Switch to buffer in current project (%s):" (project-root (project-current)))
+   nil nil
+   (lambda (buf)
+     (let ((root (expand-file-name (file-name-as-directory (project-root (project-current))))))
+       (string-prefix-p
+        root (expand-file-name (buffer-local-value 'default-directory (cdr buf))))))))
+(global-set-key (kbd "C-c p b") 'project-switch-to-buffer)
 
 (provide 'init-minibuffer)
 
