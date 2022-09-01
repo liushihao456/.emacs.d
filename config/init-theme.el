@@ -102,16 +102,18 @@ THEME could be a string or a symbol."
              (load-theme theme t))
             ((stringp theme)
              (load-theme (intern theme) t)))
-    (with-temp-buffer
-      (insert-file-contents "~/.vimrc_background")
-      (save-match-data
-        (let ((theme1 (buffer-substring-no-properties (search-forward "colorscheme ") (point-at-eol))))
-          (message "Loaded %s theme" theme1)
-          (load-theme (intern theme1) t)))
-      )))
+    (if (file-exists-p "~/.vimrc_background")
+        (with-temp-buffer
+          (insert-file-contents "~/.vimrc_background")
+          (save-match-data
+            (let ((theme1 (buffer-substring-no-properties (search-forward "colorscheme ") (point-at-eol))))
+              (message "Loaded %s theme" theme1)
+              (load-theme (intern theme1) t))))
+      (message "No theme is specified and no .vimrc_background file found."))))
 
 ;; (load-theme 'doom-one t)
-(setq base16-theme-256-color-source 'base16-shell)
+(with-eval-after-load 'base16-theme
+  (setq base16-theme-256-color-source 'base16-shell))
 (if (display-graphic-p)
     (load-base16-theme 'base16-tomorrow-night-eighties)
   (load-base16-theme))
