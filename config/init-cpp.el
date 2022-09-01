@@ -25,7 +25,12 @@
 
 ;;; Code:
 
+;; Use c++-mode for .h files
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
 (add-hook 'c-mode-common-hook 'lsp)
+(with-eval-after-load 'lsp-clangd
+  (add-to-list 'lsp-clients-clangd-args "-header-insertion=never"))
 (with-eval-after-load 'cc-mode
   (defun my/cmake-project-generate-compile-commands ()
     "Generate the compile_commands.json file containing build flags in a cmake

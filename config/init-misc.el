@@ -262,7 +262,8 @@ split; vice versa."
   (defun my/treemacs-ignore-file-predicate (file _)
     (or (string= file ".gitignore")
         (string-suffix-p ".pyc" file)
-        (string= file "__pycache__")))
+        (string= file "__pycache__")
+        (string-prefix-p ".cache" file)))
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
   (if (display-graphic-p)

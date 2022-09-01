@@ -56,6 +56,8 @@
 
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (add-hook 'meow-mode-hook (lambda () (setq delete-active-region t)))
+
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
@@ -169,6 +171,7 @@
 (global-set-key (kbd "C-h C-o") nil)
 (global-set-key (kbd "C-h C-s") nil)
 (global-set-key (kbd "C-h C-w") nil)
+(global-set-key (kbd "C-h C-m") nil)
 (global-set-key (kbd "C-x C-r") nil)
 (setq meow-cursor-type-insert 'box)
 (setq meow-keypad-leader-dispatch "C-c")
