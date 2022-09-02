@@ -47,7 +47,10 @@
            (anzu-mode nil "anzu")
            (tree-sitter-mode nil "tree-sitter")
            (flycheck-mode nil "flycheck")
-           (copilot-mode nil "copilot")))
+           (copilot-mode nil "copilot")
+           (c++-mode "C++" "cc-mode")
+           (c-mode "C" "cc-mode")
+           (java-mode "Java" "cc-mode")))
 
 ;; Tidy mode line
 (defun tidy-modeline--fill (reserve)
