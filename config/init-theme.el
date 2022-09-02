@@ -53,23 +53,37 @@ which base16-shell produces."
       (cond ((symbolp theme)
              (load-theme theme t))
             ((stringp theme)
-             (load-theme (intern theme) t))))
+             (load-theme (intern theme) t)))
+      (message "Loaded theme %s as set in init-theme.el." theme))
    ((file-exists-p "~/.vimrc_background")
         (with-temp-buffer
           (insert-file-contents "~/.vimrc_background")
           (save-match-data
             (let ((theme1 (buffer-substring-no-properties
                            (search-forward "colorscheme ") (point-at-eol))))
-              (message "Loaded %s theme" theme1)
+              (message "Loaded theme %s from .vimrc_background file." theme1)
               (load-theme (intern theme1) t)))))
    (t
     (message "No theme is specified and no .vimrc_background file found."))))
 
-(if (file-exists-p (file-name-concat user-emacs-directory "local-config.el"))
-    (progn
-      (load (file-name-concat user-emacs-directory "local-config.el"))
-      (when theme-to-load (load-theme theme-to-load t)))
-  (load-base16-theme))
+(defun load-local-config-theme ()
+  "Load the theme specified in .emacs.d/local-config.el.
+
+Return t if successfully loaded the theme."
+  (let ((local-config-file
+         (file-name-concat user-emacs-directory "local-config.el"))
+        (loaded))
+    (when (file-exists-p local-config-file)
+      (load local-config-file)
+      (when theme-to-load
+        (load-theme theme-to-load t)
+        (setq loaded t)))
+    (unless loaded
+      (message "No theme loaded from .emacs.d/local-config.el file."))
+    loaded))
+
+(unless (and (display-graphic-p) (load-local-config-theme))
+    (load-base16-theme))
 
 (setq frame-background-mode 'dark)
 (unless (display-graphic-p)
