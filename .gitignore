@@ -39,4 +39,4 @@ transient/
 /server/
 /org-roam.db
 /.org-id-locations
-/.dir-locals.el
+/local-config.el

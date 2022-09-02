@@ -40,11 +40,6 @@
   ;; Don't change size of org-mode headlines (but keep other size-changes)
   (setq solarized-scale-org-headlines nil))
 
-;; This variable can be set in .dir-locals.el
-(defvar theme-to-load nil
-  "Theme to use.")
-(put 'theme-to-load 'safe-local-variable #'custom-theme-p)
-
 (defun load-base16-theme (&optional theme)
   "Load base16 theme.
 
@@ -70,8 +65,10 @@ which base16-shell produces."
    (t
     (message "No theme is specified and no .vimrc_background file found."))))
 
-(if theme-to-load
-    (load-theme theme-to-load t)
+(if (file-exists-p (file-name-concat user-emacs-directory "local-config.el"))
+    (progn
+      (load (file-name-concat user-emacs-directory "local-config.el"))
+      (when theme-to-load (load-theme theme-to-load t)))
   (load-base16-theme))
 
 (setq frame-background-mode 'dark)
