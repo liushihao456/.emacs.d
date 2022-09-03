@@ -5,6 +5,15 @@
 ;; --------------------------------------
 
 ;;; Code:
+
+;; Define a function to find init file at first, in case there's any error
+;; during initialization
+(defun find-init-file ()
+  "Find the `user-init-file'."
+  (interactive)
+  (find-file user-init-file))
+(global-set-key (kbd "C-c f i") 'find-init-file)
+
 (setq gc-cons-threshold 100000000)
 (require 'package)
 (setq package-enable-at-startup nil)
