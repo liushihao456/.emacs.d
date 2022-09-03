@@ -108,7 +108,7 @@
    '("m" . meow-join)
    '("n" . meow-search)
    '("o" . avy-goto-char-2)
-   '("O" . meow-block)
+   '("O" . er/expand-region)
    '("p" . meow-yank)
    ;; '("q" . meow-quit)
    '("Q" . meow-goto-line)
@@ -219,6 +219,7 @@ overlays at the end of line."
   "Remove the search indicator in mode line."
   (setq mode-line-format (delete meow/search-indicator-mode-line-format mode-line-format))
   (force-mode-line-update))
+;; Meow adds `meow--remove-search-highlight' to `pre-command-hook'
 (advice-add #'meow--remove-search-highlight :override #'meow--remove-indicator-advice)
 
 ;; Custom comment function
