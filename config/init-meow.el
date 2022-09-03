@@ -24,36 +24,24 @@
 ;; --------------------------------------
 
 ;;; Code:
-(defun my/insert-pair-quotes (&optional arg)
-  "Enclose following ARG sexps in quotes."
-  (interactive "P")
-  (insert-pair arg ?\" ?\"))
 
-(defun my/insert-pair-single-quotes (&optional arg)
-  "Enclose following ARG sexps in single quotes."
-  (interactive "P")
-  (insert-pair arg ?\' ?\'))
+;; Embrace -- pair manipulation
+(add-hook 'org-mode-hook 'embrace-org-mode-hook)
+(add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
+;; The builtin hooks above are autoloaded. We need to require embrace in our
+;; custom hooks, otherwise embrace won't be loaded as embrace-add-pair is not
+;; autoloaded.
+(defun embrace-markdown-mode-hook ()
+  (require 'embrace)
+  (dolist (lst '((?* "*" . "*")
+                 (?\ "\\" . "\\")
+                 (?$ "$" . "$")
+                 (?/ "/" . "/")))
+    (embrace-add-pair (car lst) (cadr lst) (cddr lst))))
+(add-hook 'markdown-mode-hook 'embrace-markdown-mode-hook)
 
-(defun my/insert-pair-backtick-quotes (&optional arg)
-  "Enclose following ARG sexps in backtick quotes."
-  (interactive "P")
-  (insert-pair arg ?\` ?\'))
-
-(defun my/insert-pair-square-brackets (&optional arg)
-  "Enclose following ARG sexps in square brackets."
-  (interactive "P")
-  (insert-pair arg ?\[ ?\]))
-
-(defun my/insert-pair-curly-braces (&optional arg)
-  "Enclose following ARG sexps in curly braces."
-  (interactive "P")
-  (insert-pair arg ?{ ?}))
-
-(defun my/insert-pair-chevrons (&optional arg)
-  "Enclose following ARG sexps in chevrons."
-  (interactive "P")
-  (insert-pair arg ?< ?>))
-
+;; Meow -- modal editing
+(require 'meow)
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   (add-hook 'meow-mode-hook (lambda () (setq delete-active-region t)))
@@ -144,20 +132,9 @@
    '("-" . meow-pop-selection)
    '(";" . my/comment-dwim)
    '(":" . comment-kill)
-   '("P \(" . insert-parentheses)
-   '("P \)" . insert-parentheses)
-   '("P \"" . my/insert-pair-quotes)
-   '("P '" . my/insert-pair-single-quotes)
-   '("P `" . my/insert-pair-backtick-quotes)
-   '("P \[" . my/insert-pair-square-brackets)
-   '("P \]" . my/insert-pair-square-brackets)
-   '("P {" . my/insert-pair-curly-braces)
-   '("P }" . my/insert-pair-curly-braces)
-   '("P <" . my/insert-pair-chevrons)
-   '("P >" . my/insert-pair-chevrons)
+   '("S" . embrace-commander)
    '("<escape>" . ignore)))
 
-(require 'meow)
 (meow-setup)
 (meow-global-mode 1)
 (global-set-key (kbd "C-h C-f") nil)
@@ -206,13 +183,14 @@
   (unless isearch-mode-end-hook-quit
     (when isearch-success
       (let ((beg (car isearch-match-data))
-	    (end (cadr isearch-match-data)))
-	(thread-first
-	  (meow--make-selection '(select . visit)
-				beg
-				(if isearch-forward end isearch-other-end))
-	  (meow--select (not isearch-forward)))))))
+	        (end (cadr isearch-match-data)))
+	    (thread-first
+	      (meow--make-selection '(select . visit)
+	    		                beg
+	    		                (if isearch-forward end isearch-other-end))
+          (meow--select (not isearch-forward)))))))
 (add-hook 'isearch-mode-end-hook 'meow--post-isearch-function)
+;; Seamless wrap search when needed
 (defadvice isearch-search (after isearch-no-fail activate)
   (unless isearch-success
     (ad-disable-advice 'isearch-search 'after 'isearch-no-fail)

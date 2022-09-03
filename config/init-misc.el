@@ -139,7 +139,7 @@ split; vice versa."
 (when (display-graphic-p)
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode))
-  (setq initial-frame-alist '((top . 1) (left . 1) (width . 100) (fullscreen . fullheight)))
+  (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight)))
   (add-to-list 'default-frame-alist '(font . "Operator Mono-21"))
   (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
   (set-face-attribute 'fixed-pitch-serif nil :family "Ubuntu Mono")
