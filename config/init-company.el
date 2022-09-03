@@ -104,25 +104,23 @@ If failed try to complete the common part with `company-complete-common'"
         (funcall fun command arg))))
   (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
 
-  ;; Copilot integration
-  (require 'copilot)
-
-  (defun my/yas-copilot-advice (fun &rest _)
-    "Call copilot first when yasnippet is available."
-    (if (bound-and-true-p copilot-mode)
-        (or (copilot-accept-completion)
-            (funcall fun))
-      (funcall fun)))
-  (advice-add #'yas-expand :around #'my/yas-copilot-advice)
-
-  (defun my/copilot-tab-company ()
-    (interactive)
-    (or (copilot-accept-completion)
-        (my/smarter-yas-expand-next-field-complete)))
+  ;; ;; Copilot integration
+  ;; (require 'copilot)
+  ;; (defun my/yas-copilot-advice (fun &rest _)
+  ;;   "Call copilot first when yasnippet is available."
+  ;;   (if (bound-and-true-p copilot-mode)
+  ;;       (or (copilot-accept-completion)
+  ;;           (funcall fun))
+  ;;     (funcall fun)))
+  ;; (advice-add #'yas-expand :around #'my/yas-copilot-advice)
+  ;; (defun my/copilot-tab-company ()
+  ;;   (interactive)
+  ;;   (or (copilot-accept-completion)
+  ;;       (my/smarter-yas-expand-next-field-complete)))
+  ;; (define-key company-active-map [tab] 'my/copilot-tab-company)
+  ;; (define-key company-active-map (kbd "TAB") 'my/copilot-tab-company)
 
   (delq 'company-preview-if-just-one-frontend company-frontends)
-  (define-key company-active-map [tab] 'my/copilot-tab-company)
-  (define-key company-active-map (kbd "TAB") 'my/copilot-tab-company)
   )
 
 (provide 'init-company)
