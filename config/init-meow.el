@@ -129,6 +129,7 @@
    '("V" . meow-visit)
    '("'" . scroll-down-command)
    '("/" . isearch-forward)
+   '("?" . query-replace)
    '("-" . meow-pop-selection)
    '(";" . my/comment-dwim)
    '(":" . comment-kill)
@@ -198,6 +199,27 @@
     (isearch-repeat (if isearch-forward 'forward))
     (ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
     (ad-activate 'isearch-search)))
+
+;; Show search indicator in mode line instead of making overlays at the end of
+;; line.
+(defvar meow/search-current-position 0)
+(defvar meow/search-total-matched 0)
+(defconst meow/search-indicator-mode-line-format '(:eval (meow/search-update-mode-line)))
+(defun meow/search-update-mode-line ()
+  (format "(%d/%d)" meow/search-current-position meow/search-total-matched))
+(defun meow--show-indicator-advice (pos idx cnt)
+  "Show the search indicator in mode line instead of making
+overlays at the end of line."
+  (setq mode-line-format (cons meow/search-indicator-mode-line-format mode-line-format))
+  (setq meow/search-current-position idx)
+  (setq meow/search-total-matched cnt)
+  (force-mode-line-update))
+(advice-add #'meow--show-indicator :override #'meow--show-indicator-advice)
+(defun meow--remove-indicator-advice ()
+  "Remove the search indicator in mode line."
+  (setq mode-line-format (delete meow/search-indicator-mode-line-format mode-line-format))
+  (force-mode-line-update))
+(advice-add #'meow--remove-search-highlight :override #'meow--remove-indicator-advice)
 
 ;; Custom comment function
 (defun my/comment-dwim (arg)
