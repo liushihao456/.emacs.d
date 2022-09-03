@@ -76,7 +76,7 @@
     "Advising function around CONSULT-FN.
 
 DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
-    (interactive)
+    (interactive "P")
     (let ((initial (list (or given-initial
                              (when (use-region-p)
                                (buffer-substring-no-properties (region-beginning) (region-end)))
@@ -107,6 +107,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
            fname)))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
+;; Switch to buffer that belongs to the current project
 (defun project-switch-to-buffer ()
   "Switch to buffers of current buffers."
   (interactive)
