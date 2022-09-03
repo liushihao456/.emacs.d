@@ -190,7 +190,6 @@ split; vice versa."
 (setq scroll-conservatively 101)
 
 ;; Global key bindings
-(global-set-key (kbd "C--") 'undo)
 (global-set-key (kbd "C-c |") 'toggle-window-split)
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 (global-set-key (kbd "C-c f f") 'find-file-at-point)
