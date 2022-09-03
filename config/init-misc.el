@@ -141,6 +141,7 @@ split; vice versa."
     (pixel-scroll-precision-mode))
   (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight)))
   (add-to-list 'default-frame-alist '(font . "Operator Mono-21"))
+  (set-fontset-font "fontset-default" 'unicode "Menlo-21")
   (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
   (set-face-attribute 'fixed-pitch-serif nil :family "Ubuntu Mono")
   (setq face-font-rescale-alist `(("STkaiti" . ,(/ 20.0 21))))
@@ -237,7 +238,6 @@ split; vice versa."
                                          xref-find-references)))
 ;; Which-key: show key bindings below
 (which-key-mode)
-(which-key-setup-side-window-bottom)
 
 ;; C indentation style
 (setq c-default-style
