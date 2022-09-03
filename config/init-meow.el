@@ -202,11 +202,15 @@
 
 ;; Show search indicator in mode line instead of making overlays at the end of
 ;; line.
+(defface meow/search-mode-line-indicator-face
+  '((t (:foreground "magenta")))
+  "Face for meow search mode line indicator.")
 (defvar meow/search-current-position 0)
 (defvar meow/search-total-matched 0)
 (defconst meow/search-indicator-mode-line-format '(:eval (meow/search-update-mode-line)))
 (defun meow/search-update-mode-line ()
-  (format "(%d/%d)" meow/search-current-position meow/search-total-matched))
+  (propertize (format "(%d/%d)" meow/search-current-position meow/search-total-matched)
+              'face 'meow/search-mode-line-indicator-face))
 (defun meow--show-indicator-advice (pos idx cnt)
   "Show the search indicator in mode line instead of making
 overlays at the end of line."

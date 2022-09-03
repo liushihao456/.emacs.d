@@ -160,7 +160,8 @@ split; vice versa."
   (setq dashboard-items '((recents . 5) (bookmarks . 5)))
   (setq dashboard-center-content t)
   (setq dashboard-set-heading-icons t)
-  (setq dashboard-startup-banner 2)
+  (unless (display-graphic-p)
+    (setq dashboard-startup-banner 2))
   (define-key dashboard-mode-map (kbd "n") 'widget-forward)
   (define-key dashboard-mode-map (kbd "p") 'widget-backward))
 
