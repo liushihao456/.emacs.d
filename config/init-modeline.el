@@ -47,10 +47,12 @@
            (anzu-mode nil "anzu")
            (tree-sitter-mode nil "tree-sitter")
            (flycheck-mode nil "flycheck")
-           (copilot-mode nil "copilot")
-           (c++-mode "C++" "cc-mode")
-           (c-mode "C" "cc-mode")
-           (java-mode "Java" "cc-mode")))
+           (copilot-mode nil "copilot")))
+;; cc-mode.el assumes that `mode-name’ is always a string (which was true in
+;; Emacs 22 and earlier), while delight.el makes use of the fact that
+;; `mode-name’ can (since Emacs 23) contain any mode-line construct. The two are
+;; therefore incompatible. See https://www.emacswiki.org/emacs/DelightedModes.
+(advice-add 'c-update-modeline :override #'ignore)
 
 ;; Tidy mode line
 (defun tidy-modeline--fill (reserve)
