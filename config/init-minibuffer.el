@@ -35,6 +35,7 @@
   (setq prescient-sort-full-matches-first t))
 
 (with-eval-after-load 'selectrum
+  (setq selectrum-count-style 'current/matches)
   (define-key selectrum-minibuffer-map (kbd "C-j") 'embark-act))
 
 (global-set-key (kbd "C-j") 'embark-act)
