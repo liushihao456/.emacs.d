@@ -25,9 +25,9 @@
 
 ;;; Code:
 
-;; Powerline
-;; In terminal version of emacs, transparency must be set to 0 for the
-;; separators' color to match
+;; ;; Powerline
+;; ;; In terminal version of emacs, transparency must be set to 0 for the
+;; ;; separators' color to match
 ;; (require 'powerline)
 ;; (powerline-center-theme)
 
@@ -140,11 +140,6 @@ Adapted from powerline.el."
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
                               (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
                     '(:eval (my/row-col-mode-line))))
-
-;; (doom-modeline-mode t)
-;; (with-eval-after-load 'doom-modeline
-;;   (setq doom-modeline-icon nil)
-;;   (setq doom-modeline-env-version nil))
 
 
 (provide 'init-modeline)
