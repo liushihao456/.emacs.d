@@ -202,29 +202,56 @@
 
 ;; Show search indicator in mode line instead of making overlays at the end of
 ;; line.
+;;
+;; Before:
+;;
+;; `meow-search' calls `meow--remove-search-indicator' then `meow--show-indicator'.
+;;
+;; `pre-command-hook' calls `meow--remove-search-highlight' unless the command
+;; is `meow-search'
+;;
+;; After:
+;;
+;; `meow--remove-search-highlight' has an after advice that sets up mode line
+;; indicator if the command is `meow-search' and the indicator is not yet setup,
+;; and removes the mode line indicator if the command is not `meow-search' and
+;; the indicator is active.
+;;
+;; `meow--show-indicator' has an override advice that updates the search index
+;; and count information.
 (defface meow/search-mode-line-indicator-face
   '((t (:foreground "magenta")))
   "Face for meow search mode line indicator.")
 (defvar meow/search-current-position 0)
 (defvar meow/search-total-matched 0)
+(defvar meow/search-indicator-active nil)
 (defconst meow/search-indicator-mode-line-format '(:eval (meow/search-update-mode-line)))
 (defun meow/search-update-mode-line ()
   (propertize (format "(%d/%d)" meow/search-current-position meow/search-total-matched)
               'face 'meow/search-mode-line-indicator-face))
+
 (defun meow--show-indicator-advice (pos idx cnt)
   "Show the search indicator in mode line instead of making
 overlays at the end of line."
-  (setq mode-line-format (cons meow/search-indicator-mode-line-format mode-line-format))
   (setq meow/search-current-position idx)
   (setq meow/search-total-matched cnt)
   (force-mode-line-update))
 (advice-add #'meow--show-indicator :override #'meow--show-indicator-advice)
-(defun meow--remove-indicator-advice ()
-  "Remove the search indicator in mode line."
+
+(defun meow/search-setup-mode-line-indicator ()
+  (setq mode-line-format (cons meow/search-indicator-mode-line-format mode-line-format))
+  (setq meow/search-indicator-active t))
+
+(defun meow/search-reset-mode-line-indicator ()
   (setq mode-line-format (delete meow/search-indicator-mode-line-format mode-line-format))
-  (force-mode-line-update))
-;; Meow adds `meow--remove-search-highlight' to `pre-command-hook'
-(advice-add #'meow--remove-search-highlight :override #'meow--remove-indicator-advice)
+  (setq meow/search-indicator-active nil))
+
+(defun meow--highlight-pre-command-after-advice ()
+  (when (and (eq this-command 'meow-search) (not meow/search-indicator-active))
+    (meow/search-setup-mode-line-indicator))
+  (when (and (not (eq this-command 'meow-search)) meow/search-indicator-active)
+    (meow/search-reset-mode-line-indicator)))
+(advice-add #'meow--highlight-pre-command :after #'meow--highlight-pre-command-after-advice)
 
 ;; Custom comment function
 (defun my/comment-dwim (arg)
