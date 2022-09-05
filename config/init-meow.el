@@ -213,9 +213,10 @@
 ;; After:
 ;;
 ;; `meow--remove-search-highlight' has an after advice that sets up mode line
-;; indicator if the command is `meow-search' and the indicator is not yet setup,
-;; and removes the mode line indicator if the command is not `meow-search' and
-;; the indicator is active.
+;; indicator if the command is one of `meow-search', `meow-mark-word' or
+;; `meow-mark-symbol', and the indicator is not yet setup, and removes the mode
+;; line indicator if the command is not one of `meow-search', `meow-mark-word'
+;; or `meow-mark-symbol', and the indicator is active.
 ;;
 ;; `meow--show-indicator' has an override advice that updates the search index
 ;; and count information.
@@ -247,9 +248,11 @@ overlays at the end of line."
   (setq meow/search-indicator-active nil))
 
 (defun meow--highlight-pre-command-after-advice ()
-  (when (and (eq this-command 'meow-search) (not meow/search-indicator-active))
+  (when (and (memq this-command '(meow-search meow-mark-word meow-mark-symbol))
+             (not meow/search-indicator-active))
     (meow/search-setup-mode-line-indicator))
-  (when (and (not (eq this-command 'meow-search)) meow/search-indicator-active)
+  (when (and (not (memq this-command '(meow-search meow-mark-word meow-mark-symbol)))
+             meow/search-indicator-active)
     (meow/search-reset-mode-line-indicator)))
 (advice-add #'meow--highlight-pre-command :after #'meow--highlight-pre-command-after-advice)
 
