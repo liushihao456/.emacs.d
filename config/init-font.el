@@ -37,7 +37,7 @@ Return t if successfully loaded the font."
       (when (file-exists-p local-config-file)
         (require 'local-config local-config-file)
         (when (and font-to-use font-size-to-use)
-          (add-to-list 'default-frame-alist '(font . (concat font-to-use "-" font-size-to-use)))
+          (add-to-list 'default-frame-alist `(font . ,(concat font-to-use "-" font-size-to-use)))
           (set-face-attribute 'fixed-pitch nil :family font-to-use)
           (set-face-attribute 'fixed-pitch-serif nil :family font-to-use)
           ;; Fix unicode font height bug on macOS
