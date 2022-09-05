@@ -67,8 +67,9 @@ which base16-shell produces."
     (message "No theme is specified and no .vimrc_background file found."))))
 
 (if (and (display-graphic-p) local-config-theme)
-    (message "Loaded theme %s from init-local-config.el" local-config-theme)
-    (load-theme local-config-theme t)
+    (progn
+      (message "Loaded theme %s from init-local-config.el" local-config-theme)
+      (load-theme local-config-theme t))
   (load-base16-theme))
 
 (setq frame-background-mode 'dark)
