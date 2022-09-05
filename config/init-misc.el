@@ -141,12 +141,12 @@ split; vice versa."
     (pixel-scroll-precision-mode)))
 
 ;; ;; Open recent files list at Emacs start up
-;; (defun my/command-line-args-has-file-p ()
-;;   "Check if Emacs is called with a file name in command line args."
-;;   (> (length command-line-args) 1))
-;; (unless (my/command-line-args-has-file-p)
+;; (unless (> (length command-line-args) 1)
+;;   ;; Check if Emacs is called with a file name in command line args.
 ;;   (setq initial-buffer-choice 'recentf-open-files))
 
+;; From doc: if a command line argument is provided, assume a filename and skip
+;; displaying Dashboard.
 (dashboard-setup-startup-hook)
 (with-eval-after-load 'dashboard
   (setq dashboard-items '((recents . 5) (bookmarks . 5)))
@@ -165,12 +165,6 @@ split; vice versa."
 (menu-bar-mode -1)
 (when (functionp 'set-scroll-bar-mode) (set-scroll-bar-mode nil))
 (show-paren-mode t)
-;; (define-advice show-paren-function (:around (fn) fix)
-;;   "Highlight enclosing parens."
-;;   (cond ((looking-at-p "\\s(") (funcall fn))
-;;         (t (save-excursion
-;;              (ignore-errors (backward-up-list))
-;;              (funcall fn)))))
 (setq split-width-threshold 100)
 (setq-default tab-width 4)
 (tool-bar-mode -1)
@@ -206,6 +200,14 @@ split; vice versa."
 (global-set-key (kbd "M-`") 'save-buffer)
 (global-set-key (kbd "M-e") 'forward-paragraph)
 (global-set-key (kbd "M-a") 'backward-paragraph)
+;; Helpful
+;;
+;; Note that the built-in `describe-function' includes both functions
+;; and macros. `helpful-function' is functions only, so we provide
+;; `helpful-callable' as a drop-in replacement.
+(global-set-key (kbd "C-h f") 'helpful-callable)
+(global-set-key (kbd "C-h v") 'helpful-variable)
+(global-set-key (kbd "C-h k") 'helpful-key)
 ;; Magit
 (global-set-key (kbd "C-c g") 'magit-status)
 ;; Expand region
