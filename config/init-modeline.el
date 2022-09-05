@@ -133,8 +133,8 @@ Adapted from powerline.el."
                     '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
                     '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
                     " "
-                    '(:eval (my/vc-mode-line))
-                    " "
+                    ;; '(:eval (my/vc-mode-line))
+                    ;; " "
                     '(:eval (my/flycheck-mode-line))
                     " "
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
