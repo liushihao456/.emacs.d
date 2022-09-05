@@ -74,7 +74,7 @@ Return t if successfully loaded the theme."
          (file-name-concat user-emacs-directory "local-config.el"))
         (loaded))
     (when (file-exists-p local-config-file)
-      (load local-config-file)
+      (require 'local-config local-config-file)
       (when theme-to-load
         (load-theme theme-to-load t)
         (setq loaded t)))

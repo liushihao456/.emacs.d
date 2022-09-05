@@ -139,14 +139,7 @@ split; vice versa."
 (when (display-graphic-p)
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode))
-  (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight)))
-  (add-to-list 'default-frame-alist '(font . "Operator Mono-21"))
-  (set-fontset-font "fontset-default" 'unicode "Menlo-21")
-  (set-face-attribute 'fixed-pitch nil :family "Ubuntu Mono")
-  (set-face-attribute 'fixed-pitch-serif nil :family "Ubuntu Mono")
-  (setq face-font-rescale-alist `(("STkaiti" . ,(/ 20.0 21))))
-  (set-fontset-font t 'han      (font-spec :family "STkaiti"))
-  (set-fontset-font t 'cjk-misc (font-spec :family "STkaiti")))
+  (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight))))
 
 ;; ;; Open recent files list at Emacs start up
 ;; (defun my/command-line-args-has-file-p ()
