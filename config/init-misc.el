@@ -138,8 +138,7 @@ split; vice versa."
 ;; When in GUI, set fonts
 (when (display-graphic-p)
   (when (fboundp 'pixel-scroll-precision-mode)
-    (pixel-scroll-precision-mode))
-  (setq initial-frame-alist '((top . 1) (left . 1) (width . 120) (fullscreen . fullheight))))
+    (pixel-scroll-precision-mode)))
 
 ;; ;; Open recent files list at Emacs start up
 ;; (defun my/command-line-args-has-file-p ()

@@ -39,6 +39,7 @@
 ;; ;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
+(require 'init-local-config)
 (require 'init-custom)
 (require 'init-minibuffer)
 (require 'init-font)

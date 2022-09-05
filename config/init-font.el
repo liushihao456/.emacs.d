@@ -27,26 +27,17 @@
 
 ;; When in GUI, set fonts
 (when (display-graphic-p)
-  (defun load-local-config-font ()
-    "Load the font specified in .emacs.d/local-config.el.
-
-Return t if successfully loaded the font."
-    (let ((local-config-file
-           (file-name-concat user-emacs-directory "local-config.el"))
-          (loaded))
-      (when (file-exists-p local-config-file)
-        (require 'local-config local-config-file)
-        (when (and font-to-use font-size-to-use)
-          (add-to-list 'default-frame-alist `(font . ,(concat font-to-use "-" font-size-to-use)))
-          (set-face-attribute 'fixed-pitch nil :family font-to-use)
-          (set-face-attribute 'fixed-pitch-serif nil :family font-to-use)
-          ;; Fix unicode font height bug on macOS
-          (set-fontset-font "fontset-default" 'unicode (concat "Menlo" "-" font-size-to-use))
-          (setq loaded t)))
-      (unless loaded
-        (message "No theme loaded from .emacs.d/local-config.el file."))
-      loaded))
-  (load-local-config-font))
+  (when (and local-config-font local-config-font-size)
+    (add-to-list 'default-frame-alist
+                 `(font . ,(concat local-config-font
+                                   "-"
+                                   local-config-font-size)))
+    (set-face-attribute 'fixed-pitch nil :family local-config-font)
+    (set-face-attribute 'fixed-pitch-serif nil :family local-config-font)
+    ;; Fix unicode font height bug on macOS
+    (when (memq window-system '(mac ns))
+      (set-fontset-font "fontset-default" 'unicode
+                        (concat "Menlo" "-" local-config-font-size)))))
 
 (provide 'init-font)
 
