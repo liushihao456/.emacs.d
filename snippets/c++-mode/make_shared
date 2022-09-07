@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: make_shared
+# key: ms
+# --
+make_shared<$1>($2)$0

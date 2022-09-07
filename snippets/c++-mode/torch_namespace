@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
 # name: torch_namespace
-# key: to
+# key: th
 # --
 torch::

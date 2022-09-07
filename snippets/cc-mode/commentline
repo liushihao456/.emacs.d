@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: col
+# key: col
+# --
+/* $1${1:$(concat (if (string-empty-p yas-text) "-" " ") (make-string (- 78 (+ (current-column) 2)) ?-))} */
+$0
