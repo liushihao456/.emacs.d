@@ -159,7 +159,8 @@
 (setq meow-two-char-escape-delay 0.5)
 (defun meow--two-char-exit-insert-state (s)
   (when (meow-insert-mode-p)
-    (let ((modified (buffer-modified-p)))
+    (let ((modified (buffer-modified-p))
+          (undo-list buffer-undo-list))
       (insert (elt s 0))
       (let* ((second-char (elt s 1))
              (event
@@ -171,6 +172,7 @@
               (progn
                 (backward-delete-char 1)
                 (set-buffer-modified-p modified)
+                (setq buffer-undo-list undo-list)
                 (meow-insert-exit))
             (push event unread-command-events)))))))
 (defun meow-two-char-exit-insert-state ()
