@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: incs
+# key: incs
+# --
+include <$0>

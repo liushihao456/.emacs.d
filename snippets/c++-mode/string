@@ -2,4 +2,4 @@
 # name: string
 # key: s
 # --
-string
+std::string

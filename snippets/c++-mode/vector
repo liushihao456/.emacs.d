@@ -2,4 +2,4 @@
 # name: vector
 # key: v
 # --
-vector<$1> $0
+std::vector<$1> $0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vector_float
+# key: vf
+# --
+std::vector<float> $0

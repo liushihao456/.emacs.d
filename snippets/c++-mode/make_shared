@@ -2,4 +2,4 @@
 # name: make_shared
 # key: ms
 # --
-make_shared<$1>($2)$0
+std::make_shared<$1>($2)$0

@@ -2,4 +2,4 @@
 # name: vector double
 # key: vd
 # --
-vector<double> 
+std::vector<double> 
