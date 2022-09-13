@@ -75,13 +75,19 @@ FN is the original command."
 (advice-add #'scroll-down-command :around #'my/scroll-half-page-advice)
 
 (defun my/open-external-terminal-project-root ()
-  "Open an external Terminal window under current directory."
+  "Open an external Terminal or cmd.exe window under current directory."
   (interactive)
   (require 'project)
-  (if (project-root (project-current))
-      (let ((default-directory (project-root (project-current))))
-        (shell-command "open -a Terminal ."))
-    (shell-command "open -a Terminal .")))
+  (let ((default-directory (or (project-root (project-current)) default-directory)))
+    (cond ((memq system-type '(ms-dos windows-nt cygwin))
+           (let ((proc (start-process "cmd" nil "cmd.exe"
+                                      "/C" "start" "cmd.exe" "/K"
+                                      "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat")))
+             (set-process-query-on-exit-flag proc nil)))
+          ((eq system-type 'darwin)
+           (shell-command "open -a Terminal ."))
+          (t
+           nil))))
 
 (defun switch-to-other-buffer ()
   "Switch to most recently selected buffer."
