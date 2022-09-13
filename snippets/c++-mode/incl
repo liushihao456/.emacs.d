@@ -2,4 +2,4 @@
 # name: incl
 # key: incl
 # --
-include "$0"
+#include "$0"
