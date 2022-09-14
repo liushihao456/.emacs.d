@@ -78,7 +78,9 @@ FN is the original command."
   "Open an external Terminal or cmd.exe window under current directory."
   (interactive)
   (require 'project)
-  (let ((default-directory (or (project-root (project-current)) default-directory)))
+  (let ((default-directory (if (project-current)
+                               (project-root (project-current))
+                             default-directory)))
     (cond ((memq system-type '(ms-dos windows-nt cygwin))
            (let ((proc (start-process "cmd" nil "cmd.exe"
                                       "/C" "start" "cmd.exe" "/K"
