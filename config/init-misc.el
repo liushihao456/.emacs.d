@@ -74,6 +74,11 @@ FN is the original command."
 (advice-add #'scroll-up-command :around #'my/scroll-half-page-advice)
 (advice-add #'scroll-down-command :around #'my/scroll-half-page-advice)
 
+(defmacro shell-command-silent (cmd)
+  "Call `shell-command' with CMD but inhibit the message."
+  `(let ((inhibit-message t))
+     (shell-command ,cmd)))
+
 (defun my/open-external-terminal-project-root (arg)
   "Open an external Terminal or cmd.exe window at project root.
 With prefix ARG, open at the current buffer file's location."
@@ -91,8 +96,7 @@ With prefix ARG, open at the current buffer file's location."
         (set-process-query-on-exit-flag proc nil)))
      ;; MacOS
      ((eq system-type 'darwin)
-      (let ((inhibit-message t))
-        (shell-command "open -a Terminal .")))
+      (shell-command-silent "open -a Terminal ."))
      ;; Others
      (t (message "Error: unknown operating system type.")))))
 (global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
@@ -116,8 +120,7 @@ With prefix ARG, open at the current buffer file's location."
      ;; Others
      (t (message "Error: unknown operating system type.")))
     (when cmd
-      (let ((inhibit-message t))
-        (shell-command cmd)))))
+      (shell-command-silent cmd))))
 (global-set-key (kbd "C-c f e") 'my/open-external-file-explorer-project-root)
 
 (defun switch-to-other-buffer ()
