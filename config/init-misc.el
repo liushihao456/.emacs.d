@@ -74,22 +74,51 @@ FN is the original command."
 (advice-add #'scroll-up-command :around #'my/scroll-half-page-advice)
 (advice-add #'scroll-down-command :around #'my/scroll-half-page-advice)
 
-(defun my/open-external-terminal-project-root ()
-  "Open an external Terminal or cmd.exe window under current directory."
-  (interactive)
+(defun my/open-external-terminal-project-root (arg)
+  "Open an external Terminal or cmd.exe window at project root.
+With prefix ARG, open at the current buffer file's location."
+  (interactive "P")
   (require 'project)
-  (let ((default-directory (if (project-current)
+  (let ((default-directory (if (and (not arg) (project-current))
                                (project-root (project-current))
                              default-directory)))
-    (cond ((memq system-type '(ms-dos windows-nt cygwin))
-           (let ((proc (start-process "cmd" nil "cmd.exe"
-                                      "/C" "start" "cmd.exe" "/K"
-                                      "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat")))
-             (set-process-query-on-exit-flag proc nil)))
-          ((eq system-type 'darwin)
-           (shell-command "open -a Terminal ."))
-          (t
-           nil))))
+    (cond
+     ;; Windows
+     ((memq system-type '(ms-dos windows-nt cygwin))
+      (let ((proc (start-process "cmd" nil "cmd.exe"
+                                 "/C" "start" "cmd.exe" "/K"
+                                 "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat")))
+        (set-process-query-on-exit-flag proc nil)))
+     ;; MacOS
+     ((eq system-type 'darwin)
+      (let ((inhibit-message t))
+        (shell-command "open -a Terminal .")))
+     ;; Others
+     (t (message "Error: unknown operating system type.")))))
+(global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
+
+(defun my/open-external-file-explorer-project-root (arg)
+  "Open external file explorer at project root.
+With prefix ARG, open at the current buffer file's location."
+  (interactive "P")
+  (require 'project)
+  (let ((default-directory (if (and (not arg) (project-current))
+                               (project-root (project-current))
+                             default-directory))
+        cmd)
+    (cond
+     ;; Windows
+     ((memq system-type '(cygwin windows-nt ms-dos))
+      (setq cmd "explorer ."))
+     ;; MacOS
+     ((eq system-type 'darwin)
+      (setq cmd "open ."))
+     ;; Others
+     (t (message "Error: unknown operating system type.")))
+    (when cmd
+      (let ((inhibit-message t))
+        (shell-command cmd)))))
+(global-set-key (kbd "C-c f e") 'my/open-external-file-explorer-project-root)
 
 (defun switch-to-other-buffer ()
   "Switch to most recently selected buffer."
@@ -187,7 +216,6 @@ split; vice versa."
 
 ;; Global key bindings
 (global-set-key (kbd "C-c |") 'toggle-window-split)
-(global-set-key (kbd "C-c t") 'my/open-external-terminal-project-root)
 (global-set-key (kbd "C-c f f") 'find-file-at-point)
 (global-set-key (kbd "C-c p f") 'project-find-file)
 (global-set-key (kbd "C-c p p") 'project-switch-project)

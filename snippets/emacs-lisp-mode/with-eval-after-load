@@ -3,4 +3,4 @@
 # key: we
 # --
 (with-eval-after-load '$1
-$0)
+  $0)
