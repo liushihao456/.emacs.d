@@ -255,11 +255,14 @@ overlays at the end of line."
   (setq meow/search-indicator-active nil))
 
 (defun meow--highlight-pre-command-after-advice ()
-  (when (and (memq this-command '(meow-search meow-mark-word meow-mark-symbol))
+  (when (and (memq this-command
+                   '(meow-search meow-mark-word meow-mark-symbol isearch-exit))
              (not meow/search-indicator-active))
     (meow/search-setup-mode-line-indicator))
-  (when (and (not (memq this-command '(meow-search meow-mark-word meow-mark-symbol)))
-             meow/search-indicator-active)
+  (when (and
+         (not (memq this-command
+                    '(meow-search meow-mark-word meow-mark-symbol isearch-exit)))
+         meow/search-indicator-active)
     (meow/search-reset-mode-line-indicator)))
 (advice-add #'meow--highlight-pre-command :after #'meow--highlight-pre-command-after-advice)
 
