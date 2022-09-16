@@ -1,3 +1,0 @@
-[submodule "packages/lsp-mode"]
-	path = packages/lsp-mode
-	url = https://github.com/liushihao456/lsp-mode.git
