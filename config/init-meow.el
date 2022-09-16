@@ -32,6 +32,7 @@
 ;; custom hooks, otherwise embrace won't be loaded as embrace-add-pair is not
 ;; autoloaded.
 (defun embrace-markdown-mode-hook ()
+  "Embrace markdown mode hook."
   (require 'embrace)
   (dolist (lst '((?* "*" . "*")
                  (?\ "\\" . "\\")
@@ -43,6 +44,7 @@
 ;; Meow -- modal editing
 (require 'meow)
 (defun meow-setup ()
+  "Setup meow."
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   (add-hook 'meow-mode-hook (lambda () (setq delete-active-region t)))
 
@@ -155,9 +157,12 @@
 (setq meow-keypad-leader-dispatch "C-c")
 
 ;; Use jk to escape from insert state to normal state
-(setq meow-two-char-escape-sequence "jk")
-(setq meow-two-char-escape-delay 0.5)
+(defvar meow-two-char-escape-sequence "jk")
+(defvar meow-two-char-escape-delay 0.5)
 (defun meow--two-char-exit-insert-state (s)
+  "Exit meow insert state when pressing consecutive two keys.
+
+S is string of the two-key sequence."
   (when (meow-insert-mode-p)
     (let ((modified (buffer-modified-p))
           (undo-list buffer-undo-list))
@@ -176,6 +181,7 @@
                 (meow-insert-exit))
             (push event unread-command-events)))))))
 (defun meow-two-char-exit-insert-state ()
+  "Exit meow insert state when pressing consecutive two keys."
   (interactive)
   (meow--two-char-exit-insert-state meow-two-char-escape-sequence))
 (define-key meow-insert-state-keymap (substring meow-two-char-escape-sequence 0 1)
@@ -183,6 +189,7 @@
 
 ;; Isearch integration
 (defun meow--post-isearch-function ()
+  "Isearch integration with meow."
   (unless isearch-mode-end-hook-quit
     (when isearch-success
       (let ((beg (car isearch-match-data))
@@ -200,6 +207,7 @@
 (add-hook 'isearch-mode-end-hook 'meow--post-isearch-function)
 ;; Seamless wrap search when needed
 (defadvice isearch-search (after isearch-no-fail activate)
+  "Seamless wrap search when needed."
   (unless isearch-success
     (ad-disable-advice 'isearch-search 'after 'isearch-no-fail)
     (ad-activate 'isearch-search)
@@ -227,34 +235,40 @@
 ;;
 ;; `meow--show-indicator' has an override advice that updates the search index
 ;; and count information.
+(require 'anzu)
 (defface meow/search-mode-line-indicator-face
-  '((t (:foreground "magenta")))
-  "Face for meow search mode line indicator.")
+  '((t (:inherit anzu-mode-line)))
+  "Face for meow search mode line indicator."
+  :group 'meow)
 (defvar meow/search-current-position 0)
 (defvar meow/search-total-matched 0)
 (defvar meow/search-indicator-active nil)
 (defconst meow/search-indicator-mode-line-format '(:eval (meow/search-update-mode-line)))
 (defun meow/search-update-mode-line ()
+  "Meow search mode line indicator segment."
   (propertize (format "(%d/%d)" meow/search-current-position meow/search-total-matched)
               'face 'meow/search-mode-line-indicator-face))
 
 (defun meow--show-indicator-advice (pos idx cnt)
-  "Show the search indicator in mode line instead of making
-overlays at the end of line."
+  "Advice to show the search indicator in mode line.
+POS, IDX, CNT are arguments to the original function."
   (setq meow/search-current-position idx)
   (setq meow/search-total-matched cnt)
   (force-mode-line-update))
 (advice-add #'meow--show-indicator :override #'meow--show-indicator-advice)
 
 (defun meow/search-setup-mode-line-indicator ()
+  "Setup meow search mode line indicator."
   (setq mode-line-format (cons meow/search-indicator-mode-line-format mode-line-format))
   (setq meow/search-indicator-active t))
 
 (defun meow/search-reset-mode-line-indicator ()
+  "Reset meow search mode line indicator."
   (setq mode-line-format (delete meow/search-indicator-mode-line-format mode-line-format))
   (setq meow/search-indicator-active nil))
 
 (defun meow--highlight-pre-command-after-advice ()
+  "After-advice for `meow--highlight-pre-command'."
   (when (and (memq this-command
                    '(meow-search meow-mark-word meow-mark-symbol isearch-exit))
              (not meow/search-indicator-active))
@@ -268,17 +282,23 @@ overlays at the end of line."
 
 ;; Custom comment function
 (defun my/comment-dwim (arg)
-  "If region active, comment the region, else comment the line."
+  "If region active, comment the region, else comment the line.
+
+ARG only takes effect when region is not active.
+
+With positive prefix, apply to N lines including current one.
+
+With negative prefix, apply to -N lines above.  Also, further
+consecutive invocations of this command will inherit the negative
+argument."
   (interactive "p")
   (if mark-active
       (comment-dwim nil)
     (comment-line arg)))
 
-;; If there are only whitespaces at the current line when escaping from insert
-;; mode, delete them
+;; Delete whitespaces of blank line when exiting insert mode.
 (defun my/meow-escape-advice (&rest _)
-  "If there are only whitespaces at the current line when escaping from insert
-mode, delete them."
+  "Delete whitespaces of blank line when exiting insert mode."
   (let* ((bol (line-beginning-position))
          (eol (line-end-position))
          (line-string (buffer-substring-no-properties bol eol)))
