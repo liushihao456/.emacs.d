@@ -186,12 +186,17 @@
   (unless isearch-mode-end-hook-quit
     (when isearch-success
       (let ((beg (car isearch-match-data))
-	        (end (cadr isearch-match-data)))
+	        (end (cadr isearch-match-data))
+            text)
 	    (thread-first
 	      (meow--make-selection '(select . visit)
 	    		                beg
 	    		                (if isearch-forward end isearch-other-end))
-          (meow--select (not isearch-forward)))))))
+          (meow--select (not isearch-forward)))
+        (setq text (regexp-quote (buffer-substring-no-properties (region-beginning) (region-end))))
+        (meow--push-search text)
+        (meow--ensure-visible)
+        (meow--highlight-regexp-in-buffer text)))))
 (add-hook 'isearch-mode-end-hook 'meow--post-isearch-function)
 ;; Seamless wrap search when needed
 (defadvice isearch-search (after isearch-no-fail activate)
