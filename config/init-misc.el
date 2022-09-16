@@ -292,6 +292,19 @@ split; vice versa."
   (setq treemacs-follow-after-init t)
   (setq treemacs-width 30)
 
+  (defun mine/toggle-maximize-treemacs ()
+    "Maximize/restore Treemacs buffer."
+    (interactive)
+    (unless (boundp 'treemacs--original-width)
+      (setq treemacs--original-width treemacs-width))
+    (with-selected-window (treemacs-get-local-window)
+      (setq treemacs-width
+            (if (= treemacs-width treemacs--original-width)
+                (floor (* (frame-width) 0.8))
+              treemacs--original-width))
+      (treemacs--set-width treemacs-width)))
+  (define-key treemacs-mode-map (kbd "A") 'mine/toggle-maximize-treemacs)
+
   (defun my/treemacs-ignore-file-predicate (file _)
     (or (string= file ".gitignore")
         (string-suffix-p ".pyc" file)
@@ -300,11 +313,11 @@ split; vice versa."
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
   (if (display-graphic-p)
-    (progn
-      (require 'doom-themes)
-      (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-atom" for less minimal icon theme
-      (setq doom-themes-treemacs-enable-variable-pitch nil)
-      (doom-themes-treemacs-config))
+      (progn
+        (require 'doom-themes)
+        (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-atom" for less minimal icon theme
+        (setq doom-themes-treemacs-enable-variable-pitch nil)
+        (doom-themes-treemacs-config))
     (treemacs-nerd-config)))
 
 ;; Telega
