@@ -34,7 +34,7 @@
     "Generate the compile_commands.json file containing build flags in a cmake
 project in order for clangd to understand the project code."
     (interactive)
-    (let ((default-directory (cdr (project-current))))
+    (let ((default-directory (project-root (project-current))))
       (shell-command
        (if (memq system-type '(ms-dos windows-nt cygwin))
            "cmake -G Ninja -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
