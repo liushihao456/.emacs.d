@@ -314,10 +314,12 @@ split; vice versa."
 
   (if (display-graphic-p)
       (progn
-        (require 'doom-themes)
-        (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-atom" for less minimal icon theme
-        (setq doom-themes-treemacs-enable-variable-pitch nil)
-        (doom-themes-treemacs-config))
+        (require 'treemacs-svg-icon)
+        (treemacs-svg-icon-config))
+        ;; (require 'doom-themes)
+        ;; (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-atom" for less minimal icon theme
+        ;; (setq doom-themes-treemacs-enable-variable-pitch nil)
+        ;; (doom-themes-treemacs-config))
     (treemacs-nerd-config)))
 
 ;; Telega
