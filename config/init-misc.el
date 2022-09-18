@@ -320,7 +320,7 @@ split; vice versa."
         ;; (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-atom" for less minimal icon theme
         ;; (setq doom-themes-treemacs-enable-variable-pitch nil)
         ;; (doom-themes-treemacs-config))
-    (treemacs-nerd-config)))
+    (treemacs-nerd-icon-config)))
 
 ;; Telega
 (with-eval-after-load 'telega
