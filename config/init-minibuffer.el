@@ -96,6 +96,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                     (file-name-nondirectory x)
                     'selectrum--candidate-full x))
                  recentf-list))
+         (selectrum-should-sort nil)
          (fname (completing-read "File name: "
                                  (lambda (str pred action)
                                    (if (eq action 'metadata)
