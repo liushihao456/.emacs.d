@@ -320,15 +320,12 @@ split; vice versa."
         (string-prefix-p ".cache" file)))
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
-  (if (display-graphic-p)
-      (progn
-        (require 'treemacs-svg-icon)
-        (treemacs-svg-icon-config))
-        ;; (require 'doom-themes)
-        ;; (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-atom" for less minimal icon theme
-        ;; (setq doom-themes-treemacs-enable-variable-pitch nil)
-        ;; (doom-themes-treemacs-config))
-    (treemacs-nerd-icon-config)))
+  ;; treemacs-nerd-icon works both in GUI and TUI (both with nerd font icons)
+  ;; (treemacs-nerd-icon-config)
+
+  ;; treemacs-svg-icon works both in GUI and TUI (where TUI fallbacks to nerd
+  ;; font icons)
+  (treemacs-svg-icon-config))
 
 ;; Telega
 (with-eval-after-load 'telega
