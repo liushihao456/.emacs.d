@@ -292,7 +292,7 @@ split; vice versa."
   (setq treemacs-follow-after-init t)
   (setq treemacs-width 30)
 
-  (defun mine/toggle-maximize-treemacs ()
+  (defun my/toggle-maximize-treemacs ()
     "Maximize/restore Treemacs buffer."
     (interactive)
     (unless (boundp 'treemacs--original-width)
@@ -303,7 +303,15 @@ split; vice versa."
                 (floor (* (frame-width) 0.8))
               treemacs--original-width))
       (treemacs--set-width treemacs-width)))
-  (define-key treemacs-mode-map (kbd "A") 'mine/toggle-maximize-treemacs)
+  (define-key treemacs-mode-map (kbd "A") 'my/toggle-maximize-treemacs)
+  (defun my/unmaximize-treemacs (&optional arg)
+    "Restore Treemacs buffer if it's maximized."
+    (if (and (boundp 'treemacs--original-width)
+             (not (= treemacs-width treemacs--original-width)))
+        (with-selected-window (treemacs-get-local-window)
+          (setq treemacs-width treemacs--original-width)
+          (treemacs--set-width treemacs-width))))
+  (advice-add #'treemacs-visit-node-default :after #'my/unmaximize-treemacs)
 
   (defun my/treemacs-ignore-file-predicate (file _)
     (or (string= file ".gitignore")
