@@ -180,6 +180,9 @@ split; vice versa."
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode)))
 
+;; Exclude files for recentf
+(setq recentf-exclude '("bookmarks\\'"))
+
 ;; ;; Open recent files list at Emacs start up
 ;; (unless (> (length command-line-args) 1)
 ;;   ;; Check if Emacs is called with a file name in command line args.

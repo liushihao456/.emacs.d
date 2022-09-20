@@ -37,8 +37,8 @@ project in order for clangd to understand the project code."
     (let ((default-directory (project-root (project-current))))
       (shell-command
        (if (memq system-type '(ms-dos windows-nt cygwin))
-           "cmake -G Ninja -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
-         "cmake -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"))))
+           "cmake . -G Ninja -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+         "cmake . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"))))
   (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands))
 
 ;; Cmake
