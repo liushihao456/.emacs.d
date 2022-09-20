@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: commentline
+# key: col
+# --
+;; $1${1:$(concat (if (string-empty-p yas-text) "-" " ") (make-string (max 0 (- 79 (+ (current-column) 2))) ?-))} ;
+$0

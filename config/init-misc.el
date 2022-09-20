@@ -323,12 +323,8 @@ split; vice versa."
         (string-prefix-p ".cache" file)))
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
-  ;; treemacs-nerd-icon works both in GUI and TUI (both with nerd font icons)
-  ;; (treemacs-nerd-icon-config)
-
-  ;; treemacs-svg-icon works both in GUI and TUI (where TUI fallbacks to nerd
-  ;; font icons)
-  (treemacs-svg-icon-config))
+  ;; treemacs-svg-nerd-icon renders svg icons in GUI and nerd font icons in TUI.
+  (treemacs-svg-nerd-icon-config))
 
 ;; Telega
 (with-eval-after-load 'telega
@@ -336,6 +332,23 @@ split; vice versa."
         (list '(:server "127.0.0.1" :port 7890 :enable t
                         :type (:@type "proxyTypeSocks5"))))
   (setq telega-use-docker nil))
+
+;; Remove duplicate lines
+(defun uniquify-all-lines-region (start end)
+  "Find duplicate lines in region START to END keeping first occurrence."
+  (interactive "*r")
+  (save-excursion
+    (let ((end (copy-marker end)))
+      (while
+          (progn
+            (goto-char start)
+            (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
+        (replace-match "\\1\n\\2")))))
+  
+(defun uniquify-all-lines-buffer ()
+  "Delete duplicate lines in buffer and keep first occurrence."
+  (interactive "*")
+  (uniquify-all-lines-region (point-min) (point-max)))
 
 (provide 'init-misc)
 
