@@ -2,5 +2,5 @@
 # name: col
 # key: col
 # --
-/* $1${1:$(concat (if (string-empty-p yas-text) "-" " ") (make-string (- 78 (+ (current-column) 2)) ?-))} */
+/* $1${1:$(concat (if (string-empty-p yas-text) "-" " ") (make-string (max 0 (- 78 (+ (current-column) 2))) ?-))} */
 $0
