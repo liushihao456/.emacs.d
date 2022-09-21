@@ -28,6 +28,7 @@
 (selectrum-mode t)
 (selectrum-prescient-mode t)
 (marginalia-mode t)
+(icon-tools-completion-mode t)
 
 (with-eval-after-load 'prescient
   ;; Prescient filter method can be toggled during session via M-s a/f/...

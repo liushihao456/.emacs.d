@@ -41,12 +41,12 @@
 
 (require 'init-local-config)
 (require 'init-custom)
+(require 'init-custom-packages)
 (require 'init-minibuffer)
 (require 'init-font)
 (require 'init-theme)
 (require 'init-meow)
 (require 'init-misc)
-(require 'init-custom-packages)
 (require 'init-compile)
 (require 'init-wgrep)
 (require 'init-modeline)
