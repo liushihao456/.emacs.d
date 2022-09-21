@@ -323,8 +323,11 @@ split; vice versa."
         (string-prefix-p ".cache" file)))
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
-  ;; treemacs-svg-nerd-icon renders svg icons in GUI and nerd font icons in TUI.
-  (treemacs-svg-nerd-icon-config))
+  ;; icon-tools-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
+  (icon-tools-treemacs-icons-config))
+
+;; Icon-tools-dired
+(add-hook 'dired-mode-hook 'icon-tools-dired-mode)
 
 ;; Telega
 (with-eval-after-load 'telega
