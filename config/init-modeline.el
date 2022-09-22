@@ -138,7 +138,10 @@ Adapted from powerline.el."
                     '(:eval (my/flycheck-mode-line))
                     " "
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
-                              (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
+                              (list (tidy-modeline--fill-center (/ (length modes) 2))
+                                    (icon-tools-icon-for-mode major-mode)
+                                    " "
+                                    modes)))
                     '(:eval (my/row-col-mode-line))))
 
 
