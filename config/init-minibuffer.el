@@ -30,10 +30,16 @@
 (marginalia-mode t)
 (icon-tools-completion-mode t)
 
+;; Prescient sorting mechanism:
+;; 1. Most front: recently selected candidates
+;; 2. Followed by: frequently selected ones
+;; 3. The rest, if `prescient-sort-length-enable' is t (the default), are sorted
+;;    by length, otherwise are presented by their original order.
 (with-eval-after-load 'prescient
   ;; Prescient filter method can be toggled during session via M-s a/f/...
   (setq prescient-filter-method '(literal regexp initialism fuzzy))
-  (setq prescient-sort-full-matches-first t))
+  (setq prescient-sort-full-matches-first t)
+  (setq prescient-sort-length-enable nil))
 
 (with-eval-after-load 'selectrum
   (setq selectrum-count-style 'current/matches)

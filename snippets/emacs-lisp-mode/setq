@@ -2,4 +2,4 @@
 # name: setq
 # key: sq
 # --
-(setq $1 $0)
+(setq $0)
