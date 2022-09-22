@@ -36,6 +36,7 @@
            (emacs-lisp-mode "Elisp" :major)
            (which-key-mode nil "which-key")
            (abbrev-mode nil "abbrev")
+           (visual-line-mode nil "simple")
            (lsp-mode nil "lsp-mode")
            (company-mode nil "company")
            (company-box-mode nil "company-box")
@@ -81,13 +82,23 @@ Adapted from powerline.el."
         (match-string 1 buf-coding)
       buf-coding)))
 
+(defun my/buffer-file-icon-mode-line ()
+  "Render icon for current buffer file in the mode line."
+  (if-let ((buffer-file buffer-file-name)
+           (file (file-name-nondirectory buffer-file-name)))
+      (cond ((string-match-p "\\/$" file)
+             (icon-tools-icon-for-dir file 'icon-tools-lblue))
+            (t
+             (icon-tools-icon-for-file file 'icon-tools-lblue)))
+    (icon-tools-icon-for-mode major-mode)))
+
 (defun my/vc-mode-line ()
-  "Render version control information in mode line."
+  "Render version control information in the mode line."
   (cond (vc-mode (format "[%s]" (substring vc-mode 1)))
         (t nil)))
 
 (defun my/flycheck-mode-line ()
-  "Render flycheck information in mode line."
+  "Render flycheck information in the mode line."
   (if (boundp 'flycheck-last-status-change)
       (pcase flycheck-last-status-change
         (`not-checked nil)
@@ -95,23 +106,27 @@ Adapted from powerline.el."
         (`running (propertize " ?" 'face 'success))
         (`errored (propertize " !" 'face 'error))
         (`finished
-         (let* ((error-counts (flycheck-count-errors flycheck-current-errors))
-                (no-errors (cdr (assq 'error error-counts)))
-                (no-warnings (cdr (assq 'warning error-counts)))
-                (face (cond (no-errors 'error)
-                            (no-warnings 'warning)
-                            (t 'success))))
-           (if error-counts
-               (propertize (format "[%s/%s]" (or no-errors 0) (or no-warnings 0))
-                           'face face)
-             nil
-             )))
+         (when-let ((error-counts (flycheck-count-errors flycheck-current-errors)))
+           (let ((no-errors (cdr (assq 'error error-counts)))
+                 (no-warnings (cdr (assq 'warning error-counts))))
+             (format "[%s/%s]"
+                     (propertize (number-to-string (or no-errors 0)) 'face 'error)
+                     (propertize (number-to-string (or no-warnings 0)) 'face 'warning)))))
+             ;; (concat
+             ;;    (when no-errors
+             ;;      (propertize
+             ;;       (format "%s%s " (icon-tools-icon-str "ban") no-errors)
+             ;;       'face 'error))
+             ;;    (when no-warnings
+             ;;      (propertize
+             ;;       (format "%s%s" (icon-tools-icon-str "warning") no-warnings)
+             ;;       'face 'warning))))))
         (`interrupted " -")
         (`suspicious '(propertize " ?" 'face 'warning)))
     nil))
 
 (defun my/row-col-mode-line ()
-  "Render row and col information in mode line."
+  "Render row and col information in the mode line."
   (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
          (col (format-mode-line (list (propertize "%c" 'help-echo "Column number"))))
          (row-col (format "[%s : %s] " row col))
@@ -131,17 +146,17 @@ Adapted from powerline.el."
                                   ((buffer-modified-p) " *")
                                   (t " -")))
                     '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
-                    '(:eval (propertize "  %12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
+                    " "
+                    ;; '(:eval (my/buffer-file-icon-mode-line))
+                    ;; " "
+                    '(:eval (propertize "%12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
                     " "
                     ;; '(:eval (my/vc-mode-line))
                     ;; " "
                     '(:eval (my/flycheck-mode-line))
                     " "
                     '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
-                              (list (tidy-modeline--fill-center (/ (length modes) 2))
-                                    (icon-tools-icon-for-mode major-mode)
-                                    " "
-                                    modes)))
+                              (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
                     '(:eval (my/row-col-mode-line))))
 
 
