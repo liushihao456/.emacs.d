@@ -57,7 +57,9 @@
                                           (apply '+
                                                  (mapcar
                                                   (lambda (q)
-                                                    (car (flx-score item q flx-file-cache)))
+                                                    (car (or
+                                                          (flx-score item q flx-file-cache)
+                                                          '(-100))))
                                                   queries))))
                                   results)))
             (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
