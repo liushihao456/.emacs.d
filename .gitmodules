@@ -1,6 +1,3 @@
 [submodule "packages/icon-tools"]
 	path = packages/icon-tools
 	url = https://github.com/liushihao456/icon-tools.git
-[submodule "packages/flx"]
-	path = packages/flx
-	url = https://github.com/lewang/flx.git

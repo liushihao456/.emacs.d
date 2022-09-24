@@ -33,7 +33,7 @@
 (with-eval-after-load 'selectrum-prescient
   (setq selectrum-prescient-enable-sorting nil))
 
-;; Prescient sorting mechanism:
+;; Prescient default sorting mechanism:
 ;; 1. Most front: recently selected candidates
 ;; 2. Followed by: frequently selected ones
 ;; 3. The rest, if `prescient-sort-length-enable' is t (the default), are sorted
@@ -50,7 +50,6 @@
     (let ((results (funcall fn query candidates)))
       (if (and results
                (not (string-empty-p query))
-               ;; (not (string-match-p " " query))
                (< (length results) prescient-flx-threshold))
           (let* ((queries (prescient-split-query query))
                  (matches (mapcar (lambda (item)
