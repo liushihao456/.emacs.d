@@ -30,6 +30,9 @@
 (marginalia-mode t)
 (icon-tools-completion-mode t)
 
+(with-eval-after-load 'selectrum-prescient
+  (setq selectrum-prescient-enable-sorting nil))
+
 ;; Prescient sorting mechanism:
 ;; 1. Most front: recently selected candidates
 ;; 2. Followed by: frequently selected ones
@@ -39,7 +42,32 @@
   ;; Prescient filter method can be toggled during session via M-s a/f/...
   (setq prescient-filter-method '(literal regexp initialism fuzzy))
   (setq prescient-sort-full-matches-first t)
-  (setq prescient-sort-length-enable nil))
+  (setq prescient-sort-length-enable nil)
+
+  (defvar prescient-flx-threshold 500)
+  (require 'flx)
+  (defun my/prescient-filter-flx-advice (fn query candidates)
+    (let ((results (funcall fn query candidates)))
+      (if (and results
+               (not (string-empty-p query))
+               ;; (not (string-match-p " " query))
+               (< (length results) prescient-flx-threshold))
+          (let* ((queries (prescient-split-query query))
+                 (matches (mapcar (lambda (item)
+                                    (cons item
+                                          (apply '+
+                                                 (mapcar
+                                                  (lambda (q)
+                                                    (car (flx-score item q flx-file-cache)))
+                                                  queries))))
+                                  results)))
+            (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
+            (mapcar (lambda (x) (car x)) matches))
+        results)))
+
+  (advice-add #'prescient-filter :around #'my/prescient-filter-flx-advice)
+  ;; (advice-remove #'prescient-filter #'my/prescient-filter-flx-advice)
+  )
 
 (with-eval-after-load 'selectrum
   (setq selectrum-count-style 'current/matches)
