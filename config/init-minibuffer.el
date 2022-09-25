@@ -164,7 +164,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   "Generate ctags in project."
   (interactive)
   (let ((default-directory (project-root (project-current)))
-        (cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" | ctags -e -L -"))
+        (cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" | ctags -f TAGS -e -L -"))
     (cond
      ;; Windows
      ((memq system-type '(ms-dos windows-nt cygwin))
