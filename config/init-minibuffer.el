@@ -173,7 +173,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
      (t
       (shell-command cmd)))))
 
-(defun ctags-read-tag ()
+(defun ctags-read-tag (&optional file)
   "Read ctags tag at point."
   (let ((line (buffer-substring-no-properties
                (point)
@@ -185,9 +185,19 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                   (buffer-substring-no-properties
                    (progn (skip-chars-forward "") (point))
                    (progn (skip-chars-forward "^,") (point))))))
-    (list symbol line-no line)))
+    (if file
+        (list symbol line-no line file)
+      (list symbol line-no line))))
 
-(defun project-imenu ()
+(defun project-ctags-tag-annotator (cand)
+  (when-let ((tag-info (get-text-property 0 'tag-info cand)))
+    (concat (propertize " " 'display '(space :align-to center))
+            (propertize (format "%s:%s" (cadddr tag-info) (cadr tag-info)) 'face 'marginalia-value))))
+
+(add-to-list 'marginalia-annotator-registry
+             '(etags project-ctags-tag-annotator builtin none))
+
+(defun project-ctags-find-tag ()
   "Jump to symbols across the whole project."
   (interactive)
   (let* ((project-root (project-root (project-current)))
@@ -209,56 +219,45 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
           (when (looking-at "\177")
             (forward-line 1))
           (while (not (or (eobp) (looking-at "\f")))
-            (setq tag-info (save-excursion (ctags-read-tag)))
+            (setq tag-info (save-excursion (ctags-read-tag file)))
             (setq tag-name (car tag-info))
-            (push (cons
-                   (propertize
-                    tag-name
-                    ;; Unique symbol matcher
-                    'selectrum--candidate-full (format
-                                                "%s:%s:%s"
-                                                file
-                                                (cadr tag-info)
-                                                (car tag-info)))
-                   tag-info)
+            (push (cons (propertize
+                   tag-name
+                   ;; Unique symbol matcher
+                   'selectrum--candidate-full
+                   (format "%s:%s:%s" file (cadr tag-info) (car tag-info))
+                   'tag-info tag-info)
+                        tag-info)
                   tag-list)
             (push (list
                    ;; Unique symbol matcher
-                   (format
-                    "%s:%s:%s"
-                    file
-                    (cadr tag-info)
-                    (car tag-info))
+                   (format "%s:%s:%s" file (cadr tag-info) (car tag-info))
                    tag-info
                    file)
                   tag-info-list)
             (forward-line 1))
           )))
-    ;; (print (car tag-list))
     (let* ((selectrum-should-sort nil)
            (selected-tag
             (completing-read
              "Go to tag: "
              (lambda (str pred action)
                (if (eq action 'metadata)
-                   '(metadata (category . imenu))
+                   '(metadata . ((category . etags)))
                  (complete-with-action
-                  action tag-list str pred)))
-             ))
+                  action tag-list str pred)))))
            (tag-info-list-match (assoc selected-tag tag-info-list))
            (file (caddr tag-info-list-match))
            (full-file-path
             (if (string-prefix-p "/" file)
                 file
-              (concat project-root (caddr tag-info-list-match)))))
-      ;; (message "tag-info-list-match %s" tag-info-list-match)
-      ;; (message "tag-info %s" (cadr tag-info-list-match))
+              (concat project-root file))))
       (find-file full-file-path)
       (goto-char (point-min))
-      (forward-line (- (cadr (cadr tag-info-list-match)) 1))
-      )))
+      (forward-line (- (cadr (cadr tag-info-list-match)) 1)))))
+
 (global-set-key (kbd "C-c p g") 'ctags-generate-tags)
-(global-set-key (kbd "C-c p i") 'project-imenu)
+(global-set-key (kbd "C-c p i") 'project-ctags-find-tag)
 
 (provide 'init-minibuffer)
 
