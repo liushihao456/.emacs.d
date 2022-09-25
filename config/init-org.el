@@ -61,6 +61,7 @@
       (capitalize-word 1)
       (buffer-substring start end))))
 
+(add-hook 'org-mode-hook 'org-bullets-mode)
 (add-hook 'org-mode-hook
           (lambda ()
             (when (boundp 'electric-pair-inhibit-predicate)

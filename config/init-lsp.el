@@ -42,6 +42,8 @@
   (define-key lsp-mode-map (kbd "C-c l M-r") 'lsp-workspace-restart)
   (define-key lsp-mode-map (kbd "C-c l S") 'lsp-shutdown-workspace)
   (define-key lsp-mode-map (kbd "C-c l a") 'xref-find-apropos)
+  (define-key lsp-mode-map (kbd "C-c l i") 'consult-lsp-symbols)
+  (define-key lsp-mode-map (kbd "C-c l d") 'consult-lsp-diagnostics)
 
   (setq lsp-before-save-edits nil)
   (setq lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-verbosity=off"))
