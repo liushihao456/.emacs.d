@@ -128,6 +128,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (interactive)
   (let* ((tocpl (mapcar
                  (lambda (x)
+                   ;; If using selectrum, marginalia uses `selectrum--get-full'
+                   ;; to retrieve the full candidate, which uses the
+                   ;; `selectrum--candidate-full' or `selectrum-candidate-full'
+                   ;; property. See `marginalia--full-candidate'.
                    (propertize
                     (file-name-nondirectory x)
                     'selectrum--candidate-full x))
@@ -139,10 +143,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                        '(metadata (category . file))
                                      (complete-with-action
                                       action tocpl str pred))))))
-    (when fname
-      (find-file
-       (or (get-text-property 0 'selectrum--candidate-full fname)
-           fname)))))
+    (when fname (find-file fname))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
 ;; Switch to buffer that belongs to the current project
@@ -157,6 +158,107 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
        (string-prefix-p
         root (expand-file-name (buffer-local-value 'default-directory (cdr buf))))))))
 (global-set-key (kbd "C-c p b") 'project-switch-to-buffer)
+
+;; Jump to symbols across the whole project
+(defun ctags-generate-tags ()
+  "Generate ctags in project."
+  (interactive)
+  (let ((default-directory (project-root (project-current)))
+        (cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" | ctags -e -L -"))
+    (cond
+     ;; Windows
+     ((memq system-type '(ms-dos windows-nt cygwin))
+      (shell-command (concat "Powershell -Command " (shell-quote-argument cmd))))
+     ;; MacOS, Linux
+     (t
+      (shell-command cmd)))))
+
+(defun ctags-read-tag ()
+  "Read ctags tag at point."
+  (let ((line (buffer-substring-no-properties
+               (point)
+               (progn (skip-chars-forward "^") (point))))
+        (symbol (buffer-substring-no-properties
+                 (progn (skip-chars-forward "") (point))
+                 (progn (skip-chars-forward "^") (point))))
+        (line-no (string-to-number
+                  (buffer-substring-no-properties
+                   (progn (skip-chars-forward "") (point))
+                   (progn (skip-chars-forward "^,") (point))))))
+    (list symbol line-no line)))
+
+(defun project-imenu ()
+  "Jump to symbols across the whole project."
+  (interactive)
+  (let* ((project-root (project-root (project-current)))
+         (tag-file-name
+          (concat project-root "TAGS"))
+         tag-list
+         tag-info-list)
+    (with-temp-buffer
+      (insert-file-contents tag-file-name)
+      (goto-char (point-min))
+      (while (re-search-forward "\f\n" nil t)
+        (let ((file (buffer-substring-no-properties
+                     (point)
+                     (save-excursion (skip-chars-forward "^,") (point))))
+              tag-info tag-name)
+          (forward-line 1)
+          ;; Exuberant ctags add a line starting with the DEL character;
+          ;; skip past it.
+          (when (looking-at "\177")
+            (forward-line 1))
+          (while (not (or (eobp) (looking-at "\f")))
+            (setq tag-info (save-excursion (ctags-read-tag)))
+            (setq tag-name (car tag-info))
+            (push (cons
+                   (propertize
+                    tag-name
+                    ;; Unique symbol matcher
+                    'selectrum--candidate-full (format
+                                                "%s:%s:%s"
+                                                file
+                                                (cadr tag-info)
+                                                (car tag-info)))
+                   tag-info)
+                  tag-list)
+            (push (list
+                   ;; Unique symbol matcher
+                   (format
+                    "%s:%s:%s"
+                    file
+                    (cadr tag-info)
+                    (car tag-info))
+                   tag-info
+                   file)
+                  tag-info-list)
+            (forward-line 1))
+          )))
+    ;; (print (car tag-list))
+    (let* ((selectrum-should-sort nil)
+           (selected-tag
+            (completing-read
+             "Go to tag: "
+             (lambda (str pred action)
+               (if (eq action 'metadata)
+                   '(metadata (category . imenu))
+                 (complete-with-action
+                  action tag-list str pred)))
+             ))
+           (tag-info-list-match (assoc selected-tag tag-info-list))
+           (file (caddr tag-info-list-match))
+           (full-file-path
+            (if (string-prefix-p "/" file)
+                file
+              (concat project-root (caddr tag-info-list-match)))))
+      ;; (message "tag-info-list-match %s" tag-info-list-match)
+      ;; (message "tag-info %s" (cadr tag-info-list-match))
+      (find-file full-file-path)
+      (goto-char (point-min))
+      (forward-line (- (cadr (cadr tag-info-list-match)) 1))
+      )))
+(global-set-key (kbd "C-c p g") 'ctags-generate-tags)
+(global-set-key (kbd "C-c p i") 'project-imenu)
 
 (provide 'init-minibuffer)
 
