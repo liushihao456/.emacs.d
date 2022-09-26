@@ -1,3 +1,6 @@
 [submodule "packages/icon-tools"]
 	path = packages/icon-tools
 	url = https://github.com/liushihao456/icon-tools.git
+[submodule "packages/company-tip"]
+	path = packages/company-tip
+	url = https://github.com/liushihao456/company-tip
