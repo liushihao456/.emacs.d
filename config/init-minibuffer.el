@@ -221,13 +221,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
           (while (not (or (eobp) (looking-at "\f")))
             (setq tag-info (save-excursion (ctags-read-tag file)))
             (setq tag-name (car tag-info))
-            (push (cons (propertize
+            (push (propertize
                    tag-name
                    ;; Unique symbol matcher
                    'selectrum--candidate-full
                    (format "%s:%s:%s" file (cadr tag-info) (car tag-info))
                    'tag-info tag-info)
-                        tag-info)
                   tag-list)
             (push (list
                    ;; Unique symbol matcher
@@ -238,6 +237,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
             (forward-line 1))
           )))
     (let* ((selectrum-should-sort nil)
+           (marginalia--cache-size 0)
            (selected-tag
             (completing-read
              "Go to tag: "

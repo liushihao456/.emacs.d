@@ -39,7 +39,10 @@ project in order for clangd to understand the project code."
        (if (memq system-type '(ms-dos windows-nt cygwin))
            "cmake . -G Ninja -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
          "cmake . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"))))
-  (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands))
+  (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands)
+
+  (c-set-offset 'innamespace 0)
+  (c-set-offset 'access-label -2))
 
 ;; Cmake
 (when (executable-find "cmake")
