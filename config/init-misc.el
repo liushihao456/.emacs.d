@@ -364,6 +364,32 @@ This function is useful as a `:filter' to a conditional key definition."
 (define-key prog-mode-map [tab]
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 
+;; Diff-hl mode
+(global-diff-hl-mode)
+
+(defun my/diff-hl-define-bitmaps (&rest _)
+  (define-fringe-bitmap 'diff-hl-bmp-middle [#b00011000] nil nil '(center repeated))
+  (define-fringe-bitmap 'diff-hl-bmp-delete [#b11110000
+                                             #b11100000
+                                             #b11000000
+                                             #b10000000]
+                                             nil nil 'top))
+(advice-add #'diff-hl-define-bitmaps :override #'my/diff-hl-define-bitmaps)
+(defun +vc-gutter-type-face-fn (type _pos)
+  (intern (format "diff-hl-%s" type)))
+(defun my/diff-hl-type-at-pos-fn (type _pos)
+  (if (eq type 'delete)
+      'diff-hl-bmp-delete
+    'diff-hl-bmp-middle))
+(advice-add #'diff-hl-fringe-bmp-from-pos  :override #'my/diff-hl-type-at-pos-fn)
+(advice-add #'diff-hl-fringe-bmp-from-type :override #'my/diff-hl-type-at-pos-fn)
+(setq diff-hl-draw-borders nil)
+(with-eval-after-load 'flycheck
+  (setq flycheck-indication-mode 'right-fringe)
+  ;; Let the arrow point left
+  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    flycheck-fringe-bitmap-double-left-arrow nil nil 'center))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
