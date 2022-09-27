@@ -238,6 +238,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
           )))
     (let* ((selectrum-should-sort nil)
            (marginalia--cache-size 0)
+           (symbol-at-point (if (use-region-p)
+                                (buffer-substring-no-properties
+                                 (region-beginning) (region-end))
+                              (thing-at-point 'symbol t)))
            (selected-tag
             (completing-read
              "Go to tag: "
@@ -245,7 +249,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                (if (eq action 'metadata)
                    '(metadata . ((category . etags)))
                  (complete-with-action
-                  action tag-list str pred)))))
+                  action tag-list str pred)))
+             nil nil symbol-at-point))
            (tag-info-list-match (assoc selected-tag tag-info-list))
            (file (caddr tag-info-list-match))
            (full-file-path
