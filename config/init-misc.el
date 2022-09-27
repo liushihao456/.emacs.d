@@ -348,6 +348,22 @@ split; vice versa."
   (interactive "*")
   (uniquify-all-lines-region (point-min) (point-max)))
 
+;; Versatile tab key
+(defun my/tab-jump-over-pair-key-filter (cmd)
+  "Return CMD if there's any opening or closing pair after point at current line.
+This function is useful as a `:filter' to a conditional key definition."
+  (if (looking-at-p "\s*[](){}[<>\"'`]")
+      cmd))
+
+(defun my/tab-jump-over-pair ()
+  "Jump over an opening or enclosing pair character."
+  (interactive)
+  (save-match-data
+    (re-search-forward "\s*[](){}[<>\"'`]" (point-at-eol) t)))
+
+(define-key prog-mode-map [(tab)]
+  '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
