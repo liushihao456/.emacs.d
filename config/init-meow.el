@@ -156,6 +156,7 @@
 (setq meow-cursor-type-insert 'box)
 (setq meow-keypad-leader-dispatch "C-c")
 (setq meow-keypad-ctrl-meta-prefix ?M)
+(push '(diff-mode . motion) meow-mode-state-list)
 
 ;; Use jk to escape from insert state to normal state
 (defvar meow-two-char-escape-sequence "jk")

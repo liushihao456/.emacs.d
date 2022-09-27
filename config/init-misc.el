@@ -366,13 +366,15 @@ This function is useful as a `:filter' to a conditional key definition."
 
 ;; Diff-hl mode
 (global-diff-hl-mode)
-
+(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+(add-hook 'vc-dir-mode-hook 'diff-hl-dir-mode)
 (defun my/diff-hl-define-bitmaps (&rest _)
   (define-fringe-bitmap 'diff-hl-bmp-middle [#b00011000] nil nil '(center repeated))
   (define-fringe-bitmap 'diff-hl-bmp-delete [#b11110000
                                              #b11100000
                                              #b11000000
                                              #b10000000] nil nil 'top))
+
 (advice-add #'diff-hl-define-bitmaps :override #'my/diff-hl-define-bitmaps)
 (defun my/diff-hl-type-face-fn (type _pos)
   (intern (format "diff-hl-%s" type)))
