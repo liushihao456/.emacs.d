@@ -372,10 +372,9 @@ This function is useful as a `:filter' to a conditional key definition."
   (define-fringe-bitmap 'diff-hl-bmp-delete [#b11110000
                                              #b11100000
                                              #b11000000
-                                             #b10000000]
-                                             nil nil 'top))
+                                             #b10000000] nil nil 'top))
 (advice-add #'diff-hl-define-bitmaps :override #'my/diff-hl-define-bitmaps)
-(defun +vc-gutter-type-face-fn (type _pos)
+(defun my/diff-hl-type-face-fn (type _pos)
   (intern (format "diff-hl-%s" type)))
 (defun my/diff-hl-type-at-pos-fn (type _pos)
   (if (eq type 'delete)
@@ -387,8 +386,13 @@ This function is useful as a `:filter' to a conditional key definition."
 (with-eval-after-load 'flycheck
   (setq flycheck-indication-mode 'right-fringe)
   ;; Let the arrow point left
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-    flycheck-fringe-bitmap-double-left-arrow nil nil 'center))
+  (when (fboundp 'define-fringe-bitmap) ;; #ifdef HAVE_WINDOW_SYSTEM
+    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+      flycheck-fringe-bitmap-double-left-arrow)
+    (define-fringe-bitmap
+      'flycheck-fringe-bitmap-double-arrow-hi-res
+      flycheck-fringe-bitmap-double-left-arrow-hi-res
+      nil 16)))
 
 (provide 'init-misc)
 
