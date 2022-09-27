@@ -54,6 +54,9 @@
 (add-hook 'kotlin-mode-hook (lambda () (lsp)))
 
 (add-hook 'java-mode-hook 'lsp)
+(add-hook 'java-mode-hook
+          (lambda ()
+            (setq (make-local-variable lsp-ui-sideline-show-code-actions) nil)))
 (with-eval-after-load 'lsp-java
   (setq lsp-java-autobuild-enabled nil)
   (setq lsp-java-code-generation-generate-comments t)
