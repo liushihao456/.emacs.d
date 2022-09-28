@@ -58,9 +58,9 @@ autoloaded form."
              (with-no-warnings
                (append (list pkg-dir)
                        (directory-files-recursively pkg-dir "" t))))
-      (when (file-directory-p name)
+      (when (and (file-directory-p name) (not (string-suffix-p "/bin" name)))
         (message "Generating autoloads for directory: %s..." name)
-        (update-directory-autoloads name)))
+        (make-directory-autoloads name generated-autoload-file)))
     (let ((buf (find-buffer-visiting generated-autoload-file)))
       (when buf (kill-buffer buf)))))
 
