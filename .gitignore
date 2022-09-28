@@ -40,3 +40,4 @@ transient/
 /org-roam.db
 /.org-id-locations
 /TAGS
+/history

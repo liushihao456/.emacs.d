@@ -25,54 +25,121 @@
 
 ;;; Code:
 
-(selectrum-mode t)
-(selectrum-prescient-mode t)
-(marginalia-mode t)
-(icon-tools-completion-mode t)
+;; Vertico ------------------------------------------------------------------- ;
 
-(with-eval-after-load 'selectrum-prescient
-  (setq selectrum-prescient-enable-sorting nil))
+(vertico-mode)
+(savehist-mode)
 
-;; Prescient default sorting mechanism:
-;; 1. Most front: recently selected candidates
-;; 2. Followed by: frequently selected ones
-;; 3. The rest, if `prescient-sort-length-enable' is t (the default), are sorted
-;;    by length, otherwise are presented by their original order.
-(with-eval-after-load 'prescient
-  ;; Prescient filter method can be toggled during session via M-s a/f/...
-  (setq prescient-filter-method '(literal regexp initialism fuzzy))
-  (setq prescient-sort-full-matches-first t)
-  (setq prescient-sort-length-enable nil)
+;; Copied from vertico github example configurations:
+;; 
+;; Add prompt indicator to `completing-read-multiple'.
+;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+(defun crm-indicator (args)
+  (cons (format "[CRM%s] %s"
+                (replace-regexp-in-string
+                 "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                 crm-separator)
+                (car args))
+        (cdr args)))
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-  (defvar prescient-flx-threshold 500)
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+;; Enable recursive minibuffers
+(setq enable-recursive-minibuffers t)
+
+;; Orderless ----------------------------------------------------------------- ;
+
+;; Only activate orderless in minibuffer completion
+(add-hook 'minibuffer-setup-hook (lambda ()
+                                   (setq completion-styles '(orderless basic))))
+(setq completion-category-defaults nil
+      completion-category-overrides '((file (styles orderless partial-completion))))
+(setq orderless-matching-styles '(orderless-literal
+                                  orderless-regexp
+                                  orderless-initialism
+                                  orderless-flex))
+(with-eval-after-load 'orderless
+  (defun my/orderless-literal-if-suffix-bang (pattern index _total)
+    (if (string-suffix-p "!" pattern)
+        `(orderless-literal . ,(substring pattern 0 -1))))
+  (setq orderless-style-dispatchers '(my/orderless-literal-if-suffix-bang))
+
+  (defvar orderless-fuz-threshold 200)
   (require 'flx)
-  (defun my/prescient-filter-flx-advice (fn query candidates)
-    (let ((results (funcall fn query candidates)))
-      (if (and results
-               (not (string-empty-p query))
-               (< (length results) prescient-flx-threshold))
-          (let* ((queries (prescient-split-query query))
-                 (matches (mapcar (lambda (item)
-                                    (cons item
-                                          (apply '+
-                                                 (mapcar
-                                                  (lambda (q)
-                                                    (car (or
-                                                          (flx-score item q flx-file-cache)
-                                                          '(-100))))
-                                                  queries))))
-                                  results)))
-            (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
-            (mapcar (lambda (x) (car x)) matches))
-        results)))
+  (defun my/vertico-sort-flx (candidates)
+    "Sort CANDIDATES with flx scores."
+    ;; Copied from https://github.com/minad/vertico/issues/76#issuecomment-877427128
+    (when candidates
+      (let* ((query (buffer-substring (minibuffer-prompt-end)
+                                      (max (minibuffer-prompt-end) (point))))
+             (category (completion-metadata-get
+                        (completion-metadata query
+                                             minibuffer-completion-table
+                                             minibuffer-completion-predicate)
+                        'category)))
+        (when (eq category 'file)
+          (if (string-suffix-p "/" query)
+              (setq query "")
+            (setq query (file-name-nondirectory query))))
+        (if (and (not (string-empty-p query))
+                 (< (length candidates) orderless-fuz-threshold))
+            (let* ((queries (split-string query orderless-component-separator))
+                   (matches (mapcar (lambda (item)
+                                      (cons item
+                                            (apply '+
+                                                   (mapcar
+                                                    (lambda (q)
+                                                      (car (or
+                                                            (flx-score item q flx-strings-cache)
+                                                            '(-1000))))
+                                                    queries))))
+                                    candidates)))
+              (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
+              (mapcar (lambda (x) (car x)) matches))
+          candidates))))
+  (setq vertico-sort-override-function #'my/vertico-sort-flx)
 
-  (advice-add #'prescient-filter :around #'my/prescient-filter-flx-advice)
-  ;; (advice-remove #'prescient-filter #'my/prescient-filter-flx-advice)
+  ;; (defun my/orderless-filter-fuz-advice (fn query table &optional pred)
+  ;;   (when-let ((results (funcall fn query table pred)))
+  ;;     (if (and (not (string-empty-p query))
+  ;;              (< (length results) orderless-fuz-threshold))
+  ;;         (let* ((queries (split-string query orderless-component-separator))
+  ;;                (matches (mapcar (lambda (item)
+  ;;                                   (cons item
+  ;;                                         (apply '+
+  ;;                                                (mapcar
+  ;;                                                 (lambda (q)
+  ;;                                                   (car (or
+  ;;                                                         (flx-score item q flx-strings-cache)
+  ;;                                                         '(-1000))))
+  ;;                                                 queries))))
+  ;;                                 results)))
+  ;;           (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
+  ;;           (mapcar (lambda (x) (car x)) matches))
+  ;;       results)))
+
+  ;; (advice-add #'orderless-filter :around #'my/orderless-filter-fuz-advice))
+
+  ;; Disable vertico's default sorting
+  ;; (vertico--define-sort (history) 32 (if (eq % "") 0 (/ (aref % 0) 4)) (lambda (a b) -1) (lambda (a b) -1))
+  ;; (setq vertico-sort-override-function #'vertico-sort-history))
   )
 
-(with-eval-after-load 'selectrum
-  (setq selectrum-count-style 'current/matches)
-  (define-key selectrum-minibuffer-map (kbd "C-j") 'embark-act))
+;; Marginalia ---------------------------------------------------------------- ;
+
+(marginalia-mode)
+
+;; Icons --------------------------------------------------------------------- ;
+
+(icon-tools-completion-mode)
+
+;; Embark -------------------------------------------------------------------- ;
+
+(define-key minibuffer-mode-map (kbd "C-j") 'embark-act)
 
 (global-set-key (kbd "C-j") 'embark-act)
 (global-set-key (kbd "C-q") 'embark-export)
@@ -122,31 +189,35 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (advice-add #'consult-ripgrep :around #'my/consult-ripgrep-initial-input-advice)
   (setq consult-preview-key (kbd "C-o")))
 
-;; Provide completion for recent files
+;; Recentf files completion -------------------------------------------------- ;
+
 (defun recentf-open-files-compl ()
   "Find recentf files with `completing-read'."
   (interactive)
-  (let* ((tocpl (mapcar
+  (let* ((file-list (mapcar
                  (lambda (x)
-                   ;; If using selectrum, marginalia uses `selectrum--get-full'
-                   ;; to retrieve the full candidate, which uses the
-                   ;; `selectrum--candidate-full' or `selectrum-candidate-full'
-                   ;; property. See `marginalia--full-candidate'.
-                   (propertize
-                    (file-name-nondirectory x)
-                    'selectrum--candidate-full x))
+                   (cons (propertize (file-name-nondirectory x)
+                                     'full x)
+                         x))
                  recentf-list))
          (selectrum-should-sort nil)
          (fname (completing-read "File name: "
                                  (lambda (str pred action)
                                    (if (eq action 'metadata)
-                                       '(metadata (category . file))
+                                       '(metadata (category . recentf-file))
                                      (complete-with-action
-                                      action tocpl str pred))))))
-    (when fname (find-file fname))))
+                                      action file-list str pred))))))
+    (when fname (find-file (cdr (assoc fname file-list))))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
-;; Switch to buffer that belongs to the current project
+(defun recentf-open-files-annotator (cand)
+  (marginalia-annotate-file (get-text-property 0 'full cand)))
+
+(add-to-list 'marginalia-annotator-registry
+             '(recentf-file recentf-open-files-annotator builtin none))
+
+;; Switch to buffer in the current project ----------------------------------- ;
+
 (defun project-switch-to-buffer ()
   "Switch to buffers of current buffers."
   (interactive)
@@ -159,7 +230,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         root (expand-file-name (buffer-local-value 'default-directory (cdr buf))))))))
 (global-set-key (kbd "C-c p b") 'project-switch-to-buffer)
 
-;; Jump to symbols across the whole project
+;; Jump to symbols across the whole project ---------------------------------- ;
+
 (defun ctags-generate-tags ()
   "Generate ctags in project."
   (interactive)
@@ -212,6 +284,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (let ((file (buffer-substring-no-properties
                      (point)
                      (save-excursion (skip-chars-forward "^,") (point))))
+              (count 0)
               tag-info tag-name)
           (forward-line 1)
           ;; Exuberant ctags add a line starting with the DEL character;
@@ -221,21 +294,21 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
           (while (not (or (eobp) (looking-at "\f")))
             (setq tag-info (save-excursion (ctags-read-tag file)))
             (setq tag-name (car tag-info))
-            (push (propertize
-                   tag-name
-                   ;; Unique symbol matcher
-                   'selectrum--candidate-full
-                   (format "%s:%s:%s" file (cadr tag-info) (car tag-info))
-                   'tag-info tag-info)
-                  tag-list)
+            (push
+             ;; Unique symbol matcher
+             (format "%s%s"
+              (propertize tag-name 'tag-info tag-info)
+              (propertize (number-to-string count);; (format " - %s:%s" file (cadr tag-info))
+                          'invisible t))
+             tag-list)
             (push (list
                    ;; Unique symbol matcher
-                   (format "%s:%s:%s" file (cadr tag-info) (car tag-info))
+                   (format "%s%s" (car tag-info) count)
                    tag-info
                    file)
                   tag-info-list)
-            (forward-line 1))
-          )))
+            (forward-line 1)
+            (setq count (1+ count))))))
     (let* ((selectrum-should-sort nil)
            (marginalia--cache-size 0)
            (symbol-at-point (if (use-region-p)

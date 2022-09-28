@@ -181,7 +181,7 @@ split; vice versa."
     (pixel-scroll-precision-mode)))
 
 ;; Exclude files for recentf
-(setq recentf-exclude '("bookmarks\\'"))
+(setq recentf-exclude '("bookmarks\\'" ".*-autoloads.el\\'"))
 
 ;; ;; Open recent files list at Emacs start up
 ;; (unless (> (length command-line-args) 1)
