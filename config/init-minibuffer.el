@@ -68,6 +68,18 @@
         `(orderless-literal . ,(substring pattern 0 -1))))
   (setq orderless-style-dispatchers '(my/orderless-literal-if-suffix-bang))
 
+  (defun my/vertico-sort-history (candidates)
+    "Sort candidates by history."
+    (let ((hhash (vertico--history-hash))
+          hcands results2)
+      (dolist
+          (c candidates)
+        (if-let (idx (gethash c hhash))
+            (push (cons idx c) hcands)
+          (push c results2)))
+       (nconc (vertico--sort-decorated hcands)
+              (nreverse results2))))
+
   (defvar orderless-fuz-threshold 200)
   (require 'flx)
   (defun my/vertico-sort-flx (candidates)
@@ -88,46 +100,25 @@
         (if (and (not (string-empty-p query))
                  (< (length candidates) orderless-fuz-threshold))
             (let* ((queries (split-string query orderless-component-separator))
-                   (matches (mapcar (lambda (item)
-                                      (cons item
-                                            (apply '+
-                                                   (mapcar
-                                                    (lambda (q)
-                                                      (car (or
-                                                            (flx-score item q flx-strings-cache)
-                                                            '(-1000))))
-                                                    queries))))
-                                    candidates)))
+                   (matches (mapcar
+                             (lambda (item)
+                               (cons item
+                                     (apply
+                                      '+
+                                      (mapcar
+                                       (lambda (q)
+                                         (car (or
+                                               (flx-score item q flx-strings-cache)
+                                               '(-1000))))
+                                       queries))))
+                             candidates)))
               (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
               (mapcar (lambda (x) (car x)) matches))
           candidates))))
-  (setq vertico-sort-override-function #'my/vertico-sort-flx)
-
-  ;; (defun my/orderless-filter-fuz-advice (fn query table &optional pred)
-  ;;   (when-let ((results (funcall fn query table pred)))
-  ;;     (if (and (not (string-empty-p query))
-  ;;              (< (length results) orderless-fuz-threshold))
-  ;;         (let* ((queries (split-string query orderless-component-separator))
-  ;;                (matches (mapcar (lambda (item)
-  ;;                                   (cons item
-  ;;                                         (apply '+
-  ;;                                                (mapcar
-  ;;                                                 (lambda (q)
-  ;;                                                   (car (or
-  ;;                                                         (flx-score item q flx-strings-cache)
-  ;;                                                         '(-1000))))
-  ;;                                                 queries))))
-  ;;                                 results)))
-  ;;           (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
-  ;;           (mapcar (lambda (x) (car x)) matches))
-  ;;       results)))
-
-  ;; (advice-add #'orderless-filter :around #'my/orderless-filter-fuz-advice))
-
-  ;; Disable vertico's default sorting
-  ;; (vertico--define-sort (history) 32 (if (eq % "") 0 (/ (aref % 0) 4)) (lambda (a b) -1) (lambda (a b) -1))
-  ;; (setq vertico-sort-override-function #'vertico-sort-history))
-  )
+  (defun my/vertico-sort-flx-history (candidates)
+    "Sort vertico CANDIDATES first by flx scoring then by history."
+    (my/vertico-sort-history (my/vertico-sort-flx candidates)))
+  (setq vertico-sort-override-function #'my/vertico-sort-flx-history))
 
 ;; Marginalia ---------------------------------------------------------------- ;
 
