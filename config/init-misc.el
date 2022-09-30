@@ -188,8 +188,8 @@ split; vice versa."
 ;;   ;; Check if Emacs is called with a file name in command line args.
 ;;   (setq initial-buffer-choice 'recentf-open-files))
 
-;; From doc: if a command line argument is provided, assume a filename and skip
-;; displaying Dashboard.
+;; From dashboard doc: if a command line argument is provided, assume a filename
+;; and skip displaying Dashboard.
 (dashboard-setup-startup-hook)
 (with-eval-after-load 'dashboard
   (setq dashboard-items '((recents . 5) (bookmarks . 5)))
@@ -200,22 +200,15 @@ split; vice versa."
   (define-key dashboard-mode-map (kbd "n") 'widget-forward)
   (define-key dashboard-mode-map (kbd "p") 'widget-backward))
 
-(with-eval-after-load 'dired (setq dired-use-ls-dired nil))
+;; (with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)
-(setq enable-recursive-minibuffers t)
+(show-paren-mode t)
 (setq help-window-select t)
 (setq-default indent-tabs-mode nil)
-(menu-bar-mode -1)
-(when (functionp 'set-scroll-bar-mode) (set-scroll-bar-mode nil))
-(show-paren-mode t)
 (setq split-width-threshold 100)
 (setq-default tab-width 4)
-(tool-bar-mode -1)
 (setq-default truncate-lines t)
 (blink-cursor-mode -1)
-(setq c-basic-offset 4)
-(c-set-offset 'arglist-intro '+)
-(c-set-offset 'arglist-close '0)
 (column-number-mode t)
 (setq scroll-margin 4)
 (setq scroll-conservatively 101)
@@ -272,8 +265,9 @@ split; vice versa."
 (which-key-mode)
 
 ;; C indentation style
-(setq c-default-style
-      '((java-mode . "java") (other . "awk")))
+(setq c-basic-offset 4)
+(c-set-offset 'arglist-intro '+)
+(c-set-offset 'arglist-close '0)
 
 ;; Markdown mode
 (add-to-list 'auto-mode-alist
