@@ -172,8 +172,9 @@ Entered on %T")
 
 ;; Beautify org -------------------------------------------------------------- ;
 
-(set-face-background 'org-block-begin-line 'unspecified)
-(set-face-background 'org-block-end-line 'unspecified)
+(with-eval-after-load 'org
+  (set-face-background 'org-block-begin-line 'unspecified)
+  (set-face-background 'org-block-end-line 'unspecified))
 
 (add-hook 'org-mode-hook
           (lambda ()
