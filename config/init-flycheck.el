@@ -58,6 +58,7 @@ subsequent movements."
   (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
 
   (setq-default flycheck-emacs-lisp-load-path 'inherit)
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 
   (set-face-background 'flycheck-warning 'unspecified)
   (set-face-background 'flycheck-error 'unspecified)

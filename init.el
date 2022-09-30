@@ -56,10 +56,11 @@
 (require 'init-latex)
 (require 'init-gnuplot)
 (require 'init-org)
-(require 'init-lsp)
+(require 'init-elisp)
 (require 'init-python)
 (require 'init-cpp)
 (require 'init-java)
+(require 'init-lsp)
 (require 'init-web)
 (require 'init-treesitter)
 

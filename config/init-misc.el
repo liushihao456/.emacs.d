@@ -396,6 +396,9 @@ This function is useful as a `:filter' to a conditional key definition."
       flycheck-fringe-bitmap-double-left-arrow-hi-res
       nil 16)))
 
+;; Rainbow delimiters
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
