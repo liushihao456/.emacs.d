@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-;; Copied from doom emacs ---------------------------------------------------- ;
+;; Copied from doom emacs: add extra highlight ------------------------------- ;
 
 (defvar +emacs-lisp--face nil)
 
@@ -70,10 +70,10 @@ library/userland functions"
    'emacs-lisp-mode
    '((+emacs-lisp-highlight-vars-and-faces . +emacs-lisp--face))))
 
-;; Highlight quoted symbols in elisp
 (add-hook 'emacs-lisp-mode-hook 'highlight-quoted-mode)
 
-;; Display variable value next to documentation in eldoc.
+;; Display variable value next to documentation in eldoc --------------------- ;
+
 (defun +emacs-lisp-append-value-to-eldoc-a (fn sym)
   "Display variable value next to documentation in eldoc."
   (when-let (ret (funcall fn sym))
@@ -89,6 +89,10 @@ library/userland functions"
                           (if (< (length str) limit) "" truncated))))
       ret)))
 (advice-add #'elisp-get-var-docstring :around #'+emacs-lisp-append-value-to-eldoc-a)
+
+;; Prettify symbols mode ----------------------------------------------------- ;
+
+(add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
 
 (provide 'init-elisp)
 
