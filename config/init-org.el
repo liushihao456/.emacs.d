@@ -170,6 +170,36 @@ Entered on %T")
 (global-set-key (kbd "C-c n c") 'org-roam-capture)
 (global-set-key (kbd "C-c n j") 'org-roam-dailies-capture-today)
 
+;; Beautify org -------------------------------------------------------------- ;
+
+(set-face-background 'org-block-begin-line 'unspecified)
+(set-face-background 'org-block-end-line 'unspecified)
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq-local prettify-symbols-alist
+                        '(("#+BEGIN_SRC" . "✎")
+					      ("#+END_SRC" . "☐")
+					      ("#+begin_src" . "✎")
+					      ("#+end_src" . "☐")
+                          ("#+RESULTS:" . "⇒")
+					      ("[ ]" . "☐")
+                          ("[-]" . "⊡")
+					      ("[X]" . "☑")
+					      ("#+begin_quote" . "»")
+					      ("#+end_quote" . "☐")
+					      ("#+begin_verse" . "ζ")
+					      ("#+end_verse" . "☐")
+					      ("#+begin_example" . "☞")
+					      ("#+end_example" . "☐")
+                          ("#+begin_export" . "⎋")
+                          ("#+end_export" . "☐")
+                          ("#+END:" . "☐")
+                          ("#+BEGIN:" . "✎")
+                          ("#+CAPTION:" . "✑")
+                          ("#+ATTR_LATEX" . "✝︎")))
+            (prettify-symbols-mode)))
+
 (provide 'init-org)
 
 ;;; init-org.el ends here
