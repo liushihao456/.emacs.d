@@ -55,27 +55,7 @@
 ;; therefore incompatible. See https://www.emacswiki.org/emacs/DelightedModes.
 (advice-add 'c-update-modeline :override #'ignore)
 
-;; Tidy mode line
-(defun tidy-modeline--fill (reserve)
-  "Return empty space leaving RESERVE space on the right.
-Adapted from powerline.el."
-  (let ((real-reserve (if (and window-system (eq 'right (get-scroll-bar-mode)))
-                          (- reserve 3)
-                        reserve)))
-    (propertize
-     " "
-     'display `((space :align-to (- (+ right right-fringe right-margin) ,real-reserve))))))
-
-
-(defun tidy-modeline--fill-center (reserve)
-  "Return empty space leaving RESERVE space on the right in order to center a string.
-Adapted from powerline.el."
-  (propertize
-   " "
-   'display `((space :align-to (- (+ center (0.5 . right-margin)) ,reserve
-                                  (0.5 . left-margin))))))
-
-(defun buffer-encoding-abbrev ()
+(defun my/buffer-encoding-abbrev ()
   "The line ending convention used in the buffer."
   (let ((buf-coding (format "%s" buffer-file-coding-system)))
     (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
@@ -127,38 +107,61 @@ Adapted from powerline.el."
 
 (defun my/row-col-mode-line ()
   "Render row and col information in the mode line."
-  (let* ((row (format-mode-line (list (propertize "%l" 'help-echo "Line number"))))
-         (col (format-mode-line (list (propertize "%c" 'help-echo "Column number"))))
-         (row-col (format "[%s : %s] " row col))
-         (encoding (format "[%s]" (buffer-encoding-abbrev)))
-         (row-col-length (length row-col))
-         (encoding-length (+ row-col-length 1 (length encoding))))
-    (list
-     (tidy-modeline--fill encoding-length)
-     encoding
-     (tidy-modeline--fill row-col-length)
-     row-col
-     )))
+  (format "[%s : %s]"
+          (format-mode-line (list (propertize "%l" 'help-echo "Line number")))
+          (format-mode-line (list (propertize "%c" 'help-echo "Column number")))))
+
+(defun my/mode-line-render (left middle right)
+  "Return a string of `window-total-width' length containing LEFT,
+MIDDLE, and RIGHT aligned respectively."
+  (let* ((total-width (window-total-width))
+         (half-middle-width (/ (length middle) 2 ))
+         (total-space (- total-width 3 (length left) (length middle) (length right)))
+         (space1 (- (/ total-width 2) 1 (length left) half-middle-width))
+         (space1 (max 0 space1))
+         (space2 (- total-space space1))
+         (space2 (max 0 space2)))
+    (format " %s%s %s%s%s "
+            left
+            (make-string space1 ?\s)
+            middle
+            (make-string space2 ?\s)
+            right)))
+
+(defvar my/mode-line-left-segment
+  (list "%e"
+        '(:eval (cond (buffer-read-only "%*")
+                      ((buffer-modified-p) "*")
+                      (t "-")))
+        " "
+        '(:eval (propertize "[%P]"
+                            'help-echo "Position in buffer"))
+        " "
+        ;; '(:eval (my/buffer-file-icon-mode-line))
+        ;; " "
+        '(:eval (propertize "%12b"
+                            'face 'mode-line-buffer-id
+                            'help-echo default-directory))))
+
+(defvar my/mode-line-middle-segment
+  (list '(:eval (list
+                 (-remove
+                  (lambda (x) (or (equal x "(") (equal x ")")))
+                  mode-line-modes)))))
+
+(defvar my/mode-line-right-segment
+  (list '(:eval (my/flycheck-mode-line))
+        " "
+        '(:eval (my/row-col-mode-line))))
 
 (setq-default mode-line-format
-              (list "%e"
-                    '(:eval (cond (buffer-read-only " %*")
-                                  ((buffer-modified-p) " *")
-                                  (t " -")))
-                    '(:eval (propertize " [%P]" 'help-echo "Position in buffer"))
-                    " "
-                    ;; '(:eval (my/buffer-file-icon-mode-line))
-                    ;; " "
-                    '(:eval (propertize "%12b" 'face 'mode-line-buffer-id 'help-echo default-directory))
-                    " "
-                    ;; '(:eval (my/vc-mode-line))
-                    ;; " "
-                    '(:eval (my/flycheck-mode-line))
-                    " "
-                    '(:eval (let* ((modes (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
-                              (list (tidy-modeline--fill-center (/ (length modes) 2)) modes)))
-                    '(:eval (my/row-col-mode-line))))
-
+              '((:eval
+                 (replace-regexp-in-string ; escape ``%''
+                  "%" "%%"
+                  (my/mode-line-render
+                   (format-mode-line my/mode-line-left-segment)
+                   (format-mode-line my/mode-line-middle-segment)
+                   (format-mode-line my/mode-line-right-segment))))))
 
 (provide 'init-modeline)
 
