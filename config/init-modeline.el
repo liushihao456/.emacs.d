@@ -46,9 +46,11 @@
            (auto-fill-function nil "simple")
            (emmet-mode nil "emmet-mode")
            (anzu-mode nil "anzu")
+           (isearch-mode nil "isearch")
            (tree-sitter-mode nil "tree-sitter")
            (flycheck-mode nil "flycheck")
            (copilot-mode nil "copilot")))
+
 ;; cc-mode.el assumes that `mode-name’ is always a string (which was true in
 ;; Emacs 22 and earlier), while delight.el makes use of the fact that
 ;; `mode-name’ can (since Emacs 23) contain any mode-line construct. The two are
@@ -82,9 +84,9 @@
   (if (boundp 'flycheck-last-status-change)
       (pcase flycheck-last-status-change
         (`not-checked nil)
-        (`no-checker (propertize " -" 'face 'warning))
-        (`running (propertize " ?" 'face 'success))
-        (`errored (propertize " !" 'face 'error))
+        (`no-checker (propertize "  -  " 'face 'warning))
+        (`running (propertize "  ?  " 'face 'success))
+        (`errored (propertize "  !  " 'face 'error))
         (`finished
          (when-let ((error-counts (flycheck-count-errors flycheck-current-errors)))
            (let ((no-errors (cdr (assq 'error error-counts)))
@@ -101,8 +103,8 @@
              ;;      (propertize
              ;;       (format "%s%s" (icon-tools-icon-str "warning") no-warnings)
              ;;       'face 'warning))))))
-        (`interrupted " -")
-        (`suspicious '(propertize " ?" 'face 'warning)))
+        (`interrupted "  -  ")
+        (`suspicious '(propertize "  ?  " 'face 'warning)))
     nil))
 
 (defun my/row-col-mode-line ()
@@ -114,10 +116,23 @@
 (defun my/mode-line-render (left middle right)
   "Return a string of `window-total-width' length containing LEFT,
 MIDDLE, and RIGHT aligned respectively."
-  (let* ((total-width (window-total-width))
+  (let* ((addtional-items (cl-subseq
+                           mode-line-format 0 (1- (length mode-line-format))))
+         (addtional-itmes-width (length
+                                 (format-mode-line addtional-items)))
+         (total-width (window-total-width))
          (half-middle-width (/ (length middle) 2 ))
-         (total-space (- total-width 3 (length left) (length middle) (length right)))
-         (space1 (- (/ total-width 2) 1 (length left) half-middle-width))
+         (total-space (- total-width
+                         3
+                         addtional-itmes-width
+                         (length left)
+                         (length middle)
+                         (length right)))
+         (space1 (- (/ total-width 2)
+                    1
+                    addtional-itmes-width
+                    (length left)
+                    half-middle-width))
          (space1 (max 0 space1))
          (space2 (- total-space space1))
          (space2 (max 0 space2)))
