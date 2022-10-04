@@ -113,7 +113,7 @@
 
 (defun my/row-col-mode-line ()
   "Render row and col information in the mode line."
-  (format "[%3d:%2d]" (1+ (current-line)) (current-column)))
+  "[%3l:%2c]")
 
 (defun my/mode-line-render (left middle right)
   "Return a string of `window-total-width' length containing LEFT,
@@ -150,9 +150,9 @@ MIDDLE, and RIGHT aligned respectively."
                       ((buffer-modified-p) "*")
                       (t "-")))
         " "
-        '(:eval (format "[%2d%%%%]" (/ (window-start) 0.01 (point-max))))
-        ;; '(:eval (propertize "[%p]"
-        ;;                     'help-echo "Position in buffer"))
+        "["
+        mode-line-percent-position
+        "]"
         " "
         ;; '(:eval (my/buffer-file-icon-mode-line))
         ;; " "
@@ -191,9 +191,9 @@ MIDDLE, and RIGHT aligned respectively."
                             ((buffer-modified-p) "*")
                             (t "-")))
               " "
-              '(:eval (format "[%2d%%%%]" (/ (window-start) 0.01 (point-max))))
-              ;; '(:eval (propertize "[%p]"
-              ;;                     'help-echo "Position in buffer"))
+              "["
+              mode-line-percent-position
+              "]"
               " "
               ;; '(:eval (my/buffer-file-icon-mode-line))
               ;; " "
