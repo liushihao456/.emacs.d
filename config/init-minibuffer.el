@@ -59,11 +59,12 @@
                                    (setq completion-styles '(orderless basic))))
 (setq completion-category-defaults nil
       completion-category-overrides '((file (styles orderless partial-completion))))
-(setq orderless-matching-styles '(orderless-literal
-                                  orderless-regexp
-                                  orderless-initialism
-                                  orderless-flex))
 (with-eval-after-load 'orderless
+  (setq orderless-matching-styles '(orderless-literal
+                                    orderless-regexp
+                                    orderless-initialism
+                                    orderless-flex))
+
   (defun my/orderless-literal-if-suffix-bang (pattern index _total)
     (if (string-suffix-p "!" pattern)
         `(orderless-literal . ,(substring pattern 0 -1))))

@@ -26,11 +26,13 @@
 ;;; Code:
 
 ;; Embrace -- pair manipulation
+(with-eval-after-load 'embrace
+  (setq embrace-show-help-p nil))
 (add-hook 'org-mode-hook 'embrace-org-mode-hook)
 (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
 ;; The builtin hooks above are autoloaded. We need to require embrace in our
-;; custom hooks, otherwise embrace won't be loaded as embrace-add-pair is not
-;; autoloaded.
+;; custom hooks, otherwise embrace won't be loaded as embrace-add-pair is not an
+;; autoloaded function.
 (defun embrace-markdown-mode-hook ()
   "Embrace markdown mode hook."
   (require 'embrace)

@@ -190,7 +190,6 @@ split; vice versa."
 
 ;; From dashboard doc: if a command line argument is provided, assume a filename
 ;; and skip displaying Dashboard.
-(dashboard-setup-startup-hook)
 (with-eval-after-load 'dashboard
   (setq dashboard-items '((recents . 5) (bookmarks . 5)))
   (setq dashboard-center-content t)
@@ -199,6 +198,7 @@ split; vice versa."
     (setq dashboard-startup-banner 2))
   (define-key dashboard-mode-map (kbd "n") 'widget-forward)
   (define-key dashboard-mode-map (kbd "p") 'widget-backward))
+(dashboard-setup-startup-hook)
 
 (with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)

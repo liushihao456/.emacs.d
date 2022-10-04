@@ -88,9 +88,9 @@
   (if (boundp 'flycheck-last-status-change)
       (pcase flycheck-last-status-change
         (`not-checked nil)
-        (`no-checker (propertize "  -   " 'face 'warning))
-        (`running (propertize "  ?   " 'face 'success))
-        (`errored (propertize "  !   " 'face 'error))
+        (`no-checker (propertize "   -    " 'face 'warning))
+        (`running (propertize "   ?    " 'face 'success))
+        (`errored (propertize "   !    " 'face 'error))
         (`finished
          (when-let ((error-counts (flycheck-count-errors flycheck-current-errors)))
            (let ((no-errors (cdr (assq 'error error-counts)))
@@ -107,8 +107,8 @@
              ;;      (propertize
              ;;       (format "%s%s" (icon-tools-icon-str "warning") no-warnings)
              ;;       'face 'warning))))))
-        (`interrupted "  -   ")
-        (`suspicious '(propertize "  ?   " 'face 'warning)))
+        (`interrupted "   -    ")
+        (`suspicious '(propertize "   ?    " 'face 'warning)))
     nil))
 
 (defun my/row-col-mode-line ()
