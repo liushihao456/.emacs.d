@@ -200,7 +200,7 @@ split; vice versa."
   (define-key dashboard-mode-map (kbd "n") 'widget-forward)
   (define-key dashboard-mode-map (kbd "p") 'widget-backward))
 
-;; (with-eval-after-load 'dired (setq dired-use-ls-dired nil))
+(with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)
 (show-paren-mode t)
 (setq help-window-select t)

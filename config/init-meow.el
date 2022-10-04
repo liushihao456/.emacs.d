@@ -261,12 +261,16 @@ POS, IDX, CNT are arguments to the original function."
 
 (defun meow/search-setup-mode-line-indicator ()
   "Setup meow search mode line indicator."
-  (setq mode-line-format (cons meow/search-indicator-mode-line-format mode-line-format))
+  (if (bound-and-true-p mini-modeline-mode)
+      (setq mini-modeline-r-format (cons meow/search-indicator-mode-line-format mini-modeline-r-format))
+    (setq mode-line-format (cons meow/search-indicator-mode-line-format mode-line-format)))
   (setq meow/search-indicator-active t))
 
 (defun meow/search-reset-mode-line-indicator ()
   "Reset meow search mode line indicator."
-  (setq mode-line-format (delete meow/search-indicator-mode-line-format mode-line-format))
+  (if (bound-and-true-p mini-modeline-mode)
+      (setq mini-modeline-r-format (delete meow/search-indicator-mode-line-format mini-modeline-r-format))
+    (setq mode-line-format (delete meow/search-indicator-mode-line-format mode-line-format)))
   (setq meow/search-indicator-active nil))
 
 (defun meow--highlight-pre-command-after-advice ()

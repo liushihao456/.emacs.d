@@ -50,6 +50,7 @@
 
 ;; Enable recursive minibuffers
 (setq enable-recursive-minibuffers t)
+(minibuffer-depth-indicate-mode)
 
 ;; Orderless ----------------------------------------------------------------- ;
 

@@ -76,6 +76,8 @@ which base16-shell produces."
 (unless (display-graphic-p)
   (set-face-background 'default 'unspecified))
 
+(set-face-background 'fringe 'unspecified)
+
 (provide 'init-theme)
 
 ;;; init-theme.el ends here
