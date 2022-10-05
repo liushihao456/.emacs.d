@@ -197,7 +197,8 @@ MIDDLE, and RIGHT aligned respectively."
               " "
               ;; '(:eval (my/buffer-file-icon-mode-line))
               ;; " "
-              '(:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory))
+              ;; '(:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory))
+              '(-20 (:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory)))
               " "))
   (setq mini-modeline-r-format
         (list " "
