@@ -203,11 +203,27 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (when fname (find-file (cdr (assoc fname file-list))))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
-(defun recentf-open-files-annotator (cand)
-  (marginalia-annotate-file (get-text-property 0 'full cand)))
+(add-to-list 'icon-tools-completion-category-icon-alist
+             '(recentf-file . icon-tools-completion-get-file-icon))
+
+(defun marginalia--recentf-file-annotator (cand)
+  "Annotate recentf file CAND."
+  (when-let* ((file (get-text-property 0 'full cand))
+              (attrs (ignore-errors
+                       ;; may throw permission denied errors
+                       (file-attributes (substitute-in-file-name
+                                         (marginalia--full-candidate file))
+                                        'integer))))
+    (marginalia--fields
+     ((file-size-human-readable (file-attribute-size attrs))
+      :face 'marginalia-size :width -7)
+     ((marginalia--time (file-attribute-modification-time attrs))
+      :face 'marginalia-date :width -12)
+     ((file-name-directory (abbreviate-file-name file))
+      :truncate 0.6 :face 'marginalia-file-name))))
 
 (add-to-list 'marginalia-annotator-registry
-             '(recentf-file recentf-open-files-annotator builtin none))
+             '(recentf-file marginalia--recentf-file-annotator builtin none))
 
 ;; Switch to buffer in the current project ----------------------------------- ;
 
@@ -254,10 +270,16 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (list symbol line-no line file)
       (list symbol line-no line))))
 
+(add-to-list 'icon-tools-completion-category-icon-alist
+             '(etags . icon-tools-completion-get-imenu-icon))
+
 (defun project-ctags-tag-annotator (cand)
-  (when-let ((tag-info (get-text-property 0 'tag-info cand)))
-    (concat (propertize " " 'display '(space :align-to center))
-            (propertize (format "%s:%s" (cadddr tag-info) (cadr tag-info)) 'face 'marginalia-value))))
+  (when-let (tag-info (get-text-property 0 'tag-info cand))
+    (marginalia--fields
+     ((abbreviate-file-name (string-trim (or (caddr tag-info) "")))
+      :face 'marginalia-function :truncate 0.7)
+     ((format "%s:%s" (cadddr tag-info) (cadr tag-info))
+      :face 'marginalia-file-name :truncate 0.6))))
 
 (add-to-list 'marginalia-annotator-registry
              '(etags project-ctags-tag-annotator builtin none))
