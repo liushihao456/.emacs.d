@@ -8,7 +8,6 @@
 
 ;;; Code:
 
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars . nil) default-frame-alist)
-
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
