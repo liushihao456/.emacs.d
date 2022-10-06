@@ -28,7 +28,7 @@
 (setq read-process-output-max (* 1024 1024))
 
 (with-eval-after-load 'lsp-mode
-  (define-key lsp-mode-map (kbd "C-c l d") 'lsp-describe-thing-at-point)
+  (define-key lsp-mode-map (kbd "C-c l k") 'lsp-describe-thing-at-point)
   ;; (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
   ;; (define-key lsp-mode-map (kbd "C-c l R") 'lsp-ui-peek-find-references)
   (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)
