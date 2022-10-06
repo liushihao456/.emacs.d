@@ -193,7 +193,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                      'full x)
                          x))
                  recentf-list))
-         (selectrum-should-sort nil)
          (fname (completing-read "File name: "
                                  (lambda (str pred action)
                                    (if (eq action 'metadata)
@@ -324,9 +323,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                   tag-info-list)
             (forward-line 1)
             (setq count (1+ count))))))
-    (let* ((selectrum-should-sort nil)
-           (marginalia--cache-size 0)
-           (symbol-at-point (if (use-region-p)
+    (let* ((symbol-at-point (if (use-region-p)
                                 (buffer-substring-no-properties
                                  (region-beginning) (region-end))
                               (thing-at-point 'symbol t)))
