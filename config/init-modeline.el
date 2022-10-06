@@ -101,11 +101,11 @@
              ;; (concat
              ;;    (when no-errors
              ;;      (propertize
-             ;;       (format "%s%s " (icon-tools-icon-str "ban") no-errors)
+             ;;       (format "%s%s " (icon-tools-icon-str :face "ban") no-errors)
              ;;       'face 'error))
              ;;    (when no-warnings
              ;;      (propertize
-             ;;       (format "%s%s" (icon-tools-icon-str "warning") no-warnings)
+             ;;       (format "%s%s" (icon-tools-icon-str :face "warning") no-warnings)
              ;;       'face 'warning))))))
         (`interrupted "   -    ")
         (`suspicious '(propertize "   ?    " 'face 'warning)))
