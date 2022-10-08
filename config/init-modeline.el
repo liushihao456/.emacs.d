@@ -207,10 +207,9 @@ MIDDLE, and RIGHT aligned respectively."
               '(:eval (my/flycheck-mode-line))
               '(:eval (my/row-col-mode-line))
               " "))
-  ;; (setq mini-modeline-face-attr '(:background 'unspecified))
-  (setq mini-modeline-face-attr nil)
   (setq mini-modeline-right-padding 1)
   )
+
 (mini-modeline-mode)
 
 (provide 'init-modeline)
