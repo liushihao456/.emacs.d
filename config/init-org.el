@@ -71,34 +71,43 @@
                `(lambda (c)
                   (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c)))))))
 (with-eval-after-load 'org
-  ;; (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
-  ;; (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
-  ;; (add-to-list 'image-file-name-extensions "eps")
-  ;; (setq org-image-actual-width '(400)) ; Prevent inline images being too big
+  ;; Org babel
   ;; (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images) ; Redisplay after babel executing
-  (setq org-adapt-indentation nil)
-  (setq org-highlight-latex-and-related '(native))
-  ;; (setq org-export-coding-system 'utf-8)           ; Ensure exporting with UTF-8
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (C . t)
-     (js . t)
-     (ditaa . t)
-     (dot . t)
-     (org . t)
-     (shell . t)
-     (latex . t)
-     (R . t)
-     (gnuplot . t)))
-  ;; (setq org-preview-latex-default-process 'imagemagick)
-  ;; (setq org-format-latex-options '(:foreground auto :background "Transparent" :scale 1.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-  ;;                                              ("begin" "$1" "$" "$$" "\\(" "\\[")))
+  ;; (setq org-export-coding-system 'utf-8)
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '((python . t)
+  ;;    (C . t)
+  ;;    (js . t)
+  ;;    (ditaa . t)
+  ;;    (dot . t)
+  ;;    (org . t)
+  ;;    (shell . t)
+  ;;    (latex . t)
+  ;;    (R . t)
+  ;;    (gnuplot . t)))
   (setq org-src-window-setup 'current-window)
   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
-  )
+
+  ;; Images
+  ;; (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))
+  ;; (add-to-list 'image-file-name-extensions "eps")
+  ;; (setq org-image-actual-width '(400)) ; Prevent inline images being too big
+
+  ;; Latex
+  ;; (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
+  (setq org-highlight-latex-and-related '(native))
+  (setq org-preview-latex-default-process 'dvisvgm)
+  (setq org-format-latex-options '(:foreground auto
+                                   :background "Transparent"
+                                   :scale 2
+                                   :html-foreground "Black"
+                                   :html-background "Transparent"
+                                   :html-scale 1.0
+                                   :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+  (setq org-startup-with-latex-preview t))
 
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)
