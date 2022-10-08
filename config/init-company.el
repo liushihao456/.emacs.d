@@ -25,10 +25,9 @@
 
 ;;; Code:
 
-(add-hook 'prog-mode-hook 'company-mode)
-(add-hook 'LaTeX-mode-hook 'company-mode)
-(add-hook 'org-mode-hook 'company-mode)
-(add-hook 'inferior-python-mode-hook 'company-mode)
+(with-eval-after-load 'company-box
+  (setq company-box-scrollbar nil))
+
 (with-eval-after-load 'company
   (setq company-backends '(company-capf company-files))
   (define-key company-active-map (kbd "C-n") 'company-select-next)
@@ -122,6 +121,11 @@ If failed try to complete the common part with `company-complete-common'"
 
   (delq 'company-preview-if-just-one-frontend company-frontends)
   )
+
+(add-hook 'prog-mode-hook 'company-mode)
+(add-hook 'LaTeX-mode-hook 'company-mode)
+(add-hook 'org-mode-hook 'company-mode)
+(add-hook 'inferior-python-mode-hook 'company-mode)
 
 (provide 'init-company)
 
