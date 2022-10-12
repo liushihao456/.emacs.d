@@ -60,6 +60,15 @@ subsequent movements."
   (setq-default flycheck-emacs-lisp-load-path 'inherit)
   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 
+  (add-to-list 'display-buffer-alist
+               `(,flycheck-error-list-buffer
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (window-height . 0.33)))
+  (defun flycheck-list-errors-a ()
+    "Switch to flycheck errors list buffer after creating it."
+    (select-window (get-buffer-window flycheck-error-list-buffer)))
+  (advice-add #'flycheck-list-errors :after #'flycheck-list-errors-a)
+
   (set-face-background 'flycheck-warning 'unspecified)
   (set-face-background 'flycheck-error 'unspecified)
   (set-face-background 'flycheck-info 'unspecified))
