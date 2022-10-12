@@ -275,7 +275,8 @@ split; vice versa."
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
 ;; Treemacs
-(global-set-key (kbd "C-c z") 'treemacs)
+(global-set-key (kbd "C-c z") 'treemacs-select-window)
+;; (global-set-key (kbd "M-z") 'treemacs)
 (with-eval-after-load 'treemacs
   (treemacs-follow-mode)
   (treemacs-project-follow-mode)

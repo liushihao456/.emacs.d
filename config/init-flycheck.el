@@ -68,6 +68,10 @@ subsequent movements."
     "Switch to flycheck errors list buffer after creating it."
     (select-window (get-buffer-window flycheck-error-list-buffer)))
   (advice-add #'flycheck-list-errors :after #'flycheck-list-errors-a)
+  (add-hook 'window-configuration-change-hook
+            (lambda ()
+              (when-let (w (get-buffer-window flycheck-error-list-buffer))
+                (set-window-parameter w 'no-other-window t))))
 
   (set-face-background 'flycheck-warning 'unspecified)
   (set-face-background 'flycheck-error 'unspecified)
