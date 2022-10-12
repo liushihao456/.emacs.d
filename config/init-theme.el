@@ -72,7 +72,7 @@ which base16-shell produces."
       (load-theme local-config-theme t))
   (load-base16-theme))
 
-(setq frame-background-mode 'dark)
+;; (setq frame-background-mode 'dark)
 (unless (display-graphic-p)
   (set-face-background 'default 'unspecified))
 

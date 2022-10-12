@@ -29,8 +29,6 @@
 
 (with-eval-after-load 'lsp-mode
   (define-key lsp-mode-map (kbd "C-c l k") 'lsp-describe-thing-at-point)
-  ;; (define-key lsp-mode-map (kbd "C-c l D") 'lsp-ui-peek-find-definitions)
-  ;; (define-key lsp-mode-map (kbd "C-c l R") 'lsp-ui-peek-find-references)
   (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)
   (define-key lsp-mode-map (kbd "C-c l o") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l r") 'lsp-rename)
@@ -47,26 +45,28 @@
 
   (setq lsp-before-save-edits nil)
   (setq lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-verbosity=off"))
-  (setq lsp-completion-show-detail nil)
-  (setq lsp-enable-file-watchers nil)
+  ;; (setq lsp-completion-show-detail nil)
+  ;; (setq lsp-enable-file-watchers nil)
   (setq lsp-enable-indentation nil)
   (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-semantic-highlighting t)
+  (setq lsp-semantic-tokens-enable t)
   (setq lsp-headerline-breadcrumb-enable t)
-  (setq lsp-idle-delay 0.5)
+  ;; (setq lsp-idle-delay 0.5)
   (setq lsp-modeline-code-actions-enable nil)
   (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-semantic-tokens-enable nil)
   (setq lsp-signature-render-documentation nil)
-  ;; (setq lsp-ui-sideline-show-hover t)
-  ;; (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-update-mode 'line)
   (setq lsp-enable-imenu nil)
 
   ;; (setq lsp-log-io t)
   )
 
 (with-eval-after-load 'lsp-ui
+  (define-key lsp-mode-map (kbd "C-c l g") 'lsp-ui-peek-find-references)
+
+  ;; (setq lsp-ui-sideline-show-hover t)
+  ;; (setq lsp-ui-sideline-show-code-actions t)
+  (setq lsp-ui-sideline-update-mode 'line)
+
   (defun my/lsp-ui-doc--make-request (fun &rest _)
     "Wrapper around lsp-ui-doc--make-request that prevents showing doc when
 typing or company is active."
@@ -76,9 +76,10 @@ typing or company is active."
       (lsp-ui-doc--hide-frame)))
   (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
 
-  (set-face-background 'lsp-ui-doc-background "#272A36")
-  (set-face-background 'lsp-ui-sideline-code-action 'unspecified)
-  (set-face-background 'lsp-ui-sideline-symbol 'unspecified))
+  ;; (set-face-background 'lsp-ui-doc-background "#272A36")
+  ;; (set-face-background 'lsp-ui-sideline-code-action 'unspecified)
+  ;; (set-face-background 'lsp-ui-sideline-symbol 'unspecified)
+  )
 
 (add-hook 'emacs-lisp-mode-hook 'lsp-ui-mode)
 
