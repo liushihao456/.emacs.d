@@ -76,7 +76,15 @@ which base16-shell produces."
 (unless (display-graphic-p)
   (set-face-background 'default 'unspecified))
 
-(set-face-background 'fringe 'unspecified)
+(when (display-graphic-p)
+  (with-eval-after-load 'modus-themes
+    (set-face-background 'modus-themes-fringe-red 'unspecified)
+    (set-face-background 'modus-themes-fringe-green 'unspecified)
+    (set-face-background 'modus-themes-fringe-yellow 'unspecified)
+    (set-face-background 'modus-themes-fringe-blue 'unspecified)
+    (set-face-background 'modus-themes-fringe-magenta 'unspecified)
+    (set-face-background 'modus-themes-fringe-cyan 'unspecified))
+  (set-face-background 'fringe 'unspecified))
 
 (provide 'init-theme)
 
