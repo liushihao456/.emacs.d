@@ -275,7 +275,7 @@ split; vice versa."
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
 ;; Treemacs
-(global-set-key (kbd "M-z") 'treemacs)
+(global-set-key (kbd "C-c z") 'treemacs)
 (with-eval-after-load 'treemacs
   (treemacs-follow-mode)
   (treemacs-project-follow-mode)
@@ -283,28 +283,18 @@ split; vice versa."
   (setq treemacs-file-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
   (setq treemacs-follow-after-init t)
-  (setq treemacs-width 30)
+  ;; (setq treemacs-width 30)
+  (setq treemacs-indentation 1)
+  (setq treemacs-is-never-other-window t)
 
-  (defun my/toggle-maximize-treemacs ()
-    "Maximize/restore Treemacs buffer."
-    (interactive)
-    (unless (boundp 'treemacs--original-width)
-      (setq treemacs--original-width treemacs-width))
-    (with-selected-window (treemacs-get-local-window)
-      (setq treemacs-width
-            (if (= treemacs-width treemacs--original-width)
-                (floor (* (frame-width) 0.8))
-              treemacs--original-width))
-      (treemacs--set-width treemacs-width)))
-  (define-key treemacs-mode-map (kbd "A") 'my/toggle-maximize-treemacs)
-  (defun my/unmaximize-treemacs (&optional arg)
-    "Restore Treemacs buffer if it's maximized."
-    (if (and (boundp 'treemacs--original-width)
-             (not (= treemacs-width treemacs--original-width)))
+  (defun treemacs-extra-wide-toggle-off (&optional arg)
+    "Restore Treemacs buffer if it's in extr-wide state."
+    (if (get 'treemacs-extra-wide-toggle :toggle-on)
         (with-selected-window (treemacs-get-local-window)
-          (setq treemacs-width treemacs--original-width)
-          (treemacs--set-width treemacs-width))))
-  (advice-add #'treemacs-visit-node-default :after #'my/unmaximize-treemacs)
+          (treemacs--set-width treemacs-width)
+          (put 'treemacs-extra-wide-toggle :toggle-on nil)
+          (treemacs-log "Switched to normal width display"))))
+  (advice-add #'treemacs-visit-node-default :after #'treemacs-extra-wide-toggle-off)
 
   (defun my/treemacs-ignore-file-predicate (file _)
     (or (string= file ".gitignore")
