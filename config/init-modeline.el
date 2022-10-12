@@ -174,14 +174,14 @@ MIDDLE, and RIGHT aligned respectively."
         '(:eval (my/flycheck-mode-line))
         '(:eval (my/row-col-mode-line))))
 
-(setq-default mode-line-format
-              '((:eval
-                 (replace-regexp-in-string ; escape ``%''
-                  "%" "%%"
-                  (my/mode-line-render
-                   (format-mode-line my/mode-line-left-segment)
-                   (format-mode-line my/mode-line-middle-segment)
-                   (format-mode-line my/mode-line-right-segment))))))
+;; (setq-default mode-line-format
+;;               '((:eval
+;;                  (replace-regexp-in-string ; escape ``%''
+;;                   "%" "%%"
+;;                   (my/mode-line-render
+;;                    (format-mode-line my/mode-line-left-segment)
+;;                    (format-mode-line my/mode-line-middle-segment)
+;;                    (format-mode-line my/mode-line-right-segment))))))
 
 ;; Combine mode line and minibuffer ------------------------------------------ ;
 
@@ -200,7 +200,7 @@ MIDDLE, and RIGHT aligned respectively."
               ;; '(:eval (my/buffer-file-icon-mode-line))
               ;; " "
               ;; '(:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory))
-              '(-20 (:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory)))
+              '(:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory))
               " "))
   (setq mini-modeline-r-format
         (list " "
