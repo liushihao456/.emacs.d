@@ -182,7 +182,7 @@ S is string of the two-key sequence."
                 (backward-delete-char 1)
                 (set-buffer-modified-p modified)
                 (setq buffer-undo-list undo-list)
-                (meow-insert-exit))
+                (push 'escape unread-command-events))
             (push event unread-command-events)))))))
 (defun meow-two-char-exit-insert-state ()
   "Exit meow insert state when pressing consecutive two keys."
