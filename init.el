@@ -63,6 +63,7 @@
 (require 'init-lsp)
 (require 'init-web)
 (require 'init-treesitter)
+(require 'init-fold)
 
 ;; (setq gc-cons-threshold (* 800 1000))
 
