@@ -117,62 +117,62 @@
   "Render row and col information in the mode line."
   "[%3l:%2c]")
 
-(defun my/mode-line-render (left middle right)
-  "Return a string of `window-total-width' length containing LEFT,
-MIDDLE, and RIGHT aligned respectively."
-  (let* ((additional-items (cl-subseq
-                           mode-line-format 0 (1- (length mode-line-format))))
-         (additional-itmes-width (length
-                                 (format-mode-line additional-items)))
-         (total-width (window-total-width))
-         (half-middle-width (/ (length middle) 2 ))
-         (total-space (- total-width
-                         2
-                         additional-itmes-width
-                         (length left)
-                         (length middle)
-                         (length right)))
-         (space1 (- (/ total-width 2)
-                    additional-itmes-width
-                    (length left)
-                    half-middle-width))
-         (space1 (max 0 space1))
-         (space2 (- total-space space1))
-         (space2 (max 0 space2)))
-    (format " %s%s%s%s%s "
-            left
-            (make-string space1 ?\s)
-            middle
-            (make-string space2 ?\s)
-            right)))
+;; (defun my/mode-line-render (left middle right)
+;;   "Return a string of `window-total-width' length containing LEFT,
+;; MIDDLE, and RIGHT aligned respectively."
+;;   (let* ((additional-items (cl-subseq
+;;                            mode-line-format 0 (1- (length mode-line-format))))
+;;          (additional-itmes-width (length
+;;                                  (format-mode-line additional-items)))
+;;          (total-width (window-total-width))
+;;          (half-middle-width (/ (length middle) 2 ))
+;;          (total-space (- total-width
+;;                          2
+;;                          additional-itmes-width
+;;                          (length left)
+;;                          (length middle)
+;;                          (length right)))
+;;          (space1 (- (/ total-width 2)
+;;                     additional-itmes-width
+;;                     (length left)
+;;                     half-middle-width))
+;;          (space1 (max 0 space1))
+;;          (space2 (- total-space space1))
+;;          (space2 (max 0 space2)))
+;;     (format " %s%s%s%s%s "
+;;             left
+;;             (make-string space1 ?\s)
+;;             middle
+;;             (make-string space2 ?\s)
+;;             right)))
 
-(defvar my/mode-line-left-segment
-  (list "%e"
-        '(:eval (cond (buffer-read-only "%*")
-                      ((buffer-modified-p) "*")
-                      (t "-")))
-        " "
-        "["
-        mode-line-percent-position
-        "]"
-        " "
-        ;; '(:eval (my/buffer-file-icon-mode-line))
-        ;; " "
-        '(:eval (propertize "%b"
-                            'face 'mode-line-buffer-id
-                            'help-echo default-directory))
-        " "))
+;; (defvar my/mode-line-left-segment
+;;   (list "%e"
+;;         '(:eval (cond (buffer-read-only "%*")
+;;                       ((buffer-modified-p) "*")
+;;                       (t "-")))
+;;         " "
+;;         "["
+;;         mode-line-percent-position
+;;         "]"
+;;         " "
+;;         ;; '(:eval (my/buffer-file-icon-mode-line))
+;;         ;; " "
+;;         '(:eval (propertize "%b"
+;;                             'face 'mode-line-buffer-id
+;;                             'help-echo default-directory))
+;;         " "))
 
-(defvar my/mode-line-middle-segment
-  (list '(:eval (list
-                 (-remove
-                  (lambda (x) (or (equal x "(") (equal x ")")))
-                  mode-line-modes)))))
+;; (defvar my/mode-line-middle-segment
+;;   (list '(:eval (list
+;;                  (-remove
+;;                   (lambda (x) (or (equal x "(") (equal x ")")))
+;;                   mode-line-modes)))))
 
-(defvar my/mode-line-right-segment
-  (list " "
-        '(:eval (my/flycheck-mode-line))
-        '(:eval (my/row-col-mode-line))))
+;; (defvar my/mode-line-right-segment
+;;   (list " "
+;;         '(:eval (my/flycheck-mode-line))
+;;         '(:eval (my/row-col-mode-line))))
 
 ;; (setq-default mode-line-format
 ;;               '((:eval
@@ -199,8 +199,8 @@ MIDDLE, and RIGHT aligned respectively."
               " "
               ;; '(:eval (my/buffer-file-icon-mode-line))
               ;; " "
-              ;; '(:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory))
-              '(:eval (propertize "%b" 'face 'mode-line-buffer-id 'help-echo default-directory))
+              '(:eval (propertize (if (eq major-mode 'treemacs-mode) "Treemacs" "%b")
+                                  'face 'mode-line-buffer-id))
               " "))
   (setq mini-modeline-r-format
         (list " "

@@ -182,6 +182,7 @@ split; vice versa."
 
 ;; Exclude files for recentf
 (recentf-mode)
+(setq recentf-max-saved-items 100)
 (setq recentf-exclude '("bookmarks\\'" ".*-autoloads.el\\'"))
 
 ;; ;; Open recent files list at Emacs start up

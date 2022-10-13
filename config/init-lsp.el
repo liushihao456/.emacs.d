@@ -30,6 +30,7 @@
 (with-eval-after-load 'lsp-mode
   (define-key lsp-mode-map (kbd "C-c l k") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)
+  (define-key lsp-mode-map (kbd "C-c l e") 'lsp-find-declaration)
   (define-key lsp-mode-map (kbd "C-c l o") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l r") 'lsp-rename)
   (define-key lsp-mode-map (kbd "C-c l f") 'lsp-format-buffer)
@@ -49,7 +50,7 @@
   ;; (setq lsp-enable-file-watchers nil)
   (setq lsp-enable-indentation nil)
   (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-semantic-tokens-enable t)
+  ;; (setq lsp-semantic-tokens-enable t)
   (setq lsp-headerline-breadcrumb-enable t)
   ;; (setq lsp-idle-delay 0.5)
   (setq lsp-modeline-code-actions-enable nil)
