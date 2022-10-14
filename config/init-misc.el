@@ -276,9 +276,34 @@ split; vice versa."
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
 ;; Treemacs
-(global-set-key (kbd "C-c z") 'treemacs-select-window)
-;; (global-set-key (kbd "M-z") 'treemacs)
+(global-set-key (kbd "C-c d d") 'treemacs-select-window)
+(add-hook 'treemacs-mode-hook (lambda () (setq-local scroll-margin 0)))
 (with-eval-after-load 'treemacs
+  (defun my/treemacs-kill-buffer ()
+    "Kill treemacs buffer even when not in treemacs window."
+    (interactive)
+    (let ((visibility (treemacs-current-visibility)))
+      (if (eq visibility 'none)
+          (treemacs-log-failure "No treemacs buffer alive.")
+        (if (eq visibility 'visible)
+            (progn
+              (unless treemacs--in-this-buffer (treemacs--select-visible-window))
+              (treemacs-kill-buffer))
+          (kill-buffer (treemacs-get-local-buffer))
+          (run-hooks treemacs-kill-hook))
+        (treemacs-log "Killed treemacs buffer."))))
+  (global-set-key (kbd "C-c d k") 'my/treemacs-kill-buffer)
+
+  (defun my/treemacs-quit ()
+    "Quit treemacs window even when not in it."
+    (interactive)
+    (let ((visibility (treemacs-current-visibility)))
+      (if (not (eq visibility 'visible))
+          (treemacs-log-failure "Treemacs window not visible.")
+        (unless treemacs--in-this-buffer (treemacs--select-visible-window))
+        (treemacs-quit))))
+  (global-set-key (kbd "C-c d q") 'my/treemacs-quit)
+
   (treemacs-follow-mode)
   (treemacs-project-follow-mode)
   (setq treemacs--project-follow-delay 0.1)
