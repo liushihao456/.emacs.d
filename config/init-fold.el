@@ -63,7 +63,10 @@
    (run-hooks 'hs-hide-hook)))
 
 (with-eval-after-load 'hideshow
-  (define-key hs-minor-mode-map "\C-c@\C-f" 'hs-hide-leafs))
+  (define-key hs-minor-mode-map (kbd "C-c o l") 'hs-hide-level)
+  (define-key hs-minor-mode-map (kbd "C-c o o") 'hs-toggle-hiding)
+  (define-key hs-minor-mode-map (kbd "C-c o a") 'hs-show-all)
+  (define-key hs-minor-mode-map (kbd "C-c o f") 'hs-hide-leafs))
 
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
