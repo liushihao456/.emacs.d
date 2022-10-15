@@ -44,8 +44,10 @@
   (setq company-tooltip-align-annotations t)
 
   ;; Fuzzy matching
-  (company-fuzzy-mode)
-  (setq company-fuzzy-limit 100)
+  ;; (company-fuzzy-mode)
+  ;; (setq company-fuzzy-limit 100)
+  (company-flx-mode)
+  ;; (setq company-flx-limit 500)
 
   ;; Yasnippet integration
   (require 'yasnippet)

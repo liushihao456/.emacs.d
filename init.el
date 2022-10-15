@@ -13,6 +13,9 @@
   (interactive)
   (find-file user-init-file))
 (global-set-key (kbd "C-c f i") 'find-init-file)
+(global-set-key (kbd "<f5>") 'profiler-start)
+(global-set-key (kbd "<f6>") 'profiler-stop)
+(global-set-key (kbd "<f7>") 'profiler-report)
 
 (setq gc-cons-threshold 100000000)
 (require 'package)
