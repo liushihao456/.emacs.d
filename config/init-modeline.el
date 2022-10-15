@@ -52,6 +52,7 @@
            (mini-modeline-mode nil "mini-modeline")
            (eldoc-box-hover-mode nil "eldoc-box")
            (eldoc-box-hover-at-point-mode nil "eldoc-box")
+           (hs-minor-mode nil "hideshow")
            (copilot-mode nil "copilot")))
 
 ;; cc-mode.el assumes that `mode-name’ is always a string (which was true in

@@ -56,7 +56,7 @@
 
 ;; Only activate orderless in minibuffer completion
 (add-hook 'minibuffer-setup-hook (lambda ()
-                                   (setq completion-styles '(orderless basic))))
+                                   (setq-local completion-styles '(orderless basic))))
 (setq completion-category-defaults nil
       completion-category-overrides '((file (styles orderless partial-completion))))
 (with-eval-after-load 'orderless
@@ -124,6 +124,38 @@
 
 ;; Marginalia ---------------------------------------------------------------- ;
 
+(with-eval-after-load 'marginalia
+  (setq marginalia-separator "  ")
+
+  ;; Hack: when candidates are truncated for example by advicing
+  ;; `vertico--format-candidate', we can't access the truncation candidates
+  ;; here. Therefor use my custom 'truncate-to property of candidates if
+  ;; present. (The ctags candidates are marked with this property, as can be
+  ;; seen below.)
+  (defun marginalia--align (cands)
+    "Align annotations of CANDS according to `marginalia-align'."
+    (when (and cands (> (length cands) 0))
+      (setq marginalia--candw-max
+            (seq-max (cl-loop for (cand . ann) in cands collect
+                              (if-let (truncate-to (get-text-property 0 'truncate-to cand))
+                                  (min (string-width cand) truncate-to)
+                                (string-width cand))))))
+    (cl-loop for (cand . ann) in cands collect
+             (progn
+               (when-let (align (text-property-any 0 (length ann) 'marginalia--align t ann))
+                 (put-text-property
+                  align (1+ align) 'display
+                  `(space :align-to
+                    ,(pcase-exhaustive marginalia-align
+                       ('center `(+ center ,marginalia-align-offset))
+                       ('left `(+ left ,(+ marginalia-align-offset marginalia--candw-max)))
+                       ('right `(+ right ,(+ marginalia-align-offset 1
+                                             (- (string-width (substring ann 0 align))
+                                                (string-width ann)))))))
+                  ann))
+               (list cand "" ann))))
+
+  )
 (marginalia-mode)
 
 ;; Icons --------------------------------------------------------------------- ;
@@ -219,7 +251,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
      ((marginalia--time (file-attribute-modification-time attrs))
       :face 'marginalia-date :width -12)
      ((file-name-directory (abbreviate-file-name file))
-      :truncate 0.6 :face 'marginalia-file-name))))
+      :face 'marginalia-file-name))))
 
 (add-to-list 'marginalia-annotator-registry
              '(recentf-file marginalia--recentf-file-annotator builtin none))
@@ -240,113 +272,104 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 ;; Jump to symbols across the whole project ---------------------------------- ;
 
+(defvar ctags-tag-file "TAGS.json")
+(defvar ctags-truncate-width (floor (* (window-width) 0.3)))
+
 (defun ctags-generate-tags ()
   "Generate ctags in project."
-  (interactive)
+  (delete-file (concat (project-root (project-current)) ctags-tag-file))
   (let ((default-directory (project-root (project-current)))
-        (cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" | ctags -f TAGS -e -L -"))
+        (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
+                     " | ctags --output-format=json --pseudo-tags= -L - --fields=+n")))
     (cond
      ;; Windows
      ((memq system-type '(ms-dos windows-nt cygwin))
-      (shell-command (concat "Powershell -Command " (shell-quote-argument cmd))))
+      (shell-command-to-string (concat "Powershell -Command " (shell-quote-argument cmd))))
      ;; MacOS, Linux
      (t
-      (shell-command cmd)))))
+      (shell-command-to-string cmd)))))
 
-(defun ctags-read-tag (&optional file)
-  "Read ctags tag at point."
-  (let ((line (buffer-substring-no-properties
-               (point)
-               (progn (skip-chars-forward "^") (point))))
-        (symbol (buffer-substring-no-properties
-                 (progn (skip-chars-forward "") (point))
-                 (progn (skip-chars-forward "^") (point))))
-        (line-no (string-to-number
-                  (buffer-substring-no-properties
-                   (progn (skip-chars-forward "") (point))
-                   (progn (skip-chars-forward "^,") (point))))))
-    (if file
-        (list symbol line-no line file)
-      (list symbol line-no line))))
+(defun ctags-get-tags-json ()
+  "Parse ctag tags json."
+  (let ((str (ctags-generate-tags))
+        (count 0) tags)
+    (setq tags (mapcar (lambda (l) (json-parse-string l))
+                       (split-string str "\n" t)))
+    (mapc (lambda (tag)
+            (puthash "name"
+                     (format "%s%s"
+                             ;; Add 'truncate-to property to tag
+                             (propertize (gethash "name" tag) 'full-json tag
+                                         'truncate-to ctags-truncate-width)
+                             (propertize (number-to-string count) 'invisible t))
+                     tag)
+            (puthash "pattern"
+                     (string-trim
+                      (string-remove-suffix
+                       "$"
+                       (string-remove-prefix
+                        "^"
+                        (substring (gethash "pattern" tag) 1 -1))))
+                     tag)
+            (setq count (1+ count)))
+          tags)))
 
 (add-to-list 'icon-tools-completion-category-icon-alist
-             '(etags . icon-tools-completion-get-imenu-icon))
+             '(ctags . icon-tools-completion-get-imenu-icon))
 
 (defun project-ctags-tag-annotator (cand)
-  (when-let (tag-info (get-text-property 0 'tag-info cand))
+  (when-let (full-json (get-text-property 0 'full-json cand))
     (marginalia--fields
-     ((abbreviate-file-name (string-trim (or (caddr tag-info) "")))
-      :face 'marginalia-function :truncate 0.7)
-     ((format "%s:%s" (cadddr tag-info) (cadr tag-info))
-      :face 'marginalia-file-name :truncate 0.6))))
+     ((gethash "kind" full-json)
+      :face 'marginalia-type :width 10)
+     ((format "%s:%s"
+              (abbreviate-file-name (string-trim (gethash "path" full-json)))
+              (gethash "line" full-json))
+      :face 'marginalia-file-name :truncate 0.5)
+     ((string-trim (or (gethash "pattern" full-json) ""))
+      :face 'marginalia-function))))
 
 (add-to-list 'marginalia-annotator-registry
-             '(etags project-ctags-tag-annotator builtin none))
+             '(ctags project-ctags-tag-annotator builtin none))
 
 (defun project-ctags-find-tag ()
   "Jump to symbols across the whole project."
   (interactive)
   (let* ((project-root (project-root (project-current)))
-         (tag-file-name
-          (concat project-root "TAGS"))
-         tag-list
-         tag-info-list)
-    (with-temp-buffer
-      (insert-file-contents tag-file-name)
-      (goto-char (point-min))
-      (while (re-search-forward "\f\n" nil t)
-        (let ((file (buffer-substring-no-properties
-                     (point)
-                     (save-excursion (skip-chars-forward "^,") (point))))
-              (count 0)
-              tag-info tag-name)
-          (forward-line 1)
-          ;; Exuberant ctags add a line starting with the DEL character;
-          ;; skip past it.
-          (when (looking-at "\177")
-            (forward-line 1))
-          (while (not (or (eobp) (looking-at "\f")))
-            (setq tag-info (save-excursion (ctags-read-tag file)))
-            (setq tag-name (car tag-info))
-            (push
-             ;; Unique symbol matcher
-             (format "%s%s"
-              (propertize tag-name 'tag-info tag-info)
-              (propertize (number-to-string count);; (format " - %s:%s" file (cadr tag-info))
-                          'invisible t))
-             tag-list)
-            (push (list
-                   ;; Unique symbol matcher
-                   (format "%s%s" (car tag-info) count)
-                   tag-info
-                   file)
-                  tag-info-list)
-            (forward-line 1)
-            (setq count (1+ count))))))
-    (let* ((symbol-at-point (if (use-region-p)
-                                (buffer-substring-no-properties
-                                 (region-beginning) (region-end))
-                              (thing-at-point 'symbol t)))
-           (selected-tag
-            (completing-read
-             "Go to tag: "
-             (lambda (str pred action)
-               (if (eq action 'metadata)
-                   '(metadata . ((category . etags)))
-                 (complete-with-action
-                  action tag-list str pred)))
-             nil nil symbol-at-point))
-           (tag-info-list-match (assoc selected-tag tag-info-list))
-           (file (caddr tag-info-list-match))
-           (full-file-path
-            (if (string-prefix-p "/" file)
-                file
-              (concat project-root file))))
-      (find-file full-file-path)
-      (goto-char (point-min))
-      (forward-line (- (cadr (cadr tag-info-list-match)) 1)))))
+         (symbol-at-point (if (use-region-p)
+                              (buffer-substring-no-properties
+                               (region-beginning) (region-end))
+                            (thing-at-point 'symbol t)))
+         (tags-json (ctags-get-tags-json))
+         (tag-list (mapcar (lambda (ht) (gethash "name" ht)) tags-json))
+         (selected-tag
+          (completing-read
+           "Go to tag: "
+           (lambda (str pred action)
+             (if (eq action 'metadata)
+                 '(metadata . ((category . ctags)))
+               (complete-with-action
+                action tag-list str pred)))
+           nil nil symbol-at-point))
+         (tag-json (seq-find (lambda (ht) (equal (gethash "name" ht) selected-tag))
+                             tags-json))
+         (file (gethash "path" tag-json))
+         (full-file-path (concat project-root file))
+         (line-no (gethash "line" tag-json)))
+    (find-file full-file-path)
+    (goto-char (point-min))
+    (forward-line (- line-no 1))))
 
-(global-set-key (kbd "C-c p g") 'ctags-generate-tags)
+(with-eval-after-load 'vertico
+  (defun my/vertico-truncate-ctags-candidates (args)
+    (when-let (((eq (vertico--metadata-get 'category) 'ctags))
+               (w (floor (* (window-width) 0.3)))
+               (l (length (car args)))
+               ((> l w)))
+      (setcar args (concat (truncate-string-to-width (car args) (- w 3)) "...")))
+    args)
+  (advice-add #'vertico--format-candidate :filter-args #'my/vertico-truncate-ctags-candidates))
+
 (global-set-key (kbd "C-c p i") 'project-ctags-find-tag)
 
 (provide 'init-minibuffer)
