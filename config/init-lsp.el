@@ -84,11 +84,6 @@ typing or company is active."
 
 (add-hook 'emacs-lisp-mode-hook 'lsp-ui-mode)
 
-;; Show eldoc in posframe ---------------------------------------------------- ;
-
-(when (display-graphic-p)
-  (add-hook 'prog-mode-hook 'eldoc-box-hover-mode))
-
 (provide 'init-lsp)
 
 ;;; init-lsp.el ends here

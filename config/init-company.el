@@ -39,15 +39,13 @@
   (setq company-dabbrev-downcase nil)
   (setq-default company-frontends
         '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
-  (setq company-idle-delay 0.1)
+  (setq company-idle-delay 0)
   (setq company-selection-wrap-around t)
   (setq company-tooltip-align-annotations t)
 
   ;; Fuzzy matching
-  ;; (company-fuzzy-mode)
-  ;; (setq company-fuzzy-limit 100)
-  (company-flx-mode)
-  ;; (setq company-flx-limit 500)
+  (company-fuzzy-mode)
+  (setq company-fuzzy-limit 500)
 
   ;; Yasnippet integration
   (require 'yasnippet)

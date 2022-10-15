@@ -83,7 +83,7 @@
               (nreverse results2))))
 
   (defvar orderless-fuz-threshold 200)
-  (require 'flx)
+  (flx-rs-load-dyn)
   (defun my/vertico-sort-flx (candidates)
     "Sort CANDIDATES with flx scores."
     ;; Copied from https://github.com/minad/vertico/issues/76#issuecomment-877427128
@@ -110,7 +110,7 @@
                                       (mapcar
                                        (lambda (q)
                                          (car (or
-                                               (flx-score item q flx-strings-cache)
+                                               (flx-rs-score item q)
                                                '(-1000))))
                                        queries))))
                              candidates)))
