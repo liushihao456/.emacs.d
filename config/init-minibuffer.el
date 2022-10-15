@@ -132,7 +132,7 @@
   ;; here. Therefor use my custom 'truncate-to property of candidates if
   ;; present. (The ctags candidates are marked with this property, as can be
   ;; seen below.)
-  (defun marginalia--align (cands)
+  (defun marginalia--align-a (cands)
     "Align annotations of CANDS according to `marginalia-align'."
     (when (and cands (> (length cands) 0))
       (setq marginalia--candw-max
@@ -154,7 +154,7 @@
                                                 (string-width ann)))))))
                   ann))
                (list cand "" ann))))
-
+  (advice-add #'marginalia--align :override #'marginalia--align-a)
   )
 (marginalia-mode)
 
@@ -273,7 +273,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 ;; Jump to symbols across the whole project ---------------------------------- ;
 
 (defvar ctags-tag-file "TAGS.json")
-(defvar ctags-truncate-width (floor (* (window-width) 0.3)))
 
 (defun ctags-generate-tags ()
   "Generate ctags in project."
@@ -292,6 +291,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (defun ctags-get-tags-json ()
   "Parse ctag tags json."
   (let ((str (ctags-generate-tags))
+        (w (floor (* (frame-width) 0.3)))
         (count 0) tags)
     (setq tags (mapcar (lambda (l) (json-parse-string l))
                        (split-string str "\n" t)))
@@ -300,7 +300,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                      (format "%s%s"
                              ;; Add 'truncate-to property to tag
                              (propertize (gethash "name" tag) 'full-json tag
-                                         'truncate-to ctags-truncate-width)
+                                         'truncate-to w)
                              (propertize (number-to-string count) 'invisible t))
                      tag)
             (puthash "pattern"
