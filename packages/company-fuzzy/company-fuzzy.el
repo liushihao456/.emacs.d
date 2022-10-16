@@ -49,37 +49,40 @@
   :type 'number
   :group 'company-fuzzy)
 
-(defun company-fuzzy-company-capf-advice (old-fun &rest args)
-  (let ((completion-styles (list 'flex)))
+(defun company-fuzzy-company-capf--candidates-advice (old-fun &rest args)
+  ;; Flex is slower than orderless which leverages the `all-completions' API written in C.
+  (let* ((orderless-matching-styles '(orderless-flex))
+         (completion-styles '(orderless)))
     (apply old-fun args)))
 
 (defun company-fuzzy-transformer (cands)
   "Sort up to company-fuzzy-limit CANDS by their flx score."
-  (let ((num-cands (length cands)))
-    (mapcar #'car
-            (sort (mapcar
-                   (lambda (cand)
-                     (cons cand
-                           (or (car (flx-rs-score cand company-prefix))
-                               most-negative-fixnum)))
-                   (if (< num-cands company-fuzzy-limit)
-                       cands
-                     (let* ((seq (sort cands (lambda (c1 c2)
-                                               (< (length c1)
-                                                  (length c2)))))
-                            (end (min company-fuzzy-limit
-                                      num-cands
-                                      (length seq)))
-                            (result nil))
-                       (dotimes (_ end  result)
-                         (push (pop seq) result)))))
-                  (lambda (c1 c2)
-                    ;; break ties by length
-                    (if (/= (cdr c1) (cdr c2))
-                        (> (cdr c1)
-                           (cdr c2))
-                      (< (length (car c1))
-                         (length (car c2)))))))))
+  (let* ((num-cands (length cands))
+         (sub-cands (if (< num-cands company-fuzzy-limit)
+                        cands
+                      (let* ((seq (sort cands (lambda (c1 c2)
+                                                (< (length c1)
+                                                   (length c2)))))
+                             (end (min company-fuzzy-limit
+                                       num-cands
+                                       (length seq))))
+                        (cl-subseq seq 0 end)
+                        )))
+         (scored-cands (mapcar
+                        (lambda (cand)
+                          (cons cand
+                                (or (car (flx-rs-score cand company-prefix))
+                                    most-negative-fixnum)))
+                        sub-cands))
+         (sorted-cands (sort scored-cands
+                             (lambda (c1 c2)
+                               ;; break ties by length
+                               (if (/= (cdr c1) (cdr c2))
+                                   (> (cdr c1)
+                                      (cdr c2))
+                                 (< (length (car c1))
+                                    (length (car c2))))))))
+    (mapcar #'car sorted-cands)))
 
 ;;;###autoload
 (define-minor-mode company-fuzzy-mode
@@ -89,10 +92,12 @@
   :global t
   (if company-fuzzy-mode
       (progn
-        (advice-add 'company-capf :around #'company-fuzzy-company-capf-advice)
+        (require 'orderless)
+        (require 'flx-rs)
+        (flx-rs-load-dyn)
+        (advice-add #'company-capf--candidates :around #'company-fuzzy-company-capf--candidates-advice)
         (add-to-list 'company-transformers #'company-fuzzy-transformer t))
-
-    (advice-remove 'company-capf #'company-fuzzy-company-capf-advice)
+    (advice-remove #'company-capf--candidates #'company-fuzzy-company-capf--candidates-advice)
     (setq company-transformers
           (delete #'company-fuzzy-transformer company-transformers))))
 

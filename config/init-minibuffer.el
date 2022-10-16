@@ -115,7 +115,7 @@
                                        queries))))
                              candidates)))
               (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
-              (mapcar (lambda (x) (car x)) matches))
+              (mapcar #'car matches))
           candidates))))
   (defun my/vertico-sort-flx-history (candidates)
     "Sort vertico CANDIDATES first by flx scoring then by history."
