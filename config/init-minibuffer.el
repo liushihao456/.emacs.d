@@ -127,6 +127,15 @@
 (with-eval-after-load 'marginalia
   (setq marginalia-separator "  ")
 
+  (defun marginalia-annotate-buffer-a (cand)
+    "Annotate buffer CAND with modification status, file name and major mode."
+    (when-let (buffer (get-buffer cand))
+      (marginalia--fields
+       ((marginalia--buffer-status buffer))
+       ((marginalia--buffer-file buffer)
+        :face 'marginalia-file-name))))
+  (advice-add #'marginalia-annotate-buffer :override #'marginalia-annotate-buffer-a)
+
   ;; Hack: when candidates are truncated for example by advicing
   ;; `vertico--format-candidate', we can't access the truncation candidates
   ;; here. Therefor use my custom 'truncate-to property of candidates if
