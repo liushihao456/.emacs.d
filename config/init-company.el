@@ -29,7 +29,7 @@
   (setq company-box-scrollbar nil))
 
 (with-eval-after-load 'company
-  (setq company-backends '(company-capf company-files))
+  (setq company-backends '(company-capf))
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (if (display-graphic-p)
@@ -37,8 +37,6 @@
     (add-hook 'company-mode-hook 'company-tip-mode))
   (setq completion-ignore-case t)
   (setq company-dabbrev-downcase nil)
-  (setq-default company-frontends
-        '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (setq company-idle-delay 0)
   (setq company-selection-wrap-around t)
   (setq company-tooltip-align-annotations t)
@@ -46,24 +44,9 @@
   ;; Yasnippet integration
   (require 'yasnippet)
   (global-set-key (kbd "C-]") 'company-yasnippet)
-  (defun my/smarter-yas-expand-next-field-complete ()
-    "Try to `yas-expand' and `yas-next-field' at current cursor position.
 
-If failed try to complete the common part with `company-complete-common'"
-    (interactive)
-    (if yas-minor-mode
-        (let ((old-point (point))
-              (old-tick (buffer-chars-modified-tick)))
-          (yas-expand)
-          (when (and (eq old-point (point))
-                     (eq old-tick (buffer-chars-modified-tick)))
-            (ignore-errors (yas-next-field))
-            (when (and (eq old-point (point))
-                       (eq old-tick (buffer-chars-modified-tick)))
-              (company-complete-common))))
-      (company-complete-common)))
-  (define-key company-active-map [tab] 'my/smarter-yas-expand-next-field-complete)
-  (define-key company-active-map (kbd "TAB") 'my/smarter-yas-expand-next-field-complete)
+  (define-key company-active-map [tab] nil)
+  (define-key company-active-map (kbd "TAB") nil)
 
   (defun company-backend-with-yas (backend)
     "Add `yasnippet' to company backend."
@@ -98,24 +81,6 @@ If failed try to complete the common part with `company-complete-common'"
             (put-text-property 0 len 'yas-annotation-patch t arg)))
         (funcall fun command arg))))
   (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
-
-  ;; ;; Copilot integration
-  ;; (require 'copilot)
-  ;; (defun my/yas-copilot-advice (fun &rest _)
-  ;;   "Call copilot first when yasnippet is available."
-  ;;   (if (bound-and-true-p copilot-mode)
-  ;;       (or (copilot-accept-completion)
-  ;;           (funcall fun))
-  ;;     (funcall fun)))
-  ;; (advice-add #'yas-expand :around #'my/yas-copilot-advice)
-  ;; (defun my/copilot-tab-company ()
-  ;;   (interactive)
-  ;;   (or (copilot-accept-completion)
-  ;;       (my/smarter-yas-expand-next-field-complete)))
-  ;; (define-key company-active-map [tab] 'my/copilot-tab-company)
-  ;; (define-key company-active-map (kbd "TAB") 'my/copilot-tab-company)
-
-  (delq 'company-preview-if-just-one-frontend company-frontends)
   )
 
 (add-hook 'prog-mode-hook 'company-mode)
