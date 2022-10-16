@@ -35,7 +35,6 @@
   (define-key lsp-mode-map (kbd "C-c l r") 'lsp-rename)
   (define-key lsp-mode-map (kbd "C-c l f") 'lsp-format-buffer)
   (define-key lsp-mode-map (kbd "C-c l m") 'lsp-organize-imports)
-  ;; (define-key lsp-mode-map (kbd "C-c l m") 'lsp-ui-imenu)
   (define-key lsp-mode-map (kbd "C-c l x") 'lsp-execute-code-action)
   (define-key lsp-mode-map (kbd "C-c l M-s") 'lsp-describe-session)
   (define-key lsp-mode-map (kbd "C-c l M-r") 'lsp-workspace-restart)
@@ -63,24 +62,7 @@
 
 (with-eval-after-load 'lsp-ui
   (define-key lsp-mode-map (kbd "C-c l g") 'lsp-ui-peek-find-references)
-
-  ;; (setq lsp-ui-sideline-show-hover t)
-  ;; (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-update-mode 'line)
-
-  (defun my/lsp-ui-doc--make-request (fun &rest _)
-    "Wrapper around lsp-ui-doc--make-request that prevents showing doc when
-typing or company is active."
-    (if (and (not company-pseudo-tooltip-overlay)
-             (not (eq this-command 'self-insert-command)))
-        (funcall fun)
-      (lsp-ui-doc--hide-frame)))
-  (advice-add 'lsp-ui-doc--make-request :around #'my/lsp-ui-doc--make-request)
-
-  ;; (set-face-background 'lsp-ui-doc-background "#272A36")
-  ;; (set-face-background 'lsp-ui-sideline-code-action 'unspecified)
-  ;; (set-face-background 'lsp-ui-sideline-symbol 'unspecified)
-  )
+  (setq lsp-ui-sideline-update-mode 'line))
 
 (add-hook 'emacs-lisp-mode-hook 'lsp-ui-mode)
 
