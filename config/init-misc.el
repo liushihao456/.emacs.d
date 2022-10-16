@@ -25,9 +25,6 @@
 
 ;;; Code:
 
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
-
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
   "When called interactively with no active region, kill a single line instead."
@@ -314,14 +311,16 @@ split; vice versa."
   (setq treemacs-indentation 1)
   (setq treemacs-is-never-other-window t)
 
-  (defun treemacs-extra-wide-toggle-off (&optional arg)
+  (defadvice treemacs-visit-node-default (after treemacs-extra-wide-toggle-off activate)
     "Restore Treemacs buffer if it's in extr-wide state."
     (if (get 'treemacs-extra-wide-toggle :toggle-on)
         (with-selected-window (treemacs-get-local-window)
           (treemacs--set-width treemacs-width)
           (put 'treemacs-extra-wide-toggle :toggle-on nil)
           (treemacs-log "Switched to normal width display"))))
-  (advice-add #'treemacs-visit-node-default :after #'treemacs-extra-wide-toggle-off)
+  (defadvice treemacs-quit (after treemacs-quit-reset-extra-wide activate)
+    (put 'treemacs-extra-wide-toggle :toggle-on nil)
+    (treemacs-log "Switched to normal width display"))
 
   (defun my/treemacs-ignore-file-predicate (file _)
     (or (string= file ".gitignore")
