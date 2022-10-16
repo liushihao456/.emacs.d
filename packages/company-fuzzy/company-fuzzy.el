@@ -49,10 +49,142 @@
   :type 'number
   :group 'company-fuzzy)
 
+(defun company-fuzzy-commonality (strs)
+  "Return the largest string that fuzzy matches all STRS"
+  (cl-letf* ((commonality-cache (make-hash-table :test 'equal :size 200))
+             ((symbol-function
+               #'fuzzy-commonality)
+              (lambda (strs)
+                (let ((hash-value (gethash strs commonality-cache nil)))
+                  (if hash-value
+                      (if (eq hash-value 'nothing)
+                          nil
+                        hash-value)
+
+                    (setq strs (mapcar #'string-to-list strs))
+                    (let ((res) (tried) (idx))
+                      (dolist (char (car strs))
+                        (unless (memq char tried)
+                          (catch 'notfound
+                            (setq idx (mapcar (lambda (str)
+                                                (or
+                                                 (cl-position char str)
+                                                 (throw 'notfound nil)))
+                                              strs))
+                            (push (cons char
+                                        (fuzzy-commonality
+                                         (cl-mapcar (lambda (str idx)
+                                                      (cl-subseq str (1+ idx)))
+                                                    strs idx)))
+                                  res)
+                            (push char tried))))
+                      (setq res (if res
+                                    (cl-reduce
+                                     (lambda (a b)
+                                       (if (> (length a) (length b)) a b))
+                                     res)
+                                  nil))
+                      (puthash strs
+                               (if res res 'nothing)
+                               commonality-cache)
+                      res))))))
+    (concat (fuzzy-commonality strs))))
+
+(defun company-fuzzy-find-holes (merged str)
+  "Find positions in MERGED, where insertion by the user is likely, wrt. STR"
+  (require 'flx)
+  (let ((holes) (matches (cdr (flx-score str merged company-fuzzy-cache))))
+    (dolist (i (number-sequence 0 (- (length matches) 2)))
+      (when (>
+             (elt matches (1+ i))
+             (1+ (elt matches i)))
+        (push (1+ i) holes)))
+    (unless (<= (length str) (car (last matches)))
+      (push (length merged) holes))
+    holes))
+
+(defun company-fuzzy-merge (strs)
+  "Merge a collection of strings, including their collective holes"
+  (let ((common (company-fuzzy-commonality strs))
+        (holes))
+    (setq holes (make-vector (1+ (length common)) 0))
+    (dolist (str strs)
+      (dolist (hole (company-fuzzy-find-holes common str))
+        (cl-incf (elt holes hole))))
+
+    (cons common (append holes nil))))
+
+(defun company-fuzzy-completion (string table predicate point
+                                      &optional all-p)
+  "Helper function implementing a fuzzy completion-style"
+  (let* ((beforepoint (substring string 0 point))
+         (afterpoint (substring string point))
+         (boundaries (completion-boundaries beforepoint table predicate afterpoint))
+         (prefix (substring beforepoint 0 (car boundaries)))
+         (infix (concat
+                 (substring beforepoint (car boundaries))
+                 (substring afterpoint 0 (cdr boundaries))))
+         (suffix (substring afterpoint (cdr boundaries)))
+         ;; |-              string                  -|
+         ;;              point^
+         ;;            |-  boundaries -|
+         ;; |- prefix -|-    infix    -|-  suffix   -|
+         ;;
+         ;; Infix is the part supposed to be completed by table, AFAIKT.
+         ;; The first letter must be at the beginning of candidate
+         (regexp (concat "\\`" (substring infix 0 1)
+                         (mapconcat
+                          (lambda (x)
+                            (setq x (string x))
+                            (concat "[^" x "]*" (regexp-quote x)))
+                          (substring infix 1)
+                          "")))
+         (completion-regexp-list (cons regexp completion-regexp-list))
+         (candidates (or (all-completions prefix table predicate)
+                         (all-completions infix table predicate))))
+
+    (if all-p
+        ;; Implement completion-all-completions interface
+        (when candidates
+          ;; Not doing this may result in an error.
+          (setcdr (last candidates) (length prefix))
+          candidates)
+      ;; Implement completion-try-completions interface
+      (if (= (length candidates) 1)
+          (if (equal infix (car candidates))
+              t
+            ;; Avoid quirk of double / for filename completion. I don't
+            ;; know how this is *supposed* to be handled.
+            (when (and (> (length (car candidates)) 0)
+                       (> (length suffix) 0)
+                       (char-equal (aref (car candidates)
+                                         (1- (length (car candidates))))
+                                   (aref suffix 0)))
+              (setq suffix (substring suffix 1)))
+            (cons (concat prefix (car candidates) suffix)
+                  (length (concat prefix (car candidates)))))
+        (if (= (length infix) 0)
+            (cons string point)
+          (cl-destructuring-bind (merged . holes)
+              (company-fuzzy-merge candidates)
+            (cons
+             (concat prefix merged suffix)
+             (+ (length prefix)
+                (cl-position (apply #'max holes) holes)))))))))
+
+(defun company-fuzzy-try-completion (string table predicate point)
+  "Fuzzy version of completion-try-completion"
+  (company-fuzzy-completion string table predicate point))
+(defun company-fuzzy-all-completions (string table predicate point)
+  "Fuzzy version of completion-all-completions"
+  (company-fuzzy-completion string table predicate point 'all))
+
 (defun company-fuzzy-company-capf--candidates-advice (old-fun &rest args)
-  ;; Flex is slower than orderless which leverages the `all-completions' API written in C.
-  (let* ((orderless-matching-styles '(orderless-flex))
-         (completion-styles '(orderless)))
+  ;; Filtering (this function) is the performance bottleneck.
+  ;; Scoring and sorting (`company-fuzzy-transformer') is fast.
+  ;; Flex is slower than orderless which leverages the `all-completions' API
+  ;; written in C.
+  (let* ((completion-styles '(fuzzy)))
     (apply old-fun args)))
 
 (defun company-fuzzy-transformer (cands)
@@ -66,8 +198,7 @@
                              (end (min company-fuzzy-limit
                                        num-cands
                                        (length seq))))
-                        (cl-subseq seq 0 end)
-                        )))
+                        (cl-subseq seq 0 end))))
          (scored-cands (mapcar
                         (lambda (cand)
                           (cons cand
@@ -92,7 +223,12 @@
   :global t
   (if company-fuzzy-mode
       (progn
-        (require 'orderless)
+        (add-to-list 'completion-styles-alist
+                     '(fuzzy
+                       company-fuzzy-try-completion
+                       company-fuzzy-all-completions
+                       "An intelligent fuzzy matching completion style with the first letter at the beginning."))
+
         (require 'flx-rs)
         (flx-rs-load-dyn)
         (advice-add #'company-capf--candidates :around #'company-fuzzy-company-capf--candidates-advice)

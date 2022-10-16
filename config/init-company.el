@@ -42,11 +42,7 @@
   (setq company-idle-delay 0)
   (setq company-selection-wrap-around t)
   (setq company-tooltip-align-annotations t)
-
-  ;; Fuzzy matching
-  (company-fuzzy-mode)
-  (setq company-fuzzy-limit 500)
-
+  
   ;; Yasnippet integration
   (require 'yasnippet)
   (global-set-key (kbd "C-]") 'company-yasnippet)
@@ -126,6 +122,10 @@ If failed try to complete the common part with `company-complete-common'"
 (add-hook 'LaTeX-mode-hook 'company-mode)
 (add-hook 'org-mode-hook 'company-mode)
 (add-hook 'inferior-python-mode-hook 'company-mode)
+
+;; Enable fuzzy match in elisp mode; for other languages, lsp-mode comes with
+;; built-in fuzzy matching support.
+(add-hook 'emacs-lisp-mode-hook 'company-fuzzy-mode)
 
 (provide 'init-company)
 
