@@ -4,9 +4,6 @@
 [submodule "packages/company-tip"]
 	path = packages/company-tip
 	url = https://github.com/liushihao456/company-tip.git
-[submodule "packages/flx-rs"]
-	path = packages/flx-rs
-	url = https://github.com/jcs-elpa/flx-rs.git
 [submodule "packages/emacs-mini-modeline"]
 	path = packages/emacs-mini-modeline
 	url = https://github.com/kiennq/emacs-mini-modeline.git

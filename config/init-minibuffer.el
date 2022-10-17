@@ -82,12 +82,12 @@
        (nconc (vertico--sort-decorated hcands)
               (nreverse results2))))
 
-  (defvar orderless-fuz-threshold 200)
-  (flx-rs-load-dyn)
-  (defun my/vertico-sort-flx (candidates)
+  (defvar orderless-fuz-threshold 1000)
+  (require 'flx)
+  (defun my/orderless-sort-flx (candidates)
     "Sort CANDIDATES with flx scores."
-    ;; Copied from https://github.com/minad/vertico/issues/76#issuecomment-877427128
     (when candidates
+      ;; Get category: copied from https://github.com/minad/vertico/issues/76#issuecomment-877427128
       (let* ((query (buffer-substring (minibuffer-prompt-end)
                                       (max (minibuffer-prompt-end) (point))))
              (category (completion-metadata-get
@@ -110,7 +110,8 @@
                                       (mapcar
                                        (lambda (q)
                                          (car (or
-                                               (flx-rs-score item q)
+                                               ;; cache makes it much faster
+                                               (flx-score item q flx-strings-cache)
                                                '(-1000))))
                                        queries))))
                              candidates)))
@@ -119,7 +120,7 @@
           candidates))))
   (defun my/vertico-sort-flx-history (candidates)
     "Sort vertico CANDIDATES first by flx scoring then by history."
-    (my/vertico-sort-history (my/vertico-sort-flx candidates)))
+    (my/vertico-sort-history (my/orderless-sort-flx candidates)))
   (setq vertico-sort-override-function #'my/vertico-sort-flx-history))
 
 ;; Marginalia ---------------------------------------------------------------- ;
