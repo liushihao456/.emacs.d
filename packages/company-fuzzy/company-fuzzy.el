@@ -188,8 +188,8 @@
   ;; written in C.
   (if company-fuzzy-mode
       (let* ((completion-styles '(fuzzy)))
-        (apply old-fun args)))
-  (apply old-fun args))
+        (apply old-fun args))
+    (apply old-fun args)))
 
 (defun company-fuzzy-transformer (cands)
   "Sort up to company-fuzzy-limit CANDS by their flx score."
