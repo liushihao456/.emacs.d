@@ -75,8 +75,11 @@ autoloaded form."
                (not (string-suffix-p ".." name)))
       (message "Generating autoloads for package %s..."
                (file-name-nondirectory (directory-file-name name)))
+      (byte-recompile-directory name 0)
       (generate-recursive-autoloads
        (file-name-nondirectory (directory-file-name name)) name))))
+
+(global-set-key (kbd "C-c f g") 'generate-autoloads-custom-packages)
 
 (provide 'init-custom-packages)
 
