@@ -273,7 +273,7 @@ split; vice versa."
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
 ;; Treemacs
-(global-set-key (kbd "C-c d d") 'treemacs-select-window)
+(global-set-key (kbd "C-c e e") 'treemacs-select-window)
 (add-hook 'treemacs-mode-hook (lambda () (setq-local scroll-margin 0)))
 (with-eval-after-load 'treemacs
   (defun my/treemacs-kill-buffer ()
@@ -289,7 +289,7 @@ split; vice versa."
           (kill-buffer (treemacs-get-local-buffer))
           (run-hooks treemacs-kill-hook))
         (treemacs-log "Killed treemacs buffer."))))
-  (global-set-key (kbd "C-c d k") 'my/treemacs-kill-buffer)
+  (global-set-key (kbd "C-c e k") 'my/treemacs-kill-buffer)
 
   (defun my/treemacs-quit ()
     "Quit treemacs window even when not in it."
@@ -299,7 +299,7 @@ split; vice versa."
           (treemacs-log-failure "Treemacs window not visible.")
         (unless treemacs--in-this-buffer (treemacs--select-visible-window))
         (treemacs-quit))))
-  (global-set-key (kbd "C-c d q") 'my/treemacs-quit)
+  (global-set-key (kbd "C-c e q") 'my/treemacs-quit)
 
   (treemacs-follow-mode)
   (treemacs-project-follow-mode)
