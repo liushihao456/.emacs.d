@@ -302,7 +302,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   "Generate ctags in project."
   (let ((default-directory (project-root (project-current)))
         (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
-                     " | ctags --output-format=json --pseudo-tags= -L - --fields=+n")))
+                     " | ctags --output-format=json --pseudo-tags= -L - --fields=NPznF")))
     (cond
      ;; Windows
      ((memq system-type '(ms-dos windows-nt cygwin))
@@ -319,21 +319,23 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (setq tags (mapcar (lambda (l) (json-parse-string l))
                        (split-string str "\n" t)))
     (mapc (lambda (tag)
-            (puthash "name"
-                     (format "%s%s"
-                             ;; Add 'truncate-to property to tag
-                             (propertize (gethash "name" tag) 'full-json tag
-                                         'truncate-to w)
-                             (propertize (number-to-string count) 'invisible t))
-                     tag)
-            (puthash "pattern"
-                     (string-trim
-                      (string-remove-suffix
-                       "$"
-                       (string-remove-prefix
-                        "^"
-                        (substring (gethash "pattern" tag) 1 -1))))
-                     tag)
+            (if (gethash "name" tag)
+                (puthash "name"
+                         (format "%s%s"
+                                 ;; Add 'truncate-to property to tag
+                                 (propertize (gethash "name" tag) 'full-json tag
+                                             'truncate-to w)
+                                 (propertize (number-to-string count) 'invisible t))
+                         tag))
+            (if (gethash "pattern" tag)
+                (puthash "pattern"
+                         (string-trim
+                          (string-remove-suffix
+                           "$"
+                           (string-remove-prefix
+                            "^"
+                            (substring (gethash "pattern" tag) 1 -1))))
+                         tag))
             (setq count (1+ count)))
           tags)))
 
