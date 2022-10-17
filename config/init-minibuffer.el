@@ -281,11 +281,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 ;; Jump to symbols across the whole project ---------------------------------- ;
 
-(defvar ctags-tag-file "TAGS.json")
-
 (defun ctags-generate-tags ()
   "Generate ctags in project."
-  (delete-file (concat (project-root (project-current)) ctags-tag-file))
   (let ((default-directory (project-root (project-current)))
         (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
                      " | ctags --output-format=json --pseudo-tags= -L - --fields=+n")))

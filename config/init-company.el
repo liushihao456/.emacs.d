@@ -44,9 +44,24 @@
   ;; Yasnippet integration
   (require 'yasnippet)
   (global-set-key (kbd "C-]") 'company-yasnippet)
+  (defun my/smarter-yas-expand-next-field-complete ()
+    "Try to `yas-expand' and `yas-next-field' at current cursor position.
 
-  (define-key company-active-map [tab] nil)
-  (define-key company-active-map (kbd "TAB") nil)
+If failed try to complete the common part with `company-complete-common'"
+    (interactive)
+    (if yas-minor-mode
+        (let ((old-point (point))
+              (old-tick (buffer-chars-modified-tick)))
+          (yas-expand)
+          (when (and (eq old-point (point))
+                     (eq old-tick (buffer-chars-modified-tick)))
+            (ignore-errors (yas-next-field))
+            (when (and (eq old-point (point))
+                       (eq old-tick (buffer-chars-modified-tick)))
+              (company-complete-common))))
+      (company-complete-common)))
+  (define-key company-active-map [tab] 'my/smarter-yas-expand-next-field-complete)
+  (define-key company-active-map (kbd "TAB") 'my/smarter-yas-expand-next-field-complete)
 
   (defun company-backend-with-yas (backend)
     "Add `yasnippet' to company backend."
