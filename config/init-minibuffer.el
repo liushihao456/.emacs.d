@@ -136,6 +136,23 @@
         :face 'marginalia-file-name))))
   (advice-add #'marginalia-annotate-buffer :override #'marginalia-annotate-buffer-a)
 
+  (defun marginalia-annotate-bookmark-a (cand)
+    "Annotate bookmark CAND with its file name and front context string."
+    (when-let ((bm (assoc cand (bound-and-true-p bookmark-alist))))
+      (let ((front (bookmark-get-front-context-string bm)))
+        (marginalia--fields
+         ((marginalia--bookmark-type bm) :width 10 :face 'marginalia-type)
+         ((unless (or (not front) (string= front ""))
+            (concat (string-trim
+                     (replace-regexp-in-string
+                      "[ \t]+" " "
+                      (replace-regexp-in-string "\n" "\\\\n" front)))
+                    (marginalia--ellipsis)))
+          :width 25 :face 'marginalia-documentation)
+         ((bookmark-get-filename bm)
+          :face 'marginalia-file-name)))))
+  (advice-add #'marginalia-annotate-bookmark :override #'marginalia-annotate-bookmark-a)
+
   ;; Hack: when candidates are truncated for example by advicing
   ;; `vertico--format-candidate', we can't access the truncation candidates
   ;; here. Therefor use my custom 'truncate-to property of candidates if
