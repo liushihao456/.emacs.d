@@ -178,13 +178,18 @@
   "Fuzzy version of completion-all-completions"
   (company-fuzzy-completion string table predicate point 'all))
 
+;; Suppress warning of free variable
+(defvar company-fuzzy-mode)
+
 (defun company-fuzzy-company-capf--candidates-advice (old-fun &rest args)
   ;; Filtering (this function) is the performance bottleneck.
   ;; Scoring and sorting (`company-fuzzy-transformer') is fast.
   ;; Flex is slower than orderless which leverages the `all-completions' API
   ;; written in C.
-  (let* ((completion-styles '(fuzzy)))
-    (apply old-fun args)))
+  (if company-fuzzy-mode
+      (let* ((completion-styles '(fuzzy)))
+        (apply old-fun args)))
+  (apply old-fun args))
 
 (defun company-fuzzy-transformer (cands)
   "Sort up to company-fuzzy-limit CANDS by their flx score."
@@ -227,13 +232,13 @@
                        company-fuzzy-all-completions
                        "An intelligent fuzzy matching completion style with the first letter at the beginning."))
 
-        (require 'flx-rs)
         (flx-rs-load-dyn)
         (advice-add #'company-capf--candidates :around #'company-fuzzy-company-capf--candidates-advice)
+        (make-local-variable 'company-transformers)
         (add-to-list 'company-transformers #'company-fuzzy-transformer t))
     (advice-remove #'company-capf--candidates #'company-fuzzy-company-capf--candidates-advice)
-    (setq company-transformers
-          (delete #'company-fuzzy-transformer company-transformers))))
+    (setq-local company-transformers
+                (delete #'company-fuzzy-transformer company-transformers))))
 
 (provide 'company-fuzzy)
 ;;; company-fuzzy.el ends here
