@@ -1,5 +1,7 @@
 ;;; package --- Summary
+
 ;;; Commentary:
+;;
 ;;   init.el --- Emacs configuration
 ;;   This is where Emacs is inited
 ;; --------------------------------------
