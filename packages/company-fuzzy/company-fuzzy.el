@@ -219,7 +219,6 @@
   "Company-fuzzy minor mode."
   :init-value nil
   :group 'company-fuzzy
-  :global t
   (if company-fuzzy-mode
       (progn
         (add-to-list 'completion-styles-alist
