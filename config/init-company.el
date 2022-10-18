@@ -7,23 +7,15 @@
 
 ;;; Code:
 
-(with-eval-after-load 'company-box
-  (setq company-box-scrollbar nil))
-
 (with-eval-after-load 'company
   (setq company-backends '(company-capf))
   (define-key company-active-map (kbd "C-n") 'company-select-next)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (if (display-graphic-p)
-      (add-hook 'company-mode-hook 'company-box-mode)
-    (add-hook 'company-mode-hook 'company-tip-mode))
   (setq completion-ignore-case t)
   (setq company-dabbrev-downcase nil)
   (setq company-idle-delay 0)
   (setq company-selection-wrap-around t)
   (setq company-tooltip-align-annotations t)
-
-  (company-flx-mode)
   
   ;; Yasnippet integration
   (require 'yasnippet)
@@ -82,10 +74,18 @@ If failed try to complete the common part with `company-complete-common'"
   (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
   )
 
+(with-eval-after-load 'company-box
+  (setq company-box-scrollbar nil))
+
 (add-hook 'prog-mode-hook 'company-mode)
 (add-hook 'LaTeX-mode-hook 'company-mode)
 (add-hook 'org-mode-hook 'company-mode)
 (add-hook 'inferior-python-mode-hook 'company-mode)
+
+(add-hook 'company-mode-hook 'company-flx-mode)
+(if (display-graphic-p)
+    (add-hook 'company-mode-hook 'company-box-mode)
+  (add-hook 'company-mode-hook 'company-tip-mode))
 
 (provide 'init-company)
 

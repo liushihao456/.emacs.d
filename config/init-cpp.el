@@ -23,8 +23,7 @@ project in order for clangd to understand the project code."
          "cmake . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"))))
   (define-key c-mode-base-map (kbd "C-c l s") 'my/cmake-project-generate-compile-commands)
 
-  (c-set-offset 'innamespace 0)
-  (c-set-offset 'access-label -2))
+  (c-set-offset 'innamespace 0))
 
 ;; Cmake
 (when (executable-find "cmake")

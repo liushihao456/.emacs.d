@@ -234,6 +234,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                      'full x)
                          x))
                  recentf-list))
+         (vertico-sort-override-function #'identity)
          (fname (completing-read "File name: "
                                  (lambda (str pred action)
                                    (if (eq action 'metadata)
