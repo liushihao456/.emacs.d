@@ -103,7 +103,7 @@
   (defun my/vertico-sort-flx-history (candidates)
     "Sort vertico CANDIDATES first by flx scoring then by history."
     (my/vertico-sort-history (my/orderless-sort-flx candidates)))
-  (setq vertico-sort-override-function #'my/vertico-sort-flx-history))
+  (setq vertico-sort-function #'my/vertico-sort-flx-history))
 
 ;; Marginalia ---------------------------------------------------------------- ;
 
@@ -234,11 +234,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                      'full x)
                          x))
                  recentf-list))
-         (vertico-sort-override-function #'identity)
          (fname (completing-read "File name: "
                                  (lambda (str pred action)
                                    (if (eq action 'metadata)
-                                       '(metadata (category . recentf-file))
+                                       '(metadata
+                                         (category . recentf-file)
+                                         (cycle-sort-function . identity)
+                                         (display-sort-function . identity))
                                      (complete-with-action
                                       action file-list str pred))))))
     (when fname (find-file (cdr (assoc fname file-list))))))
