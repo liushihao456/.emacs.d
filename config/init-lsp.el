@@ -43,8 +43,9 @@
   )
 
 (with-eval-after-load 'lsp-ui
-  (define-key lsp-mode-map (kbd "C-c l g") 'lsp-ui-peek-find-references)
-  (setq lsp-ui-sideline-update-mode 'line)
+  (define-key lsp-mode-ui-map [remap xref-find-definitions] 'lsp-ui-peek-find-references)
+  (define-key lsp-mode-ui-map [remap xref-find-references] 'lsp-ui-peek-find-references)
+  (define-key lsp-mode-ui-map [remap lsp-describe-thing-at-point] 'lsp-ui-doc-glance)
   (setq lsp-ui-sideline-enable nil))
 
 (provide 'init-lsp)
