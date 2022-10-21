@@ -44,9 +44,8 @@
 
 (with-eval-after-load 'lsp-ui
   (define-key lsp-mode-map (kbd "C-c l g") 'lsp-ui-peek-find-references)
-  (setq lsp-ui-sideline-update-mode 'line))
-
-(add-hook 'emacs-lisp-mode-hook 'lsp-ui-mode)
+  (setq lsp-ui-sideline-update-mode 'line)
+  (setq lsp-ui-sideline-enable nil))
 
 (provide 'init-lsp)
 

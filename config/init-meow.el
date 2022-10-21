@@ -38,6 +38,7 @@
    '("<escape>" . ignore))
   (meow-leader-define-key
    '("b" . switch-to-buffer)
+   '("B" . ibuffer)
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
    '("k" . "H-k")
