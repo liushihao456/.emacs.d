@@ -1,4 +1,4 @@
-;;; react-mode.el --- Mode for typescript and react	-*- lexical-binding: t -*-
+;;; jsts-mode.el --- Mode for JavaScript and TypeScript	-*- lexical-binding: t -*-
 
 ;; Author: Shihao Liu
 ;; Keywords: company popup documentation tip
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 ;;
-;; Mode for typescript and react
+;; Mode for JavaScript and TypeScript; supports React syntax.
 ;; --------------------------------------
 
 ;;; Code:
@@ -35,7 +35,7 @@
 (require 'tree-sitter-langs)
 (require 'tree-sitter-indent)
 
-(defvar react-mode-indent-scopes
+(defvar jsts-mode-indent-scopes
   '((indent-all . ;; these nodes are always indented
                 ())
     (indent-body . ;; if parent node is one of these → indent to parent line's start col + offset
@@ -88,7 +88,7 @@
               "]")))
   "Scopes for indenting in typescript-react.")
 
-(defun react-mode-goto-prev-tag ()
+(defun jsts-mode-goto-prev-tag ()
   "Go to the previous JSX tag."
   (interactive)
   (let ((echo-keystrokes nil))
@@ -99,11 +99,11 @@
     (message "Goto tag: [n]ext [p]revious")
     (set-transient-map
      (let ((map (make-sparse-keymap)))
-       (define-key map [?n] 'react-mode-goto-next-tag)
-       (define-key map [?p] 'react-mode-goto-prev-tag)
+       (define-key map [?n] 'jsts-mode-goto-next-tag)
+       (define-key map [?p] 'jsts-mode-goto-prev-tag)
        map))))
 
-(defun react-mode-goto-next-tag ()
+(defun jsts-mode-goto-next-tag ()
   "Go to the next JSX tag."
   (interactive)
   (let ((echo-keystrokes nil))
@@ -114,56 +114,67 @@
     (message "Goto tag: [n]ext [p]revious")
     (set-transient-map
      (let ((map (make-sparse-keymap)))
-       (define-key map [?n] 'react-mode-goto-next-tag)
-       (define-key map [?p] 'react-mode-goto-prev-tag)
+       (define-key map [?n] 'jsts-mode-goto-next-tag)
+       (define-key map [?p] 'jsts-mode-goto-prev-tag)
        map))))
 
 ;;; Syntax table and parsing
 
-(defvar react-mode-syntax-table
+(defvar jsts-mode-syntax-table
   (let ((table (make-syntax-table)))
     (c-populate-syntax-table table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?` "\"" table)
     table)
-  "Syntax table for `react-mode'.")
+  "Syntax table for `jsts-mode'.")
 
 ;;; KeyMap
 
-(defvar react-mode-map
+(defvar jsts-mode-map
   (let ((keymap (make-sparse-keymap)))
     keymap)
-  "Keymap for `react-mode'.")
+  "Keymap for `jsts-mode'.")
 
 ;;; Mode hook
 
-(defcustom react-mode-hook nil
-  "*Hook called by `react-mode'."
+(defcustom jsts-mode-hook nil
+  "*Hook called by `jsts-mode'."
   :type 'hook
-  :group 'react)
+  :group 'jsts)
 
 ;;;###autoload
-(define-derived-mode react-mode prog-mode (if (string-suffix-p ".react" (buffer-file-name)) "TypeScript[REACT]" "JavaScript[JSX]")
-  "Major mode for editing typescript-react (.react).
+(define-derived-mode jsts-mode prog-mode
+  (pcase (file-name-extension (buffer-file-name))
+    ("ts" "TypeScript")
+    ("tsx" "TypeScript[TSX]")
+    ("js" "JavaScript")
+    ("jsx" "JavaScript[JSX]"))
+  "Major mode for editing JavaScript/TypeScript files; supports React syntax.
 
 Key bindings:
 
-\\{react-mode-map}"
+\\{jsts-mode-map}"
 
-  :group 'react
-  :syntax-table react-mode-syntax-table
+  :group 'jsts
+  :syntax-table jsts-mode-syntax-table
 
   (tree-sitter-hl-mode)
-  (setq-local tree-sitter-indent-current-scopes react-mode-indent-scopes)
+  (setq-local tree-sitter-indent-current-scopes jsts-mode-indent-scopes)
   (setq-local indent-line-function #'tree-sitter-indent-line)
 
-  (define-key react-mode-map (kbd "C-c C-n") 'react-mode-goto-next-tag)
-  (define-key react-mode-map (kbd "C-c C-p") 'react-mode-goto-prev-tag)
+  (define-key jsts-mode-map (kbd "C-c C-n") 'jsts-mode-goto-next-tag)
+  (define-key jsts-mode-map (kbd "C-c C-p") 'jsts-mode-goto-prev-tag)
 
+  (setq-local electric-pair-pairs
+              (append electric-pair-pairs '((?\' . ?\')) '((?\` . ?\`))))
+  (setq-local electric-pair-text-pairs electric-pair-pairs)
   (setq-local electric-indent-chars
               (append "{}():;," electric-indent-chars))
   (setq-local electric-layout-rules
               '((?\; . after) (?\{ . after) (?\} . before)))
+
+  ;; Yasnippet
+
 
   ;; Comments
   (setq-local comment-start "// ")
@@ -179,6 +190,6 @@ Key bindings:
         comment-start-skip "\\(//+\\|/\\*+\\)\\s *")
   )
 
-(provide 'react-mode)
+(provide 'jsts-mode)
 
-;;; react-mode.el ends here
+;;; jsts-mode.el ends here

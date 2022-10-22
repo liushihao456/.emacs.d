@@ -66,7 +66,7 @@
 (require 'init-cpp)
 (require 'init-java)
 (require 'init-lsp)
-(require 'init-web)
+(require 'init-js)
 (require 'init-treesitter)
 (require 'init-fold)
 

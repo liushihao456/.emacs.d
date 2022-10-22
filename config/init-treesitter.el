@@ -9,7 +9,7 @@
 
 (with-eval-after-load 'tree-sitter
   (require 'tree-sitter-langs)
-  (add-to-list 'tree-sitter-major-mode-language-alist '(react-mode . tsx))
+  (add-to-list 'tree-sitter-major-mode-language-alist '(jsts-mode . tsx))
   (setq tree-sitter-debug-highlight-jump-region t)
   (setq tree-sitter-debug-jump-buttons t)
   ;; (defun tree-sitter-rust-imenu-index-function ()

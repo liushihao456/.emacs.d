@@ -286,24 +286,27 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (defun ctags-generate-tags ()
   "Generate ctags in project."
-  (let ((default-directory (project-root (project-current)))
-        (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
-                     " | ctags --output-format=json --pseudo-tags= -L - --fields=NPznF")))
-    (cond
-     ;; Windows
-     ((memq system-type '(ms-dos windows-nt cygwin))
-      (shell-command-to-string (concat "Powershell -Command " (shell-quote-argument cmd))))
-     ;; MacOS, Linux
-     (t
-      (shell-command-to-string cmd)))))
+  (let* ((default-directory (project-root (project-current)))
+         (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
+                      " | ctags -f - --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no"))
+         (output (cond
+                  ;; Windows
+                  ((memq system-type '(ms-dos windows-nt cygwin))
+                   (shell-command-to-string (concat "Powershell -Command " (shell-quote-argument cmd))))
+                  ;; MacOS, Linux
+                  (t
+                   (shell-command-to-string cmd))))
+         (json-start (if (string-prefix-p "{" output)
+                         0
+                       (1+ (string-match-p "\n{" output)))))
+    (substring output json-start)))
 
 (defun ctags-get-tags-json ()
   "Parse ctag tags json."
   (let ((str (ctags-generate-tags))
         (w (floor (* (frame-width) 0.3)))
         (count 0) tags)
-    (setq tags (mapcar (lambda (l) (json-parse-string l))
-                       (split-string str "\n" t)))
+    (setq tags (mapcar #'json-parse-string (split-string str "\n" t)))
     (mapc (lambda (tag)
             (if (gethash "name" tag)
                 (puthash "name"
