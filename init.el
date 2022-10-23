@@ -69,6 +69,8 @@
 (require 'init-js)
 (require 'init-treesitter)
 (require 'init-fold)
+(require 'init-diffhl)
+(require 'init-treemacs)
 
 ;; (setq gc-cons-threshold (* 800 1000))
 

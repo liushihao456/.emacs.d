@@ -230,8 +230,9 @@ split; vice versa."
 (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
 (global-set-key (kbd "M-s r") 'anzu-query-replace-at-cursor)
 ;; Occur
-(define-key occur-mode-map "n" 'occur-next)
-(define-key occur-mode-map "p" 'occur-prev)
+(with-eval-after-load 'replace
+  (define-key occur-mode-map "n" 'occur-next)
+  (define-key occur-mode-map "p" 'occur-prev))
 ;; Automatically pop to some buffers
 (add-hook 'occur-hook (lambda () (pop-to-buffer (get-buffer "*Occur*"))))
 (add-hook 'bookmark-bmenu-mode-hook (lambda () (switch-to-buffer "*Bookmark List*")))
@@ -254,66 +255,6 @@ split; vice versa."
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
-;; Treemacs
-(global-set-key (kbd "C-c e e") 'treemacs-select-window)
-(add-hook 'treemacs-mode-hook (lambda () (setq-local scroll-margin 0)))
-(with-eval-after-load 'treemacs
-  (defun my/treemacs-kill-buffer ()
-    "Kill treemacs buffer even when not in treemacs window."
-    (interactive)
-    (let ((visibility (treemacs-current-visibility)))
-      (if (eq visibility 'none)
-          (treemacs-log-failure "No treemacs buffer alive.")
-        (if (eq visibility 'visible)
-            (progn
-              (unless treemacs--in-this-buffer (treemacs--select-visible-window))
-              (treemacs-kill-buffer))
-          (kill-buffer (treemacs-get-local-buffer))
-          (run-hooks treemacs-kill-hook))
-        (treemacs-log "Killed treemacs buffer."))))
-  (global-set-key (kbd "C-c e k") 'my/treemacs-kill-buffer)
-
-  (defun my/treemacs-quit ()
-    "Quit treemacs window even when not in it."
-    (interactive)
-    (let ((visibility (treemacs-current-visibility)))
-      (if (not (eq visibility 'visible))
-          (treemacs-log-failure "Treemacs window not visible.")
-        (unless treemacs--in-this-buffer (treemacs--select-visible-window))
-        (treemacs-quit))))
-  (global-set-key (kbd "C-c e q") 'my/treemacs-quit)
-
-  (treemacs-follow-mode)
-  (treemacs-project-follow-mode)
-  (setq treemacs--project-follow-delay 0.1)
-  (setq treemacs-file-follow-delay 0.1)
-  (setq treemacs-project-follow-cleanup t)
-  (setq treemacs-follow-after-init t)
-  ;; (setq treemacs-width 30)
-  (setq treemacs-indentation 1)
-  (setq treemacs-is-never-other-window t)
-
-  (defadvice treemacs-visit-node-default (after treemacs-extra-wide-toggle-off activate)
-    "Restore Treemacs buffer if it's in extr-wide state."
-    (if (get 'treemacs-extra-wide-toggle :toggle-on)
-        (with-selected-window (treemacs-get-local-window)
-          (treemacs--set-width treemacs-width)
-          (put 'treemacs-extra-wide-toggle :toggle-on nil)
-          (treemacs-log "Switched to normal width display"))))
-  (defadvice treemacs-quit (after treemacs-quit-reset-extra-wide activate)
-    (put 'treemacs-extra-wide-toggle :toggle-on nil)
-    (treemacs-log "Switched to normal width display"))
-
-  (defun my/treemacs-ignore-file-predicate (file _)
-    (or (string= file ".gitignore")
-        (string-suffix-p ".pyc" file)
-        (string= file "__pycache__")
-        (string-prefix-p ".cache" file)))
-  (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
-
-  ;; icon-tools-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
-  (icon-tools-treemacs-icons-config))
-
 ;; Icon-tools-dired
 (add-hook 'dired-mode-hook 'icon-tools-dired-mode)
 
@@ -335,7 +276,7 @@ split; vice versa."
             (goto-char start)
             (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
         (replace-match "\\1\n\\2")))))
-  
+
 (defun uniquify-all-lines-buffer ()
   "Delete duplicate lines in buffer and keep first occurrence."
   (interactive "*")
@@ -343,8 +284,9 @@ split; vice versa."
 
 ;; Versatile tab key
 (defun my/tab-jump-over-pair-key-filter (cmd)
-  "Return CMD if there's any opening or closing pair after point at current line.
-This function is useful as a `:filter' to a conditional key definition."
+  "Return CMD if there's any closing pair after point at current line.
+This function is useful as a `:filter' to a conditional key
+definition."
   (if (looking-at-p "\s*[])}>\"'`]") cmd))
 
 (defun my/tab-jump-over-pair ()
@@ -357,42 +299,6 @@ This function is useful as a `:filter' to a conditional key definition."
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 (define-key prog-mode-map [tab]
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
-
-;; Diff-hl mode
-(setq diff-hl-command-prefix (kbd "C-c v"))
-(with-eval-after-load 'diff-hl
-  (defun my/diff-hl-define-bitmaps (&rest _)
-    (define-fringe-bitmap 'diff-hl-bmp-middle [#b00011000] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-delete [#b11110000
-                                               #b11100000
-                                               #b11000000
-                                               #b10000000] nil nil 'top))
-
-  (advice-add #'diff-hl-define-bitmaps :override #'my/diff-hl-define-bitmaps)
-  (defun my/diff-hl-type-face-fn (type _pos)
-    (intern (format "diff-hl-%s" type)))
-  (defun my/diff-hl-type-at-pos-fn (type _pos)
-    (if (eq type 'delete)
-        'diff-hl-bmp-delete
-      'diff-hl-bmp-middle))
-  (advice-add #'diff-hl-fringe-bmp-from-pos  :override #'my/diff-hl-type-at-pos-fn)
-  (advice-add #'diff-hl-fringe-bmp-from-type :override #'my/diff-hl-type-at-pos-fn)
-  (setq diff-hl-draw-borders nil)
-  (with-eval-after-load 'flycheck
-    (setq flycheck-indication-mode 'right-fringe)
-    ;; Let the arrow point left
-    (when (fboundp 'define-fringe-bitmap) ;; #ifdef HAVE_WINDOW_SYSTEM
-      (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-        flycheck-fringe-bitmap-double-left-arrow)
-      (define-fringe-bitmap
-        'flycheck-fringe-bitmap-double-arrow-hi-res
-        flycheck-fringe-bitmap-double-left-arrow-hi-res
-        nil 16))))
-
-(global-diff-hl-mode)
-(unless (display-graphic-p) (diff-hl-margin-mode))
-(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-(add-hook 'vc-dir-mode-hook 'diff-hl-dir-mode)
 
 ;; Rainbow delimiters
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)

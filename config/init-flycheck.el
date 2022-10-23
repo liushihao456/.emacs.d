@@ -15,7 +15,6 @@ subsequent movements."
     (interactive)
     (let ((echo-keystrokes nil))
       (flycheck-next-error)
-      (message "Goto flycheck error: [n]ext [p]revious")
       (set-transient-map
        (let ((map (make-sparse-keymap)))
          (define-key map [?n] 'flycheck-next-error)
@@ -28,7 +27,6 @@ subsequent movements."
     (interactive)
     (let ((echo-keystrokes nil))
       (flycheck-previous-error)
-      (message "Goto flycheck error: [n]ext [p]revious")
       (set-transient-map
        (let ((map (make-sparse-keymap)))
          (define-key map [?n] 'flycheck-next-error)

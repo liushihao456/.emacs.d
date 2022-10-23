@@ -7,50 +7,52 @@
 
 ;;; Code:
 
-(defun hs-hide-leafs-recursive (minp maxp)
-  "Hide blocks below point that do not contain further blocks in
-    region (MINP MAXP)."
-  (when (hs-find-block-beginning)
-    (setq minp (1+ (point)))
-    (funcall hs-forward-sexp-func 1)
-    (setq maxp (1- (point))))
-  (unless hs-allow-nesting
-    (hs-discard-overlays minp maxp))
-  (goto-char minp)
-  (let ((leaf t))
-    (while (progn
-             (forward-comment (buffer-size))
-             (and (< (point) maxp)
-                  (re-search-forward hs-block-start-regexp maxp t)))
-      (setq pos (match-beginning hs-block-start-mdata-select))
-      (if (hs-hide-leafs-recursive minp maxp)
-          (save-excursion
-            (goto-char pos)
-            (hs-hide-block-at-point t)))
-      (setq leaf nil))
-    (goto-char maxp)
-    leaf))
+(with-eval-after-load 'origami
+  (define-key origami-mode-map (kbd "C-c o o") 'origami-forward-toggle-node)
+  (define-key origami-mode-map (kbd "M-RET") 'origami-recursively-toggle-node)
+  (define-key origami-mode-map (kbd "C-c o s") 'origami-show-only-node)
+  (define-key origami-mode-map (kbd "C-c o u") 'origami-undo)
+  (define-key origami-mode-map (kbd "C-c o r") 'origami-redo)
+  (define-key origami-mode-map (kbd "C-c o M-r") 'origami-reset)
+  (define-key origami-mode-map (kbd "C-c o a") 'origami-open-all-nodes)
+  (define-key origami-mode-map (kbd "C-c o t") 'origami-toggle-all-nodes)
 
-(defun hs-hide-leafs ()
-  "Hide all blocks in the buffer that do not contain subordinate
-    blocks.  The hook `hs-hide-hook' is run; see `run-hooks'."
-  (interactive)
-  (hs-life-goes-on
-   (save-excursion
-     (message "Hiding blocks ...")
-     (save-excursion
-       (goto-char (point-min))
-       (hs-hide-leafs-recursive (point-min) (point-max)))
-     (message "Hiding blocks ... done"))
-   (run-hooks 'hs-hide-hook)))
+  (defun transient/origami-next-fold (buffer point)
+    "Navigate to the next origami fold, enabling pressing single
+key for subsequent movements."
+    (interactive (list (current-buffer) (point)))
+    (let ((echo-keystrokes nil))
+      (origami-next-fold buffer point)
+      (set-transient-map
+       (let ((map (make-sparse-keymap)))
+         (define-key map [?n] 'origami-next-fold)
+         (define-key map [?p] 'origami-previous-fold)
+         (define-key map [?o] 'origami-forward-toggle-node)
+         map)
+       t)))
+  (defun transient/origami-previous-fold (buffer point)
+    "Navigate to the previous origami fold, enabling pressing single
+key for subsequent movements."
+    (interactive (list (current-buffer) (point)))
+    (let ((echo-keystrokes nil))
+      (origami-previous-fold buffer point)
+      (set-transient-map
+       (let ((map (make-sparse-keymap)))
+         (define-key map [?n] 'origami-next-fold)
+         (define-key map [?p] 'origami-previous-fold)
+         (define-key map [?o] 'origami-forward-toggle-node)
+         map)
+       t)))
+  (define-key origami-mode-map (kbd "C-c o p") 'transient/origami-previous-fold)
+  (define-key origami-mode-map (kbd "C-c o n") 'transient/origami-next-fold)
 
-(with-eval-after-load 'hideshow
-  (define-key hs-minor-mode-map (kbd "C-c o l") 'hs-hide-level)
-  (define-key hs-minor-mode-map (kbd "C-c o o") 'hs-toggle-hiding)
-  (define-key hs-minor-mode-map (kbd "C-c o a") 'hs-show-all)
-  (define-key hs-minor-mode-map (kbd "C-c o f") 'hs-hide-leafs))
+  (defun my/origami-recenter-a (&rest _)
+    "Recenter point to the middle of screen."
+    (recenter-top-bottom))
+  (advice-add #'origami-show-only-node :after #'my/origami-recenter-a)
+  )
 
-(add-hook 'prog-mode-hook 'hs-minor-mode)
+(add-hook 'prog-mode-hook 'origami-mode)
 
 (provide 'init-fold)
 
