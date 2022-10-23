@@ -17,7 +17,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ccls company-flx flx highlight-quoted rainbow-delimiters orderless vertico diff-hl consult-lsp org-bullets embrace org-roam meow telega all-the-icons editorconfig doom-themes base16-theme dashboard embark embark-consult consult marginalia company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode lsp-ui swift-mode kotlin-mode cdlatex deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company which-key flycheck zenburn-theme yasnippet)))
+   '(rust-mode ccls company-flx flx highlight-quoted rainbow-delimiters orderless vertico diff-hl consult-lsp org-bullets embrace org-roam meow telega all-the-icons editorconfig doom-themes base16-theme dashboard embark embark-consult consult marginalia company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode lsp-ui swift-mode kotlin-mode cdlatex deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company which-key flycheck zenburn-theme yasnippet)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
