@@ -353,6 +353,8 @@ This function is useful as a `:filter' to a conditional key definition."
   (save-match-data
     (re-search-forward "\s*[])}>\"'`]" (point-at-eol) t)))
 
+(define-key prog-mode-map (kbd "TAB")
+  '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 (define-key prog-mode-map [tab]
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 
@@ -388,6 +390,7 @@ This function is useful as a `:filter' to a conditional key definition."
         nil 16))))
 
 (global-diff-hl-mode)
+(unless (display-graphic-p) (diff-hl-margin-mode))
 (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
 (add-hook 'vc-dir-mode-hook 'diff-hl-dir-mode)
 
