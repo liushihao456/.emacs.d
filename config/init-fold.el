@@ -34,7 +34,14 @@
   (defun my/origami-recenter-a (&rest _)
     "Recenter point to the middle of screen."
     (recenter))
-  (advice-add #'origami-show-only-node :after #'my/origami-recenter-a))
+  (advice-add #'origami-show-only-node :after #'my/origami-recenter-a)
+
+  (defun origami-recursively-toggle-node-a (orig-fn &rest args)
+    "Advice around `origami-recursively-toggle-node' that makes it behave more intuitively."
+    (let ((last-command 'origami-recursively-toggle-node))
+      (apply orig-fn args)))
+  (advice-add #'origami-recursively-toggle-node
+              :around #'origami-recursively-toggle-node-a))
 
 (add-hook 'prog-mode-hook 'origami-mode)
 
