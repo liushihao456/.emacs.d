@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(require 'init-macros)
+
 (setq diff-hl-command-prefix (kbd "C-c v"))
 (with-eval-after-load 'diff-hl
   (defun my/diff-hl-define-bitmaps (&rest _)
@@ -37,39 +39,10 @@
         flycheck-fringe-bitmap-double-left-arrow-hi-res
         nil 16)))
 
-(defun transient/diff-hl-next-hunk ()
-    "Navigate to the next diff-hl hunk, enabling pressing single key
-for subsequent movements."
-    (interactive)
-    (let ((echo-keystrokes nil))
-      (diff-hl-next-hunk)
-      (set-transient-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map [?n] 'diff-hl-next-hunk)
-         (define-key map [?p] 'diff-hl-previous-hunk)
-         (define-key map [?r] 'diff-hl-revert-hunk)
-         map)
-       t)))
-  (defun transient/diff-hl-previous-hunk ()
-    "Navigate to the previous diff-hl hunk, enabling pressing single
-key for subsequent movements."
-    (interactive)
-    (let ((echo-keystrokes nil))
-      (diff-hl-previous-hunk)
-      (set-transient-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map [?n] 'diff-hl-next-hunk)
-         (define-key map [?p] 'diff-hl-previous-hunk)
-         (define-key map [?r] 'diff-hl-revert-hunk)
-         map)
-       t)))
-  (define-key diff-hl-mode-map (kbd (concat diff-hl-command-prefix " p"))
-    'transient/diff-hl-previous-hunk)
-  (define-key diff-hl-mode-map (kbd (concat diff-hl-command-prefix " n"))
-    'transient/diff-hl-next-hunk)
-  (define-key diff-hl-mode-map (kbd (concat diff-hl-command-prefix " r"))
-    'diff-hl-revert-hunk)
-  )
+  (def-transient-commands diff-hl-mode-map diff-hl-command-prefix
+    ("n" . diff-hl-next-hunk)
+    ("p" . diff-hl-previous-hunk)
+    ("r" . diff-hl-revert-hunk)))
 
 (global-diff-hl-mode)
 (unless (display-graphic-p) (diff-hl-margin-mode))

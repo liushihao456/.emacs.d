@@ -7,34 +7,14 @@
 
 ;;; Code:
 
+(require 'init-macros)
+
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (with-eval-after-load 'flycheck
-  (defun transient/flycheck-next-error ()
-    "Navigate to the next flycheck error, enabling pressing single key for
-subsequent movements."
-    (interactive)
-    (let ((echo-keystrokes nil))
-      (flycheck-next-error)
-      (set-transient-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map [?n] 'flycheck-next-error)
-         (define-key map [?p] 'flycheck-previous-error)
-         map)
-       t)))
-  (defun transient/flycheck-previous-error ()
-    "Navigate to the previous flycheck error, enabling pressing single key for
-subsequent movements."
-    (interactive)
-    (let ((echo-keystrokes nil))
-      (flycheck-previous-error)
-      (set-transient-map
-       (let ((map (make-sparse-keymap)))
-         (define-key map [?n] 'flycheck-next-error)
-         (define-key map [?p] 'flycheck-previous-error)
-         map)
-       t)))
-  (define-key flycheck-mode-map (kbd "C-c f p") 'transient/flycheck-previous-error)
-  (define-key flycheck-mode-map (kbd "C-c f n") 'transient/flycheck-next-error)
+  (def-transient-commands flycheck-mode-map "C-c f"
+    ("n" . flycheck-next-error)
+    ("p" . flycheck-previous-error))
+
   (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
 
   (setq-default flycheck-emacs-lisp-load-path 'inherit)
