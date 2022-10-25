@@ -102,7 +102,9 @@
           candidates))))
   (defun my/vertico-sort-flx-history (candidates)
     "Sort vertico CANDIDATES first by flx scoring then by history."
-    (my/vertico-sort-history (my/orderless-sort-flx candidates)))
+    (if (vertico--metadata-get 'category)
+        (my/orderless-sort-flx candidates)
+      (my/vertico-sort-history (my/orderless-sort-flx candidates))))
   (setq vertico-sort-function #'my/vertico-sort-flx-history))
 
 ;; Marginalia ---------------------------------------------------------------- ;
@@ -286,47 +288,52 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (defun ctags-generate-tags ()
   "Generate ctags in project."
-  (let* ((default-directory (project-root (project-current)))
+  (let* ((buf (get-buffer-create "*ctags-output*"))
+         (default-directory (project-root (project-current)))
          (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
-                      " | ctags -f - --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no"))
-         (output (cond
-                  ;; Windows
-                  ((memq system-type '(ms-dos windows-nt cygwin))
-                   (shell-command-to-string (concat "Powershell -Command " (shell-quote-argument cmd))))
-                  ;; MacOS, Linux
-                  (t
-                   (shell-command-to-string cmd))))
-         (json-start (if (string-prefix-p "{" output)
-                         0
-                       (1+ (string-match-p "\n{" output)))))
-    (substring output json-start)))
+                      " | ctags -f - --kinds-all=* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
+    (with-current-buffer buf
+      (erase-buffer))
+    (cond
+     ;; Windows
+     ((memq system-type '(ms-dos windows-nt cygwin))
+      (call-process-shell-command (concat "Powershell -Command " (shell-quote-argument cmd))
+                                  nil buf nil))
+     ;; MacOS, Linux
+     (t
+      (call-process-shell-command cmd nil buf nil)))
+    buf))
 
 (defun ctags-get-tags-json ()
   "Parse ctag tags json."
-  (let ((str (ctags-generate-tags))
+  (let ((buf (ctags-generate-tags))
         (w (floor (* (frame-width) 0.3)))
-        (count 0) tags)
-    (setq tags (mapcar #'json-parse-string (split-string str "\n" t)))
-    (mapc (lambda (tag)
-            (if (gethash "name" tag)
-                (puthash "name"
-                         (format "%s%s"
-                                 ;; Add 'truncate-to property to tag
-                                 (propertize (gethash "name" tag) 'full-json tag
-                                             'truncate-to w)
-                                 (propertize (number-to-string count) 'invisible t))
-                         tag))
-            (if (gethash "pattern" tag)
-                (puthash "pattern"
-                         (string-trim
-                          (string-remove-suffix
-                           "$"
-                           (string-remove-prefix
-                            "^"
-                            (substring (gethash "pattern" tag) 1 -1))))
-                         tag))
-            (setq count (1+ count)))
-          tags)))
+        (count 0) linestr tag tags)
+    (with-current-buffer buf
+      (goto-char (point-min))
+      (while (not (eobp))
+        (setq linestr (buffer-substring-no-properties (point) (line-end-position)))
+        (when (and (string-prefix-p "{" linestr) (string-suffix-p "}" linestr))
+          (setq tag (json-parse-string linestr))
+          (when (gethash "name" tag)
+            (puthash "name" (format "%s%s"
+                                    ;; Add 'truncate-to property to tag
+                                    (propertize (gethash "name" tag) 'full-json tag
+                                                'truncate-to w)
+                                    (propertize (number-to-string count) 'invisible t))
+                     tag))
+          (when (gethash "pattern" tag)
+            (puthash "pattern" (string-trim
+                                (string-remove-suffix
+                                 "$"
+                                 (string-remove-prefix
+                                  "^"
+                                  (substring (gethash "pattern" tag) 1 -1))))
+                     tag))
+          (push tag tags)
+          (setq count (1+ count)))
+        (forward-line 1)))
+    tags))
 
 (add-to-list 'icon-tools-completion-category-icon-alist
              '(ctags . icon-tools-completion-get-imenu-icon))
