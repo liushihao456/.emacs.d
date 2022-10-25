@@ -102,7 +102,7 @@
           candidates))))
   (defun my/vertico-sort-flx-history (candidates)
     "Sort vertico CANDIDATES first by flx scoring then by history."
-    (if (vertico--metadata-get 'category)
+    (if (eq (vertico--metadata-get 'category) 'buffer)
         (my/orderless-sort-flx candidates)
       (my/vertico-sort-history (my/orderless-sort-flx candidates))))
   (setq vertico-sort-function #'my/vertico-sort-flx-history))
