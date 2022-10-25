@@ -8,6 +8,9 @@
 ;;; Code:
 
 (add-hook 'python-mode-hook 'lsp)
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq-local imenu-create-index-function #'python-imenu-create-flat-index)))
 (with-eval-after-load 'python
   (require 'lsp-pyright)
   (setq python-shell-interpreter "python3")
