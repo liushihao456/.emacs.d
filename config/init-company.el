@@ -59,6 +59,13 @@
   (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
   )
 
+(add-hook 'company-mode-hook
+          (lambda ()
+            ;; This hook is added by company when `company-mode' is enabled. It disables
+            ;; `yas-next-field-or-maybe-expand' with TAB key even if TAB has been unset in
+            ;; `company-active-map'
+            (remove-hook 'yas-keymap-disable-hook 'company--active-p t)))
+
 (with-eval-after-load 'company-box
   (setq company-box-scrollbar nil))
 
