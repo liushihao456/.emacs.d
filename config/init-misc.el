@@ -299,6 +299,9 @@ definition."
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 (define-key prog-mode-map [tab]
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
+(with-eval-after-load 'cc-mode
+  (define-key c-mode-base-map (kbd "TAB")
+    '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter)))
 
 ;; Rainbow delimiters
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)

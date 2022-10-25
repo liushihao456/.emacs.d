@@ -291,7 +291,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (let* ((buf (get-buffer-create "*ctags-output*"))
          (default-directory (project-root (project-current)))
          (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
-                      " | ctags -f - --kinds-all=* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
+                      " | ctags -f - --kinds-all=\\* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
     (with-current-buffer buf
       (erase-buffer))
     (cond
