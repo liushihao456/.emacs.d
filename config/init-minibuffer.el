@@ -232,7 +232,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (interactive)
   (let* ((file-list (mapcar
                  (lambda (x)
-                   (cons (propertize (file-name-nondirectory x)
+                   (cons (propertize (if (file-directory-p x)
+                                         (concat (file-name-nondirectory
+                                                  (directory-file-name x)) "/")
+                                       (file-name-nondirectory x))
                                      'full x)
                          x))
                  recentf-list))
@@ -356,6 +359,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (defun project-ctags-find-tag ()
   "Jump to symbols across the whole project."
   (interactive)
+  (require 'project)
   (let* ((project-root (project-root (project-current)))
          (symbol-at-point (if (use-region-p)
                               (buffer-substring-no-properties
