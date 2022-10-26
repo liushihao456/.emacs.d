@@ -298,18 +298,24 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   "Generate ctags in project."
   (let* ((buf (get-buffer-create "*ctags-output*"))
          (default-directory (project-root (project-current)))
-         (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
-                      " | ctags -f - --kinds-all=* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
+         (git-ls-cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""))
     (with-current-buffer buf
       (erase-buffer))
     (cond
      ;; Windows
      ((memq system-type '(ms-dos windows-nt cygwin))
-      (call-process-shell-command (concat "Powershell -Command " (shell-quote-argument cmd))
-                                  nil buf nil))
+      (call-process-shell-command
+       (concat "Powershell -Command "
+               (shell-quote-argument
+                (concat git-ls-cmd
+                        " | ctags -f - --kinds-all=* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
+       nil buf nil))
      ;; MacOS, Linux
      (t
-      (call-process-shell-command (shell-quote-argument cmd) nil buf nil)))
+      (call-process-shell-command
+       (concat git-ls-cmd
+               " | ctags -f - --kinds-all=\\* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")
+       nil buf nil)))
     buf))
 
 (defun ctags-get-tags-json ()
