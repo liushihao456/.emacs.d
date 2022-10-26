@@ -103,7 +103,7 @@
   (defun my/vertico-sort-flx-history (candidates)
     "Sort vertico CANDIDATES first by flx scoring then by history."
     (if (eq (vertico--metadata-get 'category) 'buffer)
-        (my/orderless-sort-flx candidates)
+        (identity candidates)
       (my/vertico-sort-history (my/orderless-sort-flx candidates))))
   (setq vertico-sort-function #'my/vertico-sort-flx-history))
 
@@ -230,13 +230,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (defun recentf-open-files-compl ()
   "Find recentf files with `completing-read'."
   (interactive)
-  (let* ((file-list (mapcar
-                 (lambda (x)
-                   (cons (propertize (if (file-directory-p x)
-                                         (concat (file-name-nondirectory
-                                                  (directory-file-name x)) "/")
-                                       (file-name-nondirectory x))
-                                     'full x)
+  (let* ((count 0)
+         (file-list (mapcar
+                     (lambda (x)
+                       (cons
+                        (format "%s%s"
+                                (propertize (if (file-directory-p x)
+                                                (concat (file-name-nondirectory
+                                                         (directory-file-name x)) "/")
+                                              (file-name-nondirectory x))
+                                            'full x)
+                                (propertize (number-to-string (setq count (1+ count)))
+                                            'invisible t))
                          x))
                  recentf-list))
          (fname (completing-read "File name: "
@@ -294,7 +299,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (let* ((buf (get-buffer-create "*ctags-output*"))
          (default-directory (project-root (project-current)))
          (cmd (concat "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""
-                      " | ctags -f - --kinds-all=\\* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
+                      " | ctags -f - --kinds-all=* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
     (with-current-buffer buf
       (erase-buffer))
     (cond
@@ -304,7 +309,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                   nil buf nil))
      ;; MacOS, Linux
      (t
-      (call-process-shell-command cmd nil buf nil)))
+      (call-process-shell-command (shell-quote-argument cmd) nil buf nil)))
     buf))
 
 (defun ctags-get-tags-json ()
