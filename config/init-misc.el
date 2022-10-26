@@ -202,7 +202,6 @@ split; vice versa."
 (global-set-key (kbd "C-c p r") 'project-find-regexp)
 (global-set-key (kbd "C-c p q") 'project-query-replace-regexp)
 (global-set-key (kbd "C-c `") 'fileloop-continue)
-(global-set-key (kbd "M-i") 'imenu)
 (global-set-key (kbd "C-x v") nil)
 (global-set-key (kbd "C-c v") vc-prefix-map)
 (global-set-key (kbd "C-x B") 'ibuffer)
