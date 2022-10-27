@@ -27,6 +27,21 @@
 
 ;; Meow -- modal editing
 (require 'meow)
+
+(defun meow-find-backward (n ch &optional expand)
+  "Backward `meow-find'."
+  (interactive "p\ncFind:")
+  (if n
+      (meow-find (- n) ch expand)
+    (meow-find -1 ch expand)))
+
+(defun meow-till-backward (n ch &optional expand)
+  "Backward `meow-till'."
+  (interactive "p\ncTill:")
+  (if n
+      (meow-till (- n) ch expand)
+    (meow-till -1 ch expand)))
+
 (defun meow-setup ()
   "Setup meow."
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -80,6 +95,7 @@
    '("e" . meow-next-word)
    '("E" . meow-next-symbol)
    '("f" . meow-find)
+   '("F" . meow-find-backward)
    '("g" . meow-cancel-selection)
    '("G" . meow-grab)
    '("h" . meow-left)
@@ -103,6 +119,7 @@
    '("R" . meow-swap-grab)
    '("s" . meow-kill)
    '("t" . meow-till)
+   '("T" . meow-till-backward)
    '("u" . meow-undo)
    '("U" . meow-undo-in-selection)
    '("w" . meow-mark-word)
