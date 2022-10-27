@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: message_time_since
+# key: msgts
+# --
+(message "$1costed %.06fs" (float-time (time-since ${2:time})))

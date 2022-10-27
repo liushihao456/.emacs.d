@@ -2,5 +2,5 @@
 # name: defun
 # key: def
 # --
-(defun $1 ()
+(defun $1 ($2)
   $0)

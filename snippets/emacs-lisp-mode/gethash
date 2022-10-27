@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: gethash
+# key: gt
+# --
+(gethash "$1" $0)

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: time_current_time
+# key: tct
+# --
+(time (current-time))

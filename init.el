@@ -58,6 +58,7 @@
 (require 'init-flycheck)
 (require 'init-yasnippet)
 (require 'init-company)
+(require 'init-imenu)
 (require 'init-latex)
 (require 'init-gnuplot)
 (require 'init-org)
