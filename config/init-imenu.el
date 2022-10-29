@@ -27,10 +27,11 @@
         (with-current-buffer buf
           (erase-buffer)
           (setq buffer-undo-list t)
-          (shell-command (shell-quote-argument
-                          (concat "ctags"
-                                  " -f - --kinds-all=* --output-format=json --pseudo-tags="
-                                  " --fields=NPznF --sort=no " bfn))
+          (shell-command (concat "ctags"
+                                 " -f -"
+                                 " --kinds-all=\\*"
+                                 " --output-format=json --pseudo-tags="
+                                 " --fields=NPznF --sort=no " bfn)
                          buf)
           (goto-char (point-min))
           (while (not (eobp))
