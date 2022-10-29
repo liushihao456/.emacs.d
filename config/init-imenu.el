@@ -27,9 +27,10 @@
         (with-current-buffer buf
           (erase-buffer)
           (setq buffer-undo-list t)
-          (shell-command (concat "ctags"
-                                 " -f - --kinds-all=\\* --output-format=json --pseudo-tags="
-                                 " --fields=NPznF --sort=no " bfn)
+          (shell-command (shell-quote-argument
+                          (concat "ctags"
+                                  " -f - --kinds-all=* --output-format=json --pseudo-tags="
+                                  " --fields=NPznF --sort=no " bfn))
                          buf)
           (goto-char (point-min))
           (while (not (eobp))
@@ -86,24 +87,24 @@
   "Generate ctags in project."
   (let* ((buf (get-buffer-create "*ctags-output*"))
          (default-directory (project-root (project-current)))
-         (git-ls-cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\""))
+         (git-ls-cmd "git ls-files \"*.el\" \"*.py\" \"*.java\" \"*.cpp\" \"*.c\" \"*.h\" \"*.js\" \"*.jsx\" \"*.ts\" \"*.tsx\"")
+         (ctags-cmd (concat "ctags -f - "
+                            (if (memq system-type '(ms-dos windows-nt cygwin))
+                                "--kinds-all=*"
+                              "--kinds-all=\\*")
+                            " --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no"))
+         (cmd (format "%s | %s" git-ls-cmd ctags-cmd)))
     (with-current-buffer buf
       (erase-buffer))
     (cond
      ;; Windows
      ((memq system-type '(ms-dos windows-nt cygwin))
       (call-process-shell-command
-       (concat "Powershell -Command "
-               (shell-quote-argument
-                (concat git-ls-cmd
-                        " | ctags -f - --kinds-all=* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")))
+       (concat "Powershell -Command " (shell-quote-argument cmd))
        nil buf nil))
      ;; MacOS, Linux
      (t
-      (call-process-shell-command
-       (concat git-ls-cmd
-               " | ctags -f - --kinds-all=\\* --output-format=json --pseudo-tags= -L - --fields=NPznF --sort=no")
-       nil buf nil)))
+      (call-process-shell-command cmd nil buf nil)))
     buf))
 
 (defun ctags-parse-json ()
