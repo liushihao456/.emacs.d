@@ -10,13 +10,10 @@
 ;; Imenu --------------------------------------------------------------------- ;
 
 (global-set-key (kbd "M-i") 'imenu)
-(add-hook 'python-mode-hook
-          (lambda ()
-            (setq-local imenu-create-index-function #'python-imenu-create-flat-index)))
 
 ;; Imenu using ctags --------------------------------------------------------- ;
 
-(with-eval-after-load 'imenu
+(when (executable-find "ctags")
   (defun ctags-create-index-function ()
     (when buffer-file-name
       (let ((bfn buffer-file-name)
@@ -65,22 +62,26 @@
     (goto-char (point-min))
     (forward-line (1- position)))
 
-  (when (executable-find "ctags")
-    (setq-default imenu-create-index-function #'ctags-create-index-function)
-    (setq-default imenu-default-goto-function #'ctags-imenu-goto-function))
+  (defun ctags-imenu-setup ()
+    (message "Setup")
+    (setq-local imenu-create-index-function #'ctags-create-index-function)
+    (setq-local imenu-default-goto-function #'ctags-imenu-goto-function))
+  (dolist (mode '(prog-mode-hook org-mode-hook markdown-mode-hook))
+    (add-hook mode 'ctags-imenu-setup))
 
-  (defun imenu-ctags-annotator (cand)
-    (when-let (full-json (get-text-property 0 'full-json cand))
-      (marginalia--fields
-       ((gethash "kind" full-json)
-        :face 'marginalia-type :width 10)
-       ((gethash "line" full-json)
-        :face 'marginalia-file-name :width 5)
-       ((string-trim (or (gethash "pattern" full-json) ""))
-        :face 'marginalia-function))))
+  (with-eval-after-load 'marginalia
+    (defun ctags-imenu-annotator (cand)
+      (when-let (full-json (get-text-property 0 'full-json cand))
+        (marginalia--fields
+         ((gethash "kind" full-json)
+          :face 'marginalia-type :width 10)
+         ((gethash "line" full-json)
+          :face 'marginalia-file-name :width 5)
+         ((string-trim (or (gethash "pattern" full-json) ""))
+          :face 'marginalia-function))))
 
-  (add-to-list 'marginalia-annotator-registry
-               '(imenu imenu-ctags-annotator builtin none)))
+    (add-to-list 'marginalia-annotator-registry
+                 '(imenu ctags-imenu-annotator builtin none))))
 
 ;; Project-wise imenu using ctags -------------------------------------------- ;
 
@@ -191,8 +192,6 @@
        ((string-trim (or (gethash "pattern" full-json) ""))
         :face 'marginalia-function))))
 
-  (add-to-list 'marginalia-annotator-registry
-               '(imenu project-ctags-tag-annotator builtin none))
   (add-to-list 'marginalia-annotator-registry
                '(ctags project-ctags-tag-annotator builtin none)))
 
