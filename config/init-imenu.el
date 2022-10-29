@@ -14,6 +14,72 @@
           (lambda ()
             (setq-local imenu-create-index-function #'python-imenu-create-flat-index)))
 
+;; Imenu using ctags --------------------------------------------------------- ;
+
+(with-eval-after-load 'imenu
+  (defun ctags-create-index-function ()
+    (when buffer-file-name
+      (let ((bfn buffer-file-name)
+            (buf (get-buffer-create "*ctags-output*"))
+            (w (floor (* (frame-width) 0.3)))
+            (count 0)
+            linestr tag imenu-alist)
+        (with-current-buffer buf
+          (erase-buffer)
+          (setq buffer-undo-list t)
+          (shell-command (concat "ctags"
+                                 " -f - --kinds-all=\\* --output-format=json --pseudo-tags="
+                                 " --fields=NPznF --sort=no " bfn)
+                         buf)
+          (goto-char (point-min))
+          (while (not (eobp))
+            (setq linestr (buffer-substring-no-properties (point) (line-end-position)))
+            (when (and (string-prefix-p "{" linestr) (string-suffix-p "}" linestr))
+              (setq tag (json-parse-string linestr))
+              (when (gethash "name" tag)
+                (puthash "name" (format "%s%s"
+                                        ;; Add 'truncate-to property to tag
+                                        (propertize (gethash "name" tag)
+                                                    'full-json tag
+                                                    'kind (gethash "kind" tag)
+                                                    'truncate-to w)
+                                        (propertize (number-to-string count) 'invisible t))
+                         tag))
+              (when (gethash "pattern" tag)
+                (puthash "pattern" (string-trim
+                                    (string-remove-suffix
+                                     "$"
+                                     (string-remove-prefix
+                                      "^"
+                                      (substring (gethash "pattern" tag) 1 -1))))
+                         tag))
+              (push `(,(gethash "name" tag) . ,(gethash "line" tag)) imenu-alist)
+              (setq count (1+ count)))
+            (forward-line 1)))
+        (sort imenu-alist
+              (lambda (a b) (< (cdr a) (cdr b)))))))
+
+  (defun ctags-imenu-goto-function (name position &rest rest)
+    (goto-char (point-min))
+    (forward-line (1- position)))
+
+  (when (executable-find "ctags")
+    (setq-default imenu-create-index-function #'ctags-create-index-function)
+    (setq-default imenu-default-goto-function #'ctags-imenu-goto-function))
+
+  (defun imenu-ctags-annotator (cand)
+    (when-let (full-json (get-text-property 0 'full-json cand))
+      (marginalia--fields
+       ((gethash "kind" full-json)
+        :face 'marginalia-type :width 10)
+       ((gethash "line" full-json)
+        :face 'marginalia-file-name :width 5)
+       ((string-trim (or (gethash "pattern" full-json) ""))
+        :face 'marginalia-function))))
+
+  (add-to-list 'marginalia-annotator-registry
+               '(imenu imenu-ctags-annotator builtin none)))
+
 ;; Project-wise imenu using ctags -------------------------------------------- ;
 
 (defun ctags-generate-tags ()
@@ -104,6 +170,8 @@
 
 (global-set-key (kbd "C-c p i") 'project-imenu)
 
+;; Ctags completion ---------------------------------------------------------- ;
+
 (with-eval-after-load 'icon-tools-completion
   (add-to-list 'icon-tools-completion-category-icon-alist
                '(ctags . icon-tools-completion-get-imenu-icon)))
@@ -121,6 +189,8 @@
        ((string-trim (or (gethash "pattern" full-json) ""))
         :face 'marginalia-function))))
 
+  (add-to-list 'marginalia-annotator-registry
+               '(imenu project-ctags-tag-annotator builtin none))
   (add-to-list 'marginalia-annotator-registry
                '(ctags project-ctags-tag-annotator builtin none)))
 
