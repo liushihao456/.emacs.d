@@ -6,4 +6,7 @@
 	url = https://github.com/liushihao456/company-tip.git
 [submodule "packages/emacs-mini-modeline"]
 	path = packages/emacs-mini-modeline
-	url = https://github.com/kiennq/emacs-mini-modeline.git
+	url = https://github.com/liushihao456/emacs-mini-modeline.git
+[submodule "packages/symbols-outline"]
+	path = packages/symbols-outline
+	url = https://github.com/liushihao456/symbols-outline.el.git

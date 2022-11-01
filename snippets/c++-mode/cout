@@ -4,5 +4,5 @@
 # --
 `(progn (goto-char (point-min)) (unless (re-search-forward
 "^using\\s-+namespace std;" nil 'no-errer) "std::"))
-`cout << ${1:}${2: << ${3:`(progn (goto-char (point-min)) (unless (re-search-forward
+`cout << ${1:}$2${3: << ${4:`(progn (goto-char (point-min)) (unless (re-search-forward
 "^using\\s-+namespace std;" nil 'no-errer) "std::"))`endl}};$0
