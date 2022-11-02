@@ -88,8 +88,7 @@
                                    :html-foreground "Black"
                                    :html-background "Transparent"
                                    :html-scale 1.0
-                                   :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-  (setq org-startup-with-latex-preview t))
+                                   :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))))
 
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c a") 'org-agenda)

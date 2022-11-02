@@ -11,6 +11,7 @@
 
   ;; Symbols outline --------------------------------------------------------- ;
   (with-eval-after-load 'symbols-outline
+    ;; (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)
     (symbols-outline-follow-mode))
   (global-set-key (kbd "C-c i") 'symbols-outline-show)
 
