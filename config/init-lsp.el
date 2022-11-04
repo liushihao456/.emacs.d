@@ -32,7 +32,7 @@
   (setq lsp-enable-indentation nil)
   (setq lsp-enable-on-type-formatting nil)
   ;; (setq lsp-semantic-tokens-enable t)
-  (setq lsp-headerline-breadcrumb-enable t)
+  (setq lsp-headerline-breadcrumb-enable nil)
   ;; (setq lsp-idle-delay 0.5)
   (setq lsp-modeline-code-actions-enable nil)
   (setq lsp-modeline-diagnostics-enable nil)
