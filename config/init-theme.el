@@ -22,6 +22,10 @@
   ;; Don't change size of org-mode headlines (but keep other size-changes)
   (setq solarized-scale-org-headlines nil))
 
+(with-eval-after-load 'modus-themes
+  (setq modus-themes-italic-constructs t)
+  (setq modus-themes-region '(bg-only)))
+
 (defun load-base16-theme (&optional theme)
   "Load base16 theme.
 

@@ -275,7 +275,8 @@ Adapted from 'https://www.reddit.com/r/emacs/comments/d7x7x8/finally_fixing_inde
 
 ;; Prettify symbols mode ----------------------------------------------------- ;
 
-(add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
+;; Disable it because it breaks indentation for lines after the lambda
+;; (add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
 
 (provide 'init-elisp)
 

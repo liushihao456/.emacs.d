@@ -162,9 +162,9 @@
              ((gethash "kind" full-json)
               :face 'marginalia-type :width 10)
              ((format "%s:%s"
-                      (abbreviate-file-name (string-trim path))
+                      (file-name-nondirectory path)
                       (gethash "line" full-json))
-              :face 'marginalia-file-name :truncate 0.5)
+              :face 'marginalia-file-name :width 25)
              ((string-trim (or (gethash "pattern" full-json) ""))
               :face 'marginalia-function))
           (marginalia--fields
