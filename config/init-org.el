@@ -72,6 +72,7 @@
   (setq org-export-use-babel nil) ; Stop Org from evaluating code blocks
   (setq org-babel-python-command "python3") ; Set the command to python3 instead of python
   (setq org-confirm-babel-evaluate nil)   ; Don't prompt me to confirm everytime I want to evaluate a block
+  (setq org-src-fontify-natively nil)
 
   ;; Images
   ;; (add-to-list 'image-type-file-name-regexps '("\\.eps\\'" . imagemagick))

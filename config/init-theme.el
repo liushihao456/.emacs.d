@@ -24,7 +24,8 @@
 
 (with-eval-after-load 'modus-themes
   (setq modus-themes-italic-constructs t)
-  (setq modus-themes-region '(bg-only)))
+  (setq modus-themes-region '(bg-only))
+  (setq modus-themes-org-blocks 'gray-background))
 
 (defun load-base16-theme (&optional theme)
   "Load base16 theme.

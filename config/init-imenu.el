@@ -13,6 +13,7 @@
   (with-eval-after-load 'symbols-outline
     ;; (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)
     ;; (setq symbols-outline-use-nerd-icon-in-tui nil)
+    (setq symbols-outline-window-position 'left)
     (symbols-outline-follow-mode))
   (global-set-key (kbd "C-c i") 'symbols-outline-show)
 

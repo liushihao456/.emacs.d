@@ -137,7 +137,7 @@
    '("-" . meow-pop-selection)
    '(";" . my/comment-dwim)
    '(":" . comment-kill)
-   '("S" . embrace-commander)
+   '("`" . embrace-commander)
    '("<escape>" . ignore)))
 
 (meow-setup)

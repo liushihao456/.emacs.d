@@ -31,6 +31,24 @@
     (put 'treemacs-extra-wide-toggle :toggle-on nil)
     (treemacs-log "Switched to normal width display"))
 
+  (defun treemacs-visit-node-other-window (&optional arg)
+    "Open current node in other window.
+If the node is already opened in some other window then that
+window will be selected instead.  Stay in the current window with
+a single prefix argument ARG, or close the treemacs window with a
+double prefix argument."
+    (interactive "P")
+    (treemacs--execute-button-action
+     :file-action (find-file (treemacs-safe-button-get btn :path))
+     :dir-action (dired (treemacs-safe-button-get btn :path))
+     :tag-section-action (treemacs--visit-or-expand/collapse-tag-node btn arg nil)
+     :tag-action (treemacs--goto-tag btn)
+     :window-arg arg
+     :ensure-window-split t
+     :window  (progn (other-window 1) (get-buffer-window))
+     :no-match-explanation "Node is neither a file, a directory or a tag - nothing to do here."))
+  (setq treemacs-default-visit-action #'treemacs-visit-node-other-window)
+
   (defun my/treemacs-ignore-file-predicate (file _)
     (or (string= file ".gitignore")
         (string-suffix-p ".pyc" file)
