@@ -305,6 +305,10 @@ definition."
 ;; Rainbow delimiters
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
+(if (eq system-type 'darwin)
+    (setq mac-command-modifier 'meta
+          mac-option-modifier 'none))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
