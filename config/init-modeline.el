@@ -69,6 +69,11 @@
   (cond (vc-mode (format "[%s]" (substring vc-mode 1)))
         (t nil)))
 
+(defun my/evil-mode-line ()
+  "Render version control information in the mode line."
+  (cond (evil-mode (evil-generate-mode-line-tag evil-state))
+        (t nil)))
+
 (defun my/flycheck-mode-line ()
   "Render flycheck information in the mode line."
   (if (boundp 'flycheck-last-status-change)
@@ -189,6 +194,7 @@
   (setq mini-modeline-r-format
         (list " "
               '(:eval (list (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
+              '(:eval (my/evil-mode-line))
               " "
               '(:eval (my/flycheck-mode-line))
               '(:eval (my/row-col-mode-line))

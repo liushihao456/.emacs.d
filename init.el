@@ -50,7 +50,7 @@
 (require 'init-minibuffer)
 (require 'init-font)
 (require 'init-theme)
-(require 'init-meow)
+(require 'init-evil)
 (require 'init-misc)
 (require 'init-compile)
 (require 'init-wgrep)
