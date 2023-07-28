@@ -14,6 +14,7 @@
   (setq evil-want-C-u-scroll t)
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
 
   ;; Mode specific keymaps
   (add-to-list 'evil-motion-state-modes 'special-mode)
@@ -48,6 +49,8 @@
 (setq evil-keypad-leader-dispatch "C-c")
 (evil-define-key 'normal global-map (kbd "SPC") 'evil-keypad-state)
 (evil-define-key 'motion global-map (kbd "SPC") 'evil-keypad-state)
+(define-key evil-normal-state-map (kbd "SPC") 'evil-keypad-state)
+(define-key evil-motion-state-map (kbd "SPC") 'evil-keypad-state)
 
 (global-set-key (kbd "C-h C-f") nil)
 (global-set-key (kbd "C-h C-t") nil)
