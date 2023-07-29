@@ -22,19 +22,19 @@
   (add-to-list 'evil-motion-state-modes 'symbols-outline-mode)
   (add-to-list 'evil-motion-state-modes 'deadgrep-mode)
   (with-eval-after-load 'treemacs
-    (evil-make-overriding-map treemacs-mode-map))
+    (evil-make-overriding-map treemacs-mode-map 'motion))
   (with-eval-after-load 'dashboard
-    (evil-make-overriding-map dashboard-mode-map))
+    (evil-make-overriding-map dashboard-mode-map 'motion))
   (with-eval-after-load 'symbols-outline
-    (evil-make-overriding-map symbols-outline-mode-map))
+    (evil-make-overriding-map symbols-outline-mode-map 'motion))
   (with-eval-after-load 'deadgrep
-    (evil-make-overriding-map deadgrep-mode-map))
+    (evil-make-overriding-map deadgrep-mode-map 'motion))
   (with-eval-after-load 'help-mode
-    (evil-make-overriding-map help-mode-map))
+    (evil-make-overriding-map help-mode-map 'motion))
   (with-eval-after-load 'flycheck
-    (evil-make-overriding-map flycheck-error-list-mode-map))
+    (evil-make-overriding-map flycheck-error-list-mode-map 'motion))
   (with-eval-after-load 'xref
-    (evil-make-overriding-map xref--xref-buffer-mode-map))
+    (evil-make-overriding-map xref--xref-buffer-mode-map 'motion))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()
