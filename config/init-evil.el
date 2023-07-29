@@ -15,6 +15,7 @@
   (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
 
   ;; Mode specific keymaps
+  (add-to-list 'evil-emacs-state-modes 'diff-mode)
   (add-to-list 'evil-motion-state-modes 'special-mode)
   (add-to-list 'evil-motion-state-modes 'dashboard-mode)
   (add-to-list 'evil-motion-state-modes 'symbols-outline-mode)
@@ -29,6 +30,8 @@
     (evil-make-overriding-map deadgrep-mode-map))
   (with-eval-after-load 'help-mode
     (evil-make-overriding-map help-mode-map))
+  (with-eval-after-load 'flycheck
+    (evil-make-overriding-map flycheck-error-list-mode-map))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()
@@ -46,7 +49,7 @@
 (require 'evil-anzu)
 
 (require 'evil-keypad)
-;; (evil--setup-which-key t)
+(evil--setup-which-key t)
 (setq evil-keypad-leader-dispatch "C-c")
 (evil-define-key 'normal global-map (kbd "SPC") 'evil-keypad-state)
 (evil-define-key 'motion global-map (kbd "SPC") 'evil-keypad-state)

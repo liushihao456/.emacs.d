@@ -113,7 +113,7 @@ Nil means to lookup in top-level.")
   (let ((result ""))
     (setq result
           (thread-first
-              (mapcar #'evil--keypad-format-key-1 evil--keypad-keys)
+            (mapcar #'evil--keypad-format-key-1 evil--keypad-keys)
             (reverse)
             (string-join " ")))
     (cond
@@ -146,14 +146,7 @@ Nil means to lookup in top-level.")
 
 (defun evil--exit-keypad-state ()
   "Exit keypad state."
-  ;; (evil-keypad-mode -1)
-  (evil-change-to-previous-state)
-  ;; (when (and (eq 'beacon evil--keypad-previous-state)
-  ;;            evil--current-state)
-  ;;   (evil--beacon-apply-command evil--keypad-this-command))
-  ;; (when evil--keypad-previous-state
-  ;;   (evil--switch-state evil--keypad-previous-state))
-  )
+  (evil-change-to-previous-state))
 
 (defun evil--keypad-quit ()
   "Quit keypad state."
@@ -215,8 +208,8 @@ A string stands for finding the keymap at a specified key binding.
 Nil stands for C-c."
   :group 'evil
   :type '(choice (string :tag "Keys")
-                 (variable :tag "Keymap")
-                 (const nil)))
+          (variable :tag "Keymap")
+          (const nil)))
 
 (defcustom evil-keypad-meta-prefix ?m
   "The prefix represent M- in KEYPAD state."
@@ -242,7 +235,7 @@ it's corresponding value is appended to C- and the user is
 prompted to finish the command."
   :group 'evil
   :type '(alist :key-type (character :tag "From")
-                :value-type (character :tag "To")))
+          :value-type (character :tag "To")))
 
 (defun evil--event-key (e)
   (let ((c (event-basic-type e)))
@@ -414,7 +407,7 @@ Use (setq evil-keypad-describe-keymap-function nil) to disable popup.")
   (if (<= len (length s))
       s
     (if start
-	(concat (make-string (- len (length s)) pad) s)
+	    (concat (make-string (- len (length s)) pad) s)
       (concat s (make-string (- len (length s)) pad)))))
 
 (defun evil--string-join (sep s)
@@ -578,7 +571,7 @@ try replacing the last modifier and try again."
            (cons 'literal str)))))
       (reverse))))
 
-(defvar evil-keypad-state-keymap
+(defvar evil-keypad-state-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map t)
     (define-key map [remap self-insert-command] 'evil-keypad-self-insert)
@@ -613,7 +606,7 @@ try replacing the last modifier and try again."
     evil-keypad-leader-dispatch)
 
    ((null evil-keypad-leader-dispatch)
-    evil-keypad-state-keymap)))
+    evil-keypad-state-map)))
 
 (defun evil-keypad-self-insert ()
   "Default command when keypad state is enabled."
@@ -672,25 +665,17 @@ try replacing the last modifier and try again."
   "Enter keypad state."
   (interactive)
   (setq this-command last-command)
-  (setq overriding-local-map evil-keypad-state-keymap
-        overriding-terminal-local-map nil)
+  ;; (setq overriding-local-map evil-keypad-state-map
+  ;;       overriding-terminal-local-map nil)
   (evil--keypad-display-message))
-
-(defun evil-keypad-start ()
-  "Enter keypad state with current input as initial key sequences."
-  (interactive)
-  (setq this-command last-command)
-  (setq overriding-local-map evil-keypad-state-keymap
-        overriding-terminal-local-map nil
-        evil--keypad-allow-quick-dispatch nil)
-  (call-interactively 'evil-keypad-self-insert))
 
 (defun evil-keypad-describe-key ()
   "Describe key via KEYPAD input."
   (interactive)
   (setq this-command last-command)
-  (setq overriding-local-map evil-keypad-state-keymap
-        evil--keypad-help t)
+  (setq evil--keypad-help t)
+  ;; (setq overriding-local-map evil-keypad-state-map
+  ;;       evil--keypad-help t)
   (evil--keypad-show-message)
   (evil--keypad-display-message))
 
@@ -699,7 +684,6 @@ try replacing the last modifier and try again."
   :tag " <K> "
   :message "-- Keypad state --"
   :entry-hook (evil-keypad)
-  :intercept-esc nil
   (when (eq evil-state 'keypad)
     (setq evil--prefix-arg current-prefix-arg
 	      evil--keypad-keymap-description-activated nil
@@ -712,6 +696,7 @@ try replacing the last modifier and try again."
 
 ;; Which-key integration
 (defvar evil--which-key-setup nil)
+(declare-function which-key--create-buffer-and-show nil)
 
 (defun evil--which-key-describe-keymap ()
   (if which-key-mode
@@ -723,8 +708,7 @@ try replacing the last modifier and try again."
 (defun evil--setup-which-key (enable)
   (setq evil--which-key-setup enable)
   (if enable
-      (progn
-        (add-hook 'which-key-mode-hook 'evil--which-key-describe-keymap))
+      (add-hook 'which-key-mode-hook 'evil--which-key-describe-keymap)
     (remove-hook 'which-key-mode-hook 'evil--which-key-describe-keymap)))
 
 (provide 'evil-keypad)
