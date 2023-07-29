@@ -32,8 +32,6 @@
            (tree-sitter-mode nil "tree-sitter")
            (flycheck-mode nil "flycheck")
            (mini-modeline-mode nil "mini-modeline")
-           (eldoc-box-hover-mode nil "eldoc-box")
-           (eldoc-box-hover-at-point-mode nil "eldoc-box")
            (hs-minor-mode nil "hideshow")
            (lsp-lens-mode nil "lsp-lens")
            (copilot-mode nil "copilot")))

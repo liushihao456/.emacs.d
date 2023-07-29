@@ -10,6 +10,7 @@
 (with-eval-after-load 'evil
   (setq evil-insert-state-cursor 'box)
   (setq evil-want-C-u-scroll t)
+  (define-key evil-normal-state-map (kbd "gr") 'xref-find-references)
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
@@ -32,6 +33,8 @@
     (evil-make-overriding-map help-mode-map))
   (with-eval-after-load 'flycheck
     (evil-make-overriding-map flycheck-error-list-mode-map))
+  (with-eval-after-load 'xref
+    (evil-make-overriding-map xref--xref-buffer-mode-map))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()

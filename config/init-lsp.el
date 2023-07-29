@@ -47,7 +47,12 @@
   (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map [remap lsp-describe-thing-at-point] 'lsp-ui-doc-glance)
   (setq lsp-ui-doc-show-with-mouse nil)
-  (setq lsp-ui-sideline-enable nil))
+  (setq lsp-ui-sideline-show-hover t)
+  (setq lsp-ui-sideline-enable t))
+
+(add-hook 'emacs-lisp-mode-hook (lambda ()
+                                  (require 'lsp-ui)
+                                  (lsp-ui-sideline-mode)))
 
 (provide 'init-lsp)
 
