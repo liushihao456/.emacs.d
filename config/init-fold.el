@@ -17,6 +17,7 @@
     ("p" . origami-previous-fold)
     ("o" . origami-forward-toggle-node)
     ("a" . origami-open-all-nodes)
+    ("c" . origami-close-all-nodes)
     ("t" . origami-toggle-all-nodes)
     ("u" . origami-undo)
     ("r" . origami-redo)
