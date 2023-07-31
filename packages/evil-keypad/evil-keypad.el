@@ -665,8 +665,8 @@ try replacing the last modifier and try again."
   "Enter keypad state."
   (interactive)
   (setq this-command last-command)
-  ;; (setq overriding-local-map evil-keypad-state-map
-  ;;       overriding-terminal-local-map nil)
+  (setq overriding-local-map evil-keypad-state-map
+        overriding-terminal-local-map nil)
   (evil--keypad-display-message))
 
 (defun evil-keypad-describe-key ()
@@ -674,8 +674,7 @@ try replacing the last modifier and try again."
   (interactive)
   (setq this-command last-command)
   (setq evil--keypad-help t)
-  ;; (setq overriding-local-map evil-keypad-state-map
-  ;;       evil--keypad-help t)
+  (evil-keypad-state)
   (evil--keypad-show-message)
   (evil--keypad-display-message))
 

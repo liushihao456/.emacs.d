@@ -206,7 +206,6 @@
   )
 
 (global-set-key (kbd "C-c p s") 'consult-ripgrep)
-(global-set-key (kbd "C-h a") 'consult-apropos)
 (with-eval-after-load 'consult
   (with-eval-after-load 'embark
     (require 'embark-consult))
@@ -223,7 +222,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                              (thing-at-point 'symbol t)))))
       (apply consult-fn dir initial)))
   (advice-add #'consult-ripgrep :around #'my/consult-ripgrep-initial-input-advice)
-  (setq consult-preview-key (kbd "C-o")))
+  (setq consult-preview-key "C-o"))
 
 ;; Recentf files completion -------------------------------------------------- ;
 
