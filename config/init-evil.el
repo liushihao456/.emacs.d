@@ -9,11 +9,9 @@
 
 (with-eval-after-load 'evil
   (setq evil-insert-state-cursor 'box)
-  (setq evil-want-C-u-scroll t)
   (define-key evil-normal-state-map (kbd "gr") 'xref-find-references)
-  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
-  (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
-  (define-key evil-motion-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-normal-state-map (kbd "[f") 'beginning-of-defun)
+  (define-key evil-normal-state-map (kbd "]f") 'end-of-defun)
 
   ;; Mode specific keymaps
   (add-to-list 'evil-emacs-state-modes 'diff-mode)
@@ -35,6 +33,8 @@
     (evil-make-overriding-map flycheck-error-list-mode-map 'motion))
   (with-eval-after-load 'xref
     (evil-make-overriding-map xref--xref-buffer-mode-map 'motion))
+  (with-eval-after-load 'org
+    (evil-make-overriding-map org-mode-map 'normal))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()
@@ -50,6 +50,8 @@
 (require 'evil)
 (evil-mode)
 (require 'evil-anzu)
+(global-evil-surround-mode)
+(evil-commentary-mode)
 
 (require 'evil-keypad)
 (evil--setup-which-key t)

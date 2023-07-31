@@ -34,6 +34,7 @@
            (mini-modeline-mode nil "mini-modeline")
            (hs-minor-mode nil "hideshow")
            (lsp-lens-mode nil "lsp-lens")
+           (evil-commentary-mode nil "evil-commentary")
            (copilot-mode nil "copilot")))
 
 ;; cc-mode.el assumes that `mode-name’ is always a string (which was true in
