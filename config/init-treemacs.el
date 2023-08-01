@@ -20,6 +20,10 @@
   (setq treemacs-indentation 1)
   (setq treemacs-is-never-other-window t)
 
+  (defun treemacs--propagate-new-icons (_theme)
+    "The original function propagates icons from the Default theme to
+_THEME, hence override it with empty function body.")
+
   (defadvice treemacs-visit-node-default (after treemacs-extra-wide-toggle-off activate)
     "Restore Treemacs buffer if it's in extr-wide state."
     (if (get 'treemacs-extra-wide-toggle :toggle-on)
