@@ -35,6 +35,8 @@
     (evil-make-overriding-map xref--xref-buffer-mode-map 'motion))
   (with-eval-after-load 'org
     (evil-make-overriding-map org-mode-map 'normal))
+  (with-eval-after-load 'grep
+    (evil-make-overriding-map grep-mode-map 'motion))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()

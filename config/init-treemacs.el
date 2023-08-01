@@ -16,7 +16,7 @@
   (setq treemacs-file-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
   (setq treemacs-follow-after-init t)
-  ;; (setq treemacs-width 30)
+  (setq treemacs-width 30)
   (setq treemacs-indentation 1)
   (setq treemacs-is-never-other-window t)
 
