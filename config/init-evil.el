@@ -19,6 +19,7 @@
   (add-to-list 'evil-motion-state-modes 'dashboard-mode)
   (add-to-list 'evil-motion-state-modes 'symbols-outline-mode)
   (add-to-list 'evil-motion-state-modes 'deadgrep-mode)
+  (add-to-list 'evil-motion-state-modes 'dired-mode)
   (with-eval-after-load 'treemacs
     (evil-make-overriding-map treemacs-mode-map 'motion))
   (with-eval-after-load 'dashboard
@@ -37,6 +38,8 @@
     (evil-make-overriding-map org-mode-map 'normal))
   (with-eval-after-load 'grep
     (evil-make-overriding-map grep-mode-map 'motion))
+  (with-eval-after-load 'dired
+    (evil-make-overriding-map dired-mode-map 'motion))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()
