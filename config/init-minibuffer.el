@@ -296,6 +296,20 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         root (expand-file-name (buffer-local-value 'default-directory (cdr buf))))))))
 (global-set-key (kbd "C-c p b") 'project-switch-to-buffer)
 
+;; Insert symbol at point into minibuffer ------------------------------------ ;
+
+(defun minibuffer-insert-symbol-at-point ()
+  "Get symbol at point in original buffer and insert it to minibuffer."
+  (interactive)
+  (let (symbol)
+    (with-current-buffer (window-buffer (minibuffer-selected-window))
+      (setq symbol (thing-at-point 'symbol)))
+    (when symbol (insert symbol))))
+
+(defun my-minibuffer-setup-hook ()
+  (local-set-key (kbd "C-w") 'minibuffer-insert-symbol-at-point))
+
+(add-hook 'minibuffer-setup-hook 'my-minibuffer-setup-hook)
 
 (provide 'init-minibuffer)
 

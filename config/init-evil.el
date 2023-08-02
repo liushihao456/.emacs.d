@@ -50,7 +50,18 @@
       (call-interactively #'abort-recursive-edit)))
   (defun evil--minibuffer-setup ()
     (local-set-key (kbd "<escape>") #'evil-minibuffer-quit))
-  (add-hook 'minibuffer-setup-hook #'evil--minibuffer-setup))
+  (add-hook 'minibuffer-setup-hook #'evil--minibuffer-setup)
+
+  ;; Replace current word or selection using vim style for evil mode
+  (defun evil-replace-symbol-at-point(arg)
+    (interactive "P")
+    (unless (use-region-p)
+      (let ((symbol (thing-at-point (if arg 'word 'symbol))))
+        (minibuffer-with-setup-hook
+            (lambda () (backward-char 3))
+          (evil-ex (concat "%s/" symbol "/" symbol "/gc"))))))
+  (global-set-key (kbd "C-c r") 'evil-replace-symbol-at-point)
+  )
 
 (require 'evil)
 (evil-mode)
