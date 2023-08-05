@@ -254,8 +254,8 @@ split; vice versa."
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
-;; nerd-icons-dired
-(add-hook 'dired-mode-hook 'nerd-icons-dired-mode)
+;; nerd-svg-icons-dired
+(add-hook 'dired-mode-hook 'nerd-svg-icons-dired-mode)
 
 ;; Telega
 (with-eval-after-load 'telega
@@ -310,7 +310,7 @@ definition."
           mac-option-modifier 'none))
 
 ;; Ibuffer
-(add-hook 'ibuffer-hook #'nerd-icons-ibuffer-mode)
+(add-hook 'ibuffer-hook #'nerd-svg-icons-ibuffer-mode)
 (add-hook 'ibuffer-hook
           (lambda ()
             (unless (eq ibuffer-sorting-mode 'project-file-relative)
@@ -319,8 +319,8 @@ definition."
   (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold)))
   (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
   (setq ibuffer-project-root-functions
-        `((ibuffer-project-project-root . ,(nerd-icons-icon-str "oct-repo" :face ibuffer-filter-group-name-face))
-          (file-remote-p . ,(nerd-icons-icon-str "cod-terminal" :face ibuffer-filter-group-name-face)))))
+        `((ibuffer-project-project-root . ,(nerd-svg-icons-icon-str "oct-repo" :face ibuffer-filter-group-name-face))
+          (file-remote-p . ,(nerd-svg-icons-icon-str "cod-terminal" :face ibuffer-filter-group-name-face)))))
 
 (provide 'init-misc)
 

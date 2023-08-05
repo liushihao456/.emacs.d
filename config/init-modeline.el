@@ -58,10 +58,10 @@
   (if-let ((buffer-file buffer-file-name)
            (file (file-name-nondirectory buffer-file-name)))
       (cond ((string-match-p "\\/$" file)
-             (nerd-icons-icon-for-dir file))
+             (nerd-svg-icons-icon-for-dir file))
             (t
-             (nerd-icons-icon-for-file file)))
-    (nerd-icons-icon-for-mode major-mode)))
+             (nerd-svg-icons-icon-for-file file)))
+    (nerd-svg-icons-icon-for-mode major-mode)))
 
 (defun my/vc-mode-line ()
   "Render version control information in the mode line."
@@ -91,11 +91,11 @@
              ;; (concat
              ;;    (when no-errors
              ;;      (propertize
-             ;;       (format "%s%s " (nerd-icons-icon-str :face "ban") no-errors)
+             ;;       (format "%s%s " (nerd-svg-icons-icon-str :face "ban") no-errors)
              ;;       'face 'error))
              ;;    (when no-warnings
              ;;      (propertize
-             ;;       (format "%s%s" (nerd-icons-icon-str :face "warning") no-warnings)
+             ;;       (format "%s%s" (nerd-svg-icons-icon-str :face "warning") no-warnings)
              ;;       'face 'warning))))))
         (`interrupted "   -    ")
         (`suspicious '(propertize "   ?    " 'face 'warning)))
