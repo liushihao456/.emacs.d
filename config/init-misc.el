@@ -309,6 +309,19 @@ definition."
     (setq mac-command-modifier 'meta
           mac-option-modifier 'none))
 
+;; Ibuffer
+(add-hook 'ibuffer-hook #'nerd-icons-ibuffer-mode)
+(add-hook 'ibuffer-hook
+          (lambda ()
+            (unless (eq ibuffer-sorting-mode 'project-file-relative)
+              (ibuffer-do-sort-by-project-file-relative))))
+(with-eval-after-load 'ibuffer-project
+  (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold)))
+  (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+  (setq ibuffer-project-root-functions
+        `((ibuffer-project-project-root . ,(nerd-icons-icon-str "oct-repo" :face ibuffer-filter-group-name-face))
+          (file-remote-p . ,(nerd-icons-icon-str "cod-terminal" :face ibuffer-filter-group-name-face)))))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
