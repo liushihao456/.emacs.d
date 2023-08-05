@@ -58,10 +58,10 @@
   (if-let ((buffer-file buffer-file-name)
            (file (file-name-nondirectory buffer-file-name)))
       (cond ((string-match-p "\\/$" file)
-             (icon-tools-icon-for-dir file 'icon-tools-lblue))
+             (nerd-icons-icon-for-dir file))
             (t
-             (icon-tools-icon-for-file file 'icon-tools-lblue)))
-    (icon-tools-icon-for-mode major-mode)))
+             (nerd-icons-icon-for-file file)))
+    (nerd-icons-icon-for-mode major-mode)))
 
 (defun my/vc-mode-line ()
   "Render version control information in the mode line."
@@ -91,11 +91,11 @@
              ;; (concat
              ;;    (when no-errors
              ;;      (propertize
-             ;;       (format "%s%s " (icon-tools-icon-str :face "ban") no-errors)
+             ;;       (format "%s%s " (nerd-icons-icon-str :face "ban") no-errors)
              ;;       'face 'error))
              ;;    (when no-warnings
              ;;      (propertize
-             ;;       (format "%s%s" (icon-tools-icon-str :face "warning") no-warnings)
+             ;;       (format "%s%s" (nerd-icons-icon-str :face "warning") no-warnings)
              ;;       'face 'warning))))))
         (`interrupted "   -    ")
         (`suspicious '(propertize "   ?    " 'face 'warning)))
@@ -185,8 +185,8 @@
               mode-line-percent-position
               "]"
               " "
-              ;; '(:eval (my/buffer-file-icon-mode-line))
-              ;; " "
+              '(:eval (my/buffer-file-icon-mode-line))
+              " "
               '(:eval (propertize (if (eq major-mode 'treemacs-mode) "Treemacs" "%b")
                                   'face 'mode-line-buffer-id))
               " "))

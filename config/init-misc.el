@@ -254,8 +254,8 @@ split; vice versa."
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
-;; Icon-tools-dired
-(add-hook 'dired-mode-hook 'icon-tools-dired-mode)
+;; nerd-icons-dired
+(add-hook 'dired-mode-hook 'nerd-icons-dired-mode)
 
 ;; Telega
 (with-eval-after-load 'telega

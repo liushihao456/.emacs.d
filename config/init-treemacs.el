@@ -60,8 +60,8 @@ double prefix argument."
         (string-prefix-p ".cache" file)))
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
-  ;; icon-tools-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
-  (icon-tools-treemacs-icons-config))
+  ;; Nerd-icons-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
+  (nerd-icons-treemacs-icons-config))
 
 (provide 'init-treemacs)
 

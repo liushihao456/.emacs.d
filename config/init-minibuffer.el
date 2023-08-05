@@ -171,7 +171,7 @@
 
 ;; Icons --------------------------------------------------------------------- ;
 
-(icon-tools-completion-mode)
+(nerd-icons-completion-mode)
 
 ;; Embark -------------------------------------------------------------------- ;
 
@@ -255,13 +255,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (when fname (find-file (cdr (assoc fname file-list))))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
-(defun icon-tools-completion-get-recentf-file-icon (cand)
+(defun nerd-icons-completion-get-recentf-file-icon (cand)
   "Return the icon for the candidate CAND of completion category recentf-file."
   (let ((real-cand (substring cand 0 (next-single-property-change 0 'invisible cand))))
-    (icon-tools-completion-get-file-icon real-cand)))
+    (nerd-icons-completion-get-file-icon real-cand)))
 
-(add-to-list 'icon-tools-completion-category-icon-alist
-             '(recentf-file . icon-tools-completion-get-recentf-file-icon))
+(add-to-list 'nerd-icons-completion-category-icon-alist
+             '(recentf-file . nerd-icons-completion-get-recentf-file-icon))
 
 (defun marginalia--recentf-file-annotator (cand)
   "Annotate recentf file CAND."

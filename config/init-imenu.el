@@ -151,9 +151,9 @@
 
   (global-set-key (kbd "C-c p i") 'ctags-jump-to-symbol-in-project)
 
-  (with-eval-after-load 'icon-tools-completion
-    (add-to-list 'icon-tools-completion-category-icon-alist
-                 '(ctags . icon-tools-completion-get-imenu-icon)))
+  (with-eval-after-load 'nerd-icons-completion
+    (add-to-list 'nerd-icons-completion-category-icon-alist
+                 '(ctags . nerd-icons-completion-get-imenu-icon)))
 
   (with-eval-after-load 'marginalia
     (defun project-ctags-tag-annotator (cand)
