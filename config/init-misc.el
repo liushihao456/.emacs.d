@@ -313,14 +313,13 @@ definition."
 (add-hook 'ibuffer-hook #'nerd-svg-icons-ibuffer-mode)
 (add-hook 'ibuffer-hook
           (lambda ()
+            (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
             (unless (eq ibuffer-sorting-mode 'project-file-relative)
               (ibuffer-do-sort-by-project-file-relative))))
 (with-eval-after-load 'ibuffer-project
-  (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold)))
-  (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
   (setq ibuffer-project-root-functions
-        `((ibuffer-project-project-root . ,(nerd-svg-icons-icon-str "oct-repo" :face ibuffer-filter-group-name-face))
-          (file-remote-p . ,(nerd-svg-icons-icon-str "cod-terminal" :face ibuffer-filter-group-name-face)))))
+        `((ibuffer-project-project-root . ,(nerd-svg-icons-icon-str "oct-repo" :face 'nerd-svg-icons-lorange))
+          (file-remote-p . ,(nerd-svg-icons-icon-str "cod-terminal" :face 'nerd-svg-icons-lorange)))))
 
 (provide 'init-misc)
 
