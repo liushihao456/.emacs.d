@@ -83,9 +83,18 @@
   ;; (org-defkey org-mode-map "\C-c{" 'org-cdlatex-environment-indent)
   (setq org-highlight-latex-and-related '(native))
   (setq org-preview-latex-default-process 'dvisvgm)
+  (setq org-preview-latex-process-alist '((dvisvgm
+                                           :programs ("latex" "dvisvgm")
+                                           :description "dvi > svg"
+                                           :message "you need to install the programs: latex and dvisvgm."
+                                           :image-input-type "dvi"
+                                           :image-output-type "svg"
+                                           ;; :image-size-adjust (1.7 . 1.5)
+                                           :latex-compiler ("latex -shell-escape -interaction nonstopmode -output-directory %o %f")
+                                           :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
   (setq org-format-latex-options '(:foreground auto
                                    :background "Transparent"
-                                   :scale 2
+                                   ;; :scale 2
                                    :html-foreground "Black"
                                    :html-background "Transparent"
                                    :html-scale 1.0

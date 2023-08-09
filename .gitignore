@@ -41,3 +41,4 @@ transient/
 /.org-id-locations
 /TAGS
 /history
+*.el~
