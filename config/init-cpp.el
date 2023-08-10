@@ -45,6 +45,25 @@ project in order for clangd to understand the project code."
   (when (executable-find "cmake-language-server")
     (add-hook 'cmake-mode-hook 'lsp)))
 
+(with-eval-after-load 'cc-mode
+  (defun cpp-compile-vs-sln ()
+    "Compile visual studio projects."
+    (interactive)
+    (let * ((vsvars (shell-quote-argument "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat"))
+            (sln-dir (locate-dominating-file default-directory
+                                             (lambda (dir)
+                                               (directory-files dir
+                                                                nil
+                                                                ".*\\.sln$"
+                                                                t))))
+            (sln-file (shell-quote-argument
+                       (car (directory-files sln-dir t ".*\\.sln$"))))
+            (build-config "Release")
+            (compile-command (concat "call " vsvars " && msbuild " sln-file
+                                     " /p:Configuration=" build-config)))
+         (call-interactively #'compile)))
+  (define-key c-mode-base-map (kbd "<f1>") 'cpp-compile-vs-sln))
+
 (provide 'init-cpp)
 
 ;;; init-cpp.el ends here
