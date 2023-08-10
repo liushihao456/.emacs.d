@@ -38,9 +38,12 @@
               (when-let (w (get-buffer-window flycheck-error-list-buffer))
                 (set-window-parameter w 'no-other-window t))))
 
-  (set-face-background 'flycheck-warning 'unspecified)
-  (set-face-background 'flycheck-error 'unspecified)
-  (set-face-background 'flycheck-info 'unspecified))
+  (set-face-background 'flycheck-warning (face-background 'default))
+  (set-face-background 'flycheck-error (face-background 'default))
+  (set-face-background 'flycheck-info (face-background 'default))
+  (set-face-background 'flycheck-fringe-warning (face-background 'default))
+  (set-face-background 'flycheck-fringe-error (face-background 'default))
+  (set-face-background 'flycheck-fringe-info (face-background 'default)))
 
 (provide 'init-flycheck)
 

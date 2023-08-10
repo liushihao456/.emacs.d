@@ -11,6 +11,9 @@
 
 (setq diff-hl-command-prefix (kbd "C-c v"))
 (with-eval-after-load 'diff-hl
+  (set-face-background 'diff-hl-change (face-background 'default))
+  (set-face-background 'diff-hl-insert (face-background 'default))
+  (set-face-background 'diff-hl-delete (face-background 'default))
   (defun my/diff-hl-define-bitmaps (&rest _)
     (define-fringe-bitmap 'diff-hl-bmp-middle [#b00011000] nil nil '(center repeated))
     (define-fringe-bitmap 'diff-hl-bmp-delete [#b11110000
