@@ -8,6 +8,7 @@
 ;;; Code:
 
 (with-eval-after-load 'jsts-mode
+  (require 'prettier-js)
   (defun prettier-buffer ()
     "Organize imports and call prettier to format buffer."
     (interactive)

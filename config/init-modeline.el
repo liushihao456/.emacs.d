@@ -7,12 +7,6 @@
 
 ;;; Code:
 
-;; ;; Powerline
-;; ;; In terminal version of emacs, transparency must be set to 0 for the
-;; ;; separators' color to match
-;; (require 'powerline)
-;; (powerline-center-theme)
-
 ;; Delight modeline lighters
 (delight '((eldoc-mode nil "eldoc")
            (emacs-lisp-mode "Elisp" :major)
