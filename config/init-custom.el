@@ -21,16 +21,7 @@
  '(evil-symbol-word-search t)
  '(evil-want-C-u-scroll t)
  '(package-selected-packages
-   '(ibuffer-project lua-mode org-tidy evil-commentary evil-surround
-     evil-textobj-tree-sitter lsp-treemacs evil-anzu evil origami rust-mode ccls
-     company-flx flx highlight-quoted rainbow-delimiters orderless vertico
-     diff-hl consult-lsp org-bullets org-roam all-the-icons editorconfig
-     doom-themes base16-theme dashboard embark embark-consult consult marginalia
-     company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init
-     tree-sitter tree-sitter-langs anzu lsp-mode lsp-ui swift-mode kotlin-mode
-     cdlatex deadgrep wgrep selectrum selectrum-prescient json-mode emmet-mode
-     expand-region gnuplot-mode lsp-java delight auctex magit company which-key
-     flycheck zenburn-theme yasnippet)))
+   '(wgrep-deadgrep ibuffer-project lua-mode org-tidy evil-commentary evil-surround evil-textobj-tree-sitter lsp-treemacs evil-anzu evil origami rust-mode ccls company-flx flx highlight-quoted rainbow-delimiters orderless vertico diff-hl consult-lsp org-bullets org-roam all-the-icons editorconfig doom-themes base16-theme dashboard embark embark-consult consult marginalia company-box spacemacs-theme lsp-pyright solarized-theme benchmark-init tree-sitter tree-sitter-langs anzu lsp-mode lsp-ui swift-mode kotlin-mode cdlatex deadgrep wgrep json-mode emmet-mode expand-region gnuplot-mode lsp-java delight auctex magit company which-key flycheck zenburn-theme yasnippet)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         Faces customized by Custom                        ;;
