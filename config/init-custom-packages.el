@@ -27,24 +27,11 @@ autoloaded form."
   (interactive "sPackage name: \nDPackage directory: ")
   (require 'autoload)
   (let* ((auto-name (format "%s-autoloads.el" pkg-name))
-         (generated-autoload-file (expand-file-name auto-name pkg-dir))
-         (autoload-timestamps nil)
-         (backup-inhibited t)
-         (version-control 'never))
+         (generated-autoload-file (expand-file-name auto-name pkg-dir)))
     (when (file-exists-p generated-autoload-file)
       (delete-file generated-autoload-file))
     (message "Generating autoloads to file: %s" generated-autoload-file)
-    (write-region (autoload-rubric generated-autoload-file "package" nil)
-                  nil generated-autoload-file nil 'silent)
-    (dolist (name
-             (with-no-warnings
-               (append (list pkg-dir)
-                       (directory-files-recursively pkg-dir "" t))))
-      (when (and (file-directory-p name) (not (string-suffix-p "/bin" name)))
-        (message "Generating autoloads for directory: %s..." name)
-        (make-directory-autoloads name generated-autoload-file)))
-    (let ((buf (find-buffer-visiting generated-autoload-file)))
-      (when buf (kill-buffer buf)))))
+    (package-generate-autoloads pkg-name pkg-dir)))
 
 (defun generate-autoloads-custom-packages ()
   "Generate autoloads for all custom packages."

@@ -40,6 +40,8 @@
     (evil-make-overriding-map grep-mode-map 'motion))
   (with-eval-after-load 'dired
     (evil-make-overriding-map dired-mode-map 'motion))
+  (with-eval-after-load 'compile
+    (evil-make-overriding-map compilation-mode-map 'motion))
 
   ;; Quit minibuffer with ESC
   (defun evil-minibuffer-quit ()
