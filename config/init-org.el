@@ -119,10 +119,12 @@ Entered on %T")
            (file "~/Documents/Org-mode/notes/prog-notes.org")
            "* %? %^g"))))
 (with-eval-after-load 'org-agenda
+  (setq org-agenda-include-diary t)
+  (setq calendar-longitude 120.52)
+  (setq calendar-latitude 31.53)
   (setq org-agenda-files
         '("~/Documents/Org-mode/capture/journals.org"
-          "~/Documents/Org-mode/capture/tasks.org"
-          "~/Documents/Org-mode/src/agenda-expressions.org"))
+          "~/Documents/Org-mode/capture/tasks.org"))
   (setq org-agenda-span 'day)
   (setq org-agenda-time-grid
         '((daily today require-timed)

@@ -27,7 +27,6 @@ games/
 anaconda-mode/
 python-language-server/
 /ccls/
-/diary
 /org-clock-save.el
 /.dap-breakpoints
 *.elc
@@ -42,3 +41,4 @@ transient/
 /TAGS
 /history
 *.el~
+/org-persist/
