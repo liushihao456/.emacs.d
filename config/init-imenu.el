@@ -10,9 +10,11 @@
 (when (executable-find "ctags")
 
   ;; Symbols outline --------------------------------------------------------- ;
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook
+              (lambda ()
+                (setq-local symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))))
   (with-eval-after-load 'symbols-outline
-    ;; (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)
-    ;; (setq symbols-outline-use-nerd-icon-in-tui nil)
     (setq symbols-outline-window-position 'left)
     (symbols-outline-follow-mode))
   (global-set-key (kbd "C-c i") 'symbols-outline-show)

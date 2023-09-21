@@ -186,7 +186,7 @@ split; vice versa."
 (show-paren-mode t)
 (setq help-window-select t)
 (setq-default indent-tabs-mode nil)
-(setq split-width-threshold 100)
+(setq split-width-threshold 160)
 (setq-default tab-width 4)
 (setq-default truncate-lines t)
 (blink-cursor-mode -1)
