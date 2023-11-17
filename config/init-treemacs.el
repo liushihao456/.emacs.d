@@ -12,6 +12,7 @@
 (with-eval-after-load 'treemacs
   (treemacs-follow-mode)
   (treemacs-project-follow-mode)
+  (treemacs-hide-gitignored-files-mode)
   (setq treemacs--project-follow-delay 0.1)
   (setq treemacs-file-follow-delay 0.1)
   (setq treemacs-project-follow-cleanup t)
