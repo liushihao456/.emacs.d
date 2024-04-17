@@ -9,7 +9,7 @@
 
 ;; When in GUI, set fonts
 (when (display-graphic-p)
-  (when (and local-config-font local-config-font-size)
+  (when (and (boundp 'local-config-font) (boundp 'local-config-font-size))
     (add-to-list 'default-frame-alist
                  `(font . ,(format "%s-%s" local-config-font
                                    local-config-font-size)))
