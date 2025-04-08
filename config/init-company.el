@@ -40,23 +40,23 @@
   (with-eval-after-load 'lsp-mode
     (advice-add #'lsp--auto-configure :after #'my/company-enable-yas))
 
-  (defun my/company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
-    "Enable yasnippet but disable it inline."
-    (if (eq command 'prefix)
-        (when-let ((prefix (funcall fun 'prefix)))
-          (unless (memq (char-before (- (point) (length prefix)))
-                        '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?` ?/))
-            prefix))
-      (progn
-        (when (and arg
-                   (not (get-text-property 0 'yas-annotation-patch arg)))
-          (let* ((name (get-text-property 0 'yas-annotation arg))
-                 (snip (format "-> %s (Snippet)" name))
-                 (len (length arg)))
-            (put-text-property 0 len 'yas-annotation snip arg)
-            (put-text-property 0 len 'yas-annotation-patch t arg)))
-        (funcall fun command arg))))
-  (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
+  ;; (defun my/company-yasnippet-disable-inline (fun command &optional arg &rest _ignore)
+  ;;   "Enable yasnippet but disable it inline."
+  ;;   (if (eq command 'prefix)
+  ;;       (when-let ((prefix (funcall fun 'prefix)))
+  ;;         (unless (memq (char-before (- (point) (length prefix)))
+  ;;                       '(?. ?< ?> ?\( ?\) ?\[ ?{ ?} ?\" ?' ?` ?/))
+  ;;           prefix))
+  ;;     (progn
+  ;;       (when (and arg
+  ;;                  (not (get-text-property 0 'yas-annotation-patch arg)))
+  ;;         (let* ((name (get-text-property 0 'yas-annotation arg))
+  ;;                (snip (format "-> %s (Snippet)" name))
+  ;;                (len (length arg)))
+  ;;           (put-text-property 0 len 'yas-annotation snip arg)
+  ;;           (put-text-property 0 len 'yas-annotation-patch t arg)))
+  ;;       (funcall fun command arg))))
+  ;; (advice-add #'company-yasnippet :around #'my/company-yasnippet-disable-inline)
   )
 
 (add-hook 'company-mode-hook
