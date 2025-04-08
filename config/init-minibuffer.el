@@ -50,62 +50,7 @@
   (defun my/orderless-literal-if-suffix-bang (pattern index _total)
     (if (string-suffix-p "!" pattern)
         `(orderless-literal . ,(substring pattern 0 -1))))
-  (setq orderless-style-dispatchers '(my/orderless-literal-if-suffix-bang))
-
-  (defun my/vertico-sort-history (candidates)
-    "Sort candidates by history."
-    (let ((hhash (vertico--history-hash))
-          hcands results2)
-      (dolist
-          (c candidates)
-        (if-let (idx (gethash c hhash))
-            (push (cons idx c) hcands)
-          (push c results2)))
-       (nconc (vertico--sort-decorated hcands)
-              (nreverse results2))))
-
-  (defvar orderless-fuz-threshold 1000)
-  (require 'flx)
-  (defun my/orderless-sort-flx (candidates)
-    "Sort CANDIDATES with flx scores."
-    (when candidates
-      ;; Get category: copied from https://github.com/minad/vertico/issues/76#issuecomment-877427128
-      (let* ((query (buffer-substring (minibuffer-prompt-end)
-                                      (max (minibuffer-prompt-end) (point))))
-             (category (completion-metadata-get
-                        (completion-metadata query
-                                             minibuffer-completion-table
-                                             minibuffer-completion-predicate)
-                        'category)))
-        (when (eq category 'file)
-          (if (string-suffix-p "/" query)
-              (setq query "")
-            (setq query (file-name-nondirectory query))))
-        (if (and (not (string-empty-p query))
-                 (< (length candidates) orderless-fuz-threshold))
-            (let* ((queries (split-string query orderless-component-separator))
-                   (matches (mapcar
-                             (lambda (item)
-                               (cons item
-                                     (apply
-                                      '+
-                                      (mapcar
-                                       (lambda (q)
-                                         (car (or
-                                               ;; cache makes it much faster
-                                               (flx-score item q flx-strings-cache)
-                                               '(-1000))))
-                                       queries))))
-                             candidates)))
-              (setq matches (sort matches (lambda (x y) (> (cdr x) (cdr y)))))
-              (mapcar #'car matches))
-          candidates))))
-  (defun my/vertico-sort-flx-history (candidates)
-    "Sort vertico CANDIDATES first by flx scoring then by history."
-    (if (eq (vertico--metadata-get 'category) 'buffer)
-        (identity candidates)
-      (my/vertico-sort-history (my/orderless-sort-flx candidates))))
-  (setq vertico-sort-function #'my/vertico-sort-flx-history))
+  (setq orderless-style-dispatchers '(my/orderless-literal-if-suffix-bang)))
 
 ;; Marginalia ---------------------------------------------------------------- ;
 
