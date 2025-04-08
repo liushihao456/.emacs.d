@@ -25,14 +25,14 @@
     "The original function propagates icons from the Default theme to
 _THEME, hence override it with empty function body.")
 
-  (defadvice treemacs-visit-node-default (after treemacs-extra-wide-toggle-off activate)
+  (define-advice treemacs-visit-node-default (:after (&rest _args))
     "Restore Treemacs buffer if it's in extr-wide state."
     (if (get 'treemacs-extra-wide-toggle :toggle-on)
         (with-selected-window (treemacs-get-local-window)
           (treemacs--set-width treemacs-width)
           (put 'treemacs-extra-wide-toggle :toggle-on nil)
           (treemacs-log "Switched to normal width display"))))
-  (defadvice treemacs-quit (after treemacs-quit-reset-extra-wide activate)
+  (define-advice treemacs-quit (:after (&rest _args))
     (put 'treemacs-extra-wide-toggle :toggle-on nil)
     (treemacs-log "Switched to normal width display"))
 
