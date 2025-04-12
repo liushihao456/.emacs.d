@@ -113,8 +113,8 @@ Adapted from 'https://www.reddit.com/r/emacs/comments/d7x7x8/finally_fixing_inde
                        ;; Align keywords in plists if each newline begins with
                        ;; a keyword. This is useful for "unquoted plist
                        ;; function" macros, like `map!' and `defhydra'.
-                       (when-let ((first (elt state 1))
-                                  (char (char-after (1+ first))))
+                       (when-let* ((first (elt state 1))
+                                   (char (char-after (1+ first))))
                          (and (eq char ?:)
                               (ignore-errors
                                 (or (save-excursion
@@ -139,14 +139,14 @@ Adapted from 'https://www.reddit.com/r/emacs/comments/d7x7x8/finally_fixing_inde
                              (quotep 0))
                          (while positions
                            (let ((point (pop positions)))
-                             (or (when-let (char (char-before point))
+                             (or (when-let* (char (char-before point))
                                    (cond
                                     ((eq char ?\())
                                     ((memq char '(?\' ?\`))
                                      (or (save-excursion
                                            (goto-char (1+ point))
                                            (skip-chars-forward "( ")
-                                           (when-let (fn (ignore-errors (read (current-buffer))))
+                                           (when-let* (fn (ignore-errors (read (current-buffer))))
                                              (if (and (symbolp fn)
                                                       (fboundp fn)
                                                       ;; Only special forms and
@@ -259,7 +259,7 @@ Adapted from 'https://www.reddit.com/r/emacs/comments/d7x7x8/finally_fixing_inde
 
 (defun +emacs-lisp-append-value-to-eldoc-a (fn sym)
   "Display variable value next to documentation in eldoc."
-  (when-let (ret (funcall fn sym))
+  (when-let* ((ret (funcall fn sym)))
     (if (boundp sym)
         (concat ret " "
                 (let* ((truncated " [...]")

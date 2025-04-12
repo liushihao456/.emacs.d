@@ -49,7 +49,7 @@
 
 (defun my/buffer-file-icon-mode-line ()
   "Render icon for current buffer file in the mode line."
-  (if-let ((buffer-file buffer-file-name)
+  (if-let* ((buffer-file buffer-file-name)
            (file (file-name-nondirectory buffer-file-name)))
       (cond ((string-match-p "\\/$" file)
              (nerd-svg-icons-icon-for-dir file))
@@ -76,21 +76,21 @@
         (`running (propertize "   ?    " 'face 'success))
         (`errored (propertize "   !    " 'face 'error))
         (`finished
-         (when-let ((error-counts (flycheck-count-errors flycheck-current-errors)))
+         (when-let* ((error-counts (flycheck-count-errors flycheck-current-errors)))
            (let ((no-errors (cdr (assq 'error error-counts)))
                  (no-warnings (cdr (assq 'warning error-counts))))
              (format "[%s/%s] "
                      (propertize (format "%2d" (or no-errors 0)) 'face 'error)
                      (propertize (format "%2d" (or no-warnings 0)) 'face 'warning)))))
-             ;; (concat
-             ;;    (when no-errors
-             ;;      (propertize
-             ;;       (format "%s%s " (nerd-svg-icons-icon-str :face "ban") no-errors)
-             ;;       'face 'error))
-             ;;    (when no-warnings
-             ;;      (propertize
-             ;;       (format "%s%s" (nerd-svg-icons-icon-str :face "warning") no-warnings)
-             ;;       'face 'warning))))))
+        ;; (concat
+        ;;    (when no-errors
+        ;;      (propertize
+        ;;       (format "%s%s " (nerd-svg-icons-icon-str :face "ban") no-errors)
+        ;;       'face 'error))
+        ;;    (when no-warnings
+        ;;      (propertize
+        ;;       (format "%s%s" (nerd-svg-icons-icon-str :face "warning") no-warnings)
+        ;;       'face 'warning))))))
         (`interrupted "   -    ")
         (`suspicious '(propertize "   ?    " 'face 'warning)))
     nil))

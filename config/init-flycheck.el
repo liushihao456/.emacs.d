@@ -35,7 +35,7 @@
   (advice-add #'flycheck-error-list-goto-error :after #'flycheck-goto-error-a)
   (add-hook 'window-configuration-change-hook
             (lambda ()
-              (when-let (w (get-buffer-window flycheck-error-list-buffer))
+              (when-let* ((w (get-buffer-window flycheck-error-list-buffer)))
                 (set-window-parameter w 'no-other-window t))))
 
   (set-face-background 'flycheck-warning (face-background 'default))

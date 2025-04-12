@@ -59,7 +59,7 @@
 
   (defun marginalia-annotate-buffer-a (cand)
     "Annotate buffer CAND with modification status, file name and major mode."
-    (when-let (buffer (get-buffer cand))
+    (when-let* ((buffer (get-buffer cand)))
       (marginalia--fields
        ((marginalia--buffer-status buffer))
        ((marginalia--buffer-file buffer)
@@ -68,7 +68,7 @@
 
   (defun marginalia-annotate-bookmark-a (cand)
     "Annotate bookmark CAND with its file name and front context string."
-    (when-let ((bm (assoc cand (bound-and-true-p bookmark-alist))))
+    (when-let* ((bm (assoc cand (bound-and-true-p bookmark-alist))))
       (let ((front (bookmark-get-front-context-string bm)))
         (marginalia--fields
          ((marginalia--bookmark-type bm) :width 10 :face 'marginalia-type)
@@ -93,12 +93,12 @@
     (when (and cands (> (length cands) 0))
       (setq marginalia--candw-max
             (seq-max (cl-loop for (cand . ann) in cands collect
-                              (if-let (truncate-to (get-text-property 0 'truncate-to cand))
+                              (if-let* ((truncate-to (get-text-property 0 'truncate-to cand)))
                                   (min (string-width cand) truncate-to)
                                 (string-width cand))))))
     (cl-loop for (cand . ann) in cands collect
              (progn
-               (when-let (align (text-property-any 0 (length ann) 'marginalia--align t ann))
+               (when-let* ((align (text-property-any 0 (length ann) 'marginalia--align t ann)))
                  (put-text-property
                   align (1+ align) 'display
                   `(space :align-to

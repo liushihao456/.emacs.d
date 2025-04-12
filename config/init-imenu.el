@@ -159,8 +159,8 @@
 
   (with-eval-after-load 'marginalia
     (defun project-ctags-tag-annotator (cand)
-      (when-let (full-json (get-text-property 0 'full-json cand))
-        (if-let (path (gethash "path" full-json))
+      (when-let* ((full-json (get-text-property 0 'full-json cand)))
+        (if-let* ((path (gethash "path" full-json)))
             (marginalia--fields
              ((gethash "kind" full-json)
               :face 'marginalia-type :width 10)
@@ -183,10 +183,10 @@
 
   (with-eval-after-load 'vertico
     (defun my/vertico-truncate-ctags-candidates (args)
-      (when-let (((eq (vertico--metadata-get 'category) 'ctags))
-                 (w (floor (* (window-width) 0.3)))
-                 (l (length (car args)))
-                 ((> l w)))
+      (when-let* (((eq (vertico--metadata-get 'category) 'ctags))
+                  (w (floor (* (window-width) 0.3)))
+                  (l (length (car args)))
+                  ((> l w)))
         (setcar args (concat (truncate-string-to-width (car args) (- w 3)) "...")))
       args)
     (advice-add #'vertico--format-candidate :filter-args #'my/vertico-truncate-ctags-candidates))
