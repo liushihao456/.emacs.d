@@ -213,7 +213,7 @@ split; vice versa."
 (global-set-key (kbd "M-n") 'scroll-up-line)
 (global-set-key (kbd "M-p") 'scroll-down-line)
 (global-set-key (kbd "M-'") 'switch-to-other-buffer)
-(global-set-key (kbd "C-M-'") 'kill-this-buffer)
+(global-set-key (kbd "C-M-'") 'kill-current-buffer)
 (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "M-`") 'save-buffer)
 (global-set-key (kbd "M-e") 'forward-paragraph)
