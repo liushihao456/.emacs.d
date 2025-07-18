@@ -80,11 +80,7 @@
   (defun ctags-jump-to-symbol-in-buffer ()
     "Jump to symbol in the buffer."
     (interactive)
-    (let* ((symbol-at-point (if (use-region-p)
-                                (buffer-substring-no-properties
-                                 (region-beginning) (region-end))
-                              (thing-at-point 'symbol t)))
-           (tags-json (ctags-parse-json (ctags-generate-tags-in-buffer)))
+    (let* ((tags-json (ctags-parse-json (ctags-generate-tags-in-buffer)))
            (tag-list (mapcar (lambda (ht) (gethash "name" ht)) tags-json)))
       (if (length= tag-list 0)
           (message "No symbols found.")
@@ -96,7 +92,7 @@
                        '(metadata . ((category . ctags)))
                      (complete-with-action
                       action tag-list str pred)))
-                 nil nil symbol-at-point))
+                 nil nil))
                (tag-json (seq-find (lambda (ht) (equal (gethash "name" ht) selected-tag))
                                    tags-json))
                (line-no (gethash "line" tag-json)))
@@ -135,10 +131,6 @@
     (interactive)
     (require 'project)
     (let* ((project-root (project-root (project-current)))
-           (symbol-at-point (if (use-region-p)
-                                (buffer-substring-no-properties
-                                 (region-beginning) (region-end))
-                              (thing-at-point 'symbol t)))
            (tags-json (ctags-parse-json (ctags-generate-tags-in-project)))
            (tag-list (mapcar (lambda (ht) (gethash "name" ht)) tags-json))
            (selected-tag
@@ -149,7 +141,7 @@
                    '(metadata . ((category . ctags)))
                  (complete-with-action
                   action tag-list str pred)))
-             nil nil symbol-at-point))
+             nil nil))
            (tag-json (seq-find (lambda (ht) (equal (gethash "name" ht) selected-tag))
                                tags-json))
            (file (gethash "path" tag-json))
