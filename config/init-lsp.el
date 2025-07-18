@@ -9,7 +9,10 @@
 
 (setq read-process-output-max (* 1024 1024))
 
-(with-eval-after-load 'lsp-mode
+(use-package lsp-mode
+  :ensure t
+  :defer t
+  :config
   (define-key lsp-mode-map (kbd "C-c l k") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)
   (define-key lsp-mode-map (kbd "C-c l e") 'lsp-find-declaration)
@@ -42,17 +45,16 @@
   ;; (setq lsp-log-io t)
   )
 
-(with-eval-after-load 'lsp-ui
+(use-package lsp-ui
+  :ensure t
+  :hook (emacs-lisp-mode . lsp-ui-sideline-mode)
+  :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map [remap lsp-describe-thing-at-point] 'lsp-ui-doc-glance)
   (setq lsp-ui-doc-show-with-mouse nil)
   (setq lsp-ui-sideline-show-hover t)
   (setq lsp-ui-sideline-enable t))
-
-(add-hook 'emacs-lisp-mode-hook (lambda ()
-                                  (require 'lsp-ui)
-                                  (lsp-ui-sideline-mode)))
 
 (provide 'init-lsp)
 

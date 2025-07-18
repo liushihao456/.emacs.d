@@ -7,17 +7,25 @@
 
 ;;; Code:
 
-(when (executable-find "ctags")
+(use-package symbols-outline
+  :load-path "packages/symbols-outline"
+  :bind ("C-c i" . symbols-outline-show)
+  :init
+  (add-hook 'lsp-mode-hook
+            (lambda ()
+              (setq-local symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)))
+  :config
+  (setq symbols-outline-window-position 'left)
+  (require 'symbols-outline-follow-mode)
+  (symbols-outline-follow-mode))
 
-  ;; Symbols outline --------------------------------------------------------- ;
-  (with-eval-after-load 'lsp-mode
-    (add-hook 'lsp-mode-hook
-              (lambda ()
-                (setq-local symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))))
-  (with-eval-after-load 'symbols-outline
-    (setq symbols-outline-window-position 'left)
-    (symbols-outline-follow-mode))
-  (global-set-key (kbd "C-c i") 'symbols-outline-show)
+;; (use-package symbols-outline-follow-mode
+;;   :load-path "packages/symbols-outline"
+;;   :after symbols-outline
+;;   :config
+;;   (symbols-outline-follow-mode))
+
+(when (executable-find "ctags")
 
   (defun ctags-parse-json (buf)
     "Parse ctag tags json."
@@ -153,11 +161,15 @@
 
   (global-set-key (kbd "C-c p i") 'ctags-jump-to-symbol-in-project)
 
-  (with-eval-after-load 'nerd-svg-icons-completion
+  (use-package nerd-svg-icons-completion
+    :defer t
+    :config
     (add-to-list 'nerd-svg-icons-completion-category-icon-alist
                  '(ctags . nerd-svg-icons-completion-get-imenu-icon)))
 
-  (with-eval-after-load 'marginalia
+  (use-package marginalia
+    :defer t
+    :config
     (defun project-ctags-tag-annotator (cand)
       (when-let* ((full-json (get-text-property 0 'full-json cand)))
         (if-let* ((path (gethash "path" full-json)))
@@ -181,7 +193,9 @@
     (add-to-list 'marginalia-annotator-registry
                  '(ctags project-ctags-tag-annotator builtin none)))
 
-  (with-eval-after-load 'vertico
+  (use-package vertico
+    :defer t
+    :config
     (defun my/vertico-truncate-ctags-candidates (args)
       (when-let* (((eq (vertico--metadata-get 'category) 'ctags))
                   (w (floor (* (window-width) 0.3)))
@@ -191,8 +205,6 @@
       args)
     (advice-add #'vertico--format-candidate :filter-args #'my/vertico-truncate-ctags-candidates))
   )
-
-;; Ctags completion ---------------------------------------------------------- ;
 
 (provide 'init-imenu)
 

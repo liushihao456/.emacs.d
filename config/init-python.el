@@ -7,8 +7,17 @@
 
 ;;; Code:
 
-(add-hook 'python-mode-hook 'lsp)
-(with-eval-after-load 'python
+(use-package lsp-mode
+  :ensure t
+  :hook (python-mode . lsp))
+
+(use-package lsp-pyright
+  :ensure t
+  :defer t)
+
+(use-package python
+  :defer t
+  :config
   (require 'lsp-pyright)
   (setq python-shell-interpreter "python3")
   (defun my/format-buffer ()
@@ -20,13 +29,6 @@
       (goto-char old-point)))
   (define-key python-mode-map (kbd "C-c C-l") nil)
   (define-key python-mode-map (kbd "<f5>") 'my/format-buffer))
-
-(with-eval-after-load 'lsp-python-ms
-  (setq lsp-python-ms-cache "Library"))
-
-(with-eval-after-load 'lsp-pyright
-  ;; (setq lsp-pyright-use-library-code-for-types nil)
-  )
 
 (provide 'init-python)
 

@@ -7,9 +7,10 @@
 
 ;;; Code:
 
-(add-to-list 'auto-mode-alist '("\\.gnuplot\\'" . gnuplot-mode))
-(add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot-mode))
-(with-eval-after-load 'gnuplot-mode
+(use-package gnuplot-mode
+  :ensure t
+  :mode ("\\.gp\\'" "\\.gnuplot\\'")
+  :config
   (defun gnuplot-epslatex-generate-eps ()
     "Generate eps output in an epslatex terminal in gnuplot using dvips."
     (interactive)

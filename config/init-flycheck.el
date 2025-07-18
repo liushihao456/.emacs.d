@@ -9,8 +9,10 @@
 
 (require 'init-macros)
 
-(add-hook 'prog-mode-hook 'flycheck-mode)
-(with-eval-after-load 'flycheck
+(use-package flycheck
+  :ensure t
+  :hook (prog-mode . flycheck-mode)
+  :config
   (def-transient-commands flycheck-mode-map "C-c f"
     ("n" . flycheck-next-error)
     ("p" . flycheck-previous-error))

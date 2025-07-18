@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(require 'init-macros)
+
 ;; Kill currnet line and copy current line
 (defadvice kill-region (before slick-cut activate compile)
   "When called interactively with no active region, kill a single line instead."
@@ -134,12 +136,6 @@ split; vice versa."
       (select-window first-win)
       (if this-win-is-2nd (other-window 1)))))
 
-(when (display-graphic-p)
-  ;;; I prefer cmd key for meta
-  ;; (setq mac-command-modifier 'meta)
-  ;; (setq mac-option-modifier 'none)
-  )
-
 ;; Hide the startup message
 (setq inhibit-startup-message t)
 ;; Change all prompts to y or n
@@ -154,7 +150,7 @@ split; vice versa."
 (add-hook 'after-init-hook (lambda () (message "Emacs started in %s" (emacs-init-time))))
 ;; Avoid line break in help-mode
 (add-hook 'help-mode-hook 'visual-line-mode)
-;; When in GUI, set fonts
+;; When in GUI, pixel scroll
 (when (display-graphic-p)
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode)))
@@ -164,24 +160,20 @@ split; vice versa."
 (setq recentf-max-saved-items 100)
 (setq recentf-exclude '("bookmarks\\'" ".*-autoloads.el\\'"))
 
-;; ;; Open recent files list at Emacs start up
-;; (unless (> (length command-line-args) 1)
-;;   ;; Check if Emacs is called with a file name in command line args.
-;;   (setq initial-buffer-choice 'recentf-open-files))
-
-;; From dashboard doc: if a command line argument is provided, assume a filename
-;; and skip displaying Dashboard.
-(with-eval-after-load 'dashboard
+;; From dashboard doc: if a command line argument is provided, Dashboard won't
+;; be displayed.
+(use-package dashboard
+  :ensure t
+  :config
   (setq dashboard-items '((recents . 5) (bookmarks . 5)))
   (setq dashboard-center-content t)
   (setq dashboard-set-heading-icons t)
   (unless (display-graphic-p)
     (setq dashboard-startup-banner 2))
   (define-key dashboard-mode-map (kbd "n") 'widget-forward)
-  (define-key dashboard-mode-map (kbd "p") 'widget-backward))
-(dashboard-setup-startup-hook)
+  (define-key dashboard-mode-map (kbd "p") 'widget-backward)
+  (dashboard-setup-startup-hook))
 
-(with-eval-after-load 'dired (setq dired-use-ls-dired nil))
 (electric-pair-mode t)
 (show-paren-mode t)
 (setq help-window-select t)
@@ -218,32 +210,39 @@ split; vice versa."
 (global-set-key (kbd "M-`") 'save-buffer)
 (global-set-key (kbd "M-e") 'forward-paragraph)
 (global-set-key (kbd "M-a") 'backward-paragraph)
+
 ;; Magit
-(global-set-key (kbd "C-c g") 'magit-status)
+(use-package magit
+  :ensure t
+  :bind ("C-c g" . magit-status))
+
 ;; Expand region
-(global-set-key (kbd "C-\\") 'er/expand-region)
+(use-package expand-region
+  :ensure t
+  :bind ("C-\\" . er/expand-region))
 
 ;; Anzu - show match counts in mode line
-(global-anzu-mode t)
-(global-set-key [remap query-replace] 'anzu-query-replace)
-(global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
-(global-set-key (kbd "M-s r") 'anzu-query-replace-at-cursor)
-;; Occur
-(with-eval-after-load 'replace
-  (define-key occur-mode-map "n" 'occur-next)
-  (define-key occur-mode-map "p" 'occur-prev))
-;; Automatically pop to some buffers
-(add-hook 'occur-hook (lambda () (pop-to-buffer (get-buffer "*Occur*"))))
-(add-hook 'bookmark-bmenu-mode-hook (lambda () (switch-to-buffer "*Bookmark List*")))
-(add-hook 'process-menu-mode-hook (lambda () (pop-to-buffer "*Process List*")))
-;; Xref
-(with-eval-after-load 'xref
-  (setq xref-prompt-for-identifier '(not xref-find-definitions
-                                         xref-find-definitions-other-window
-                                         xref-find-definitions-other-frame
-                                         xref-find-references)))
+(use-package anzu
+  :ensure t
+  :init
+  (global-anzu-mode t)
+  (global-set-key [remap query-replace] 'anzu-query-replace)
+  (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
+  (global-set-key (kbd "M-s r") 'anzu-query-replace-at-cursor))
+
+;; ;; Xref
+;; (use-package xref
+;;   :defer t
+;;   (setq xref-prompt-for-identifier '(not xref-find-definitions
+;;                                          xref-find-definitions-other-window
+;;                                          xref-find-definitions-other-frame
+;;                                          xref-find-references)))
+
 ;; Which-key: show key bindings below
-(which-key-mode)
+(use-package which-key
+  :ensure t
+  :init
+  (which-key-mode))
 
 ;; C indentation style
 (setq c-basic-offset 4)
@@ -251,18 +250,9 @@ split; vice versa."
 (c-set-offset 'arglist-close '0)
 
 ;; Markdown mode
-(add-to-list 'auto-mode-alist
-             '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
-
-;; nerd-svg-icons-dired
-(add-hook 'dired-mode-hook 'nerd-svg-icons-dired-mode)
-
-;; Telega
-(with-eval-after-load 'telega
-  (setq telega-proxies
-        (list '(:server "127.0.0.1" :port 7890 :enable t
-                        :type (:@type "proxyTypeSocks5"))))
-  (setq telega-use-docker nil))
+(use-package markdown-mode
+  :ensure t
+  :mode ("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . gfm-mode))
 
 ;; Remove duplicate lines
 (defun uniquify-all-lines-region (start end)
@@ -298,28 +288,121 @@ definition."
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 (define-key prog-mode-map [tab]
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
-(with-eval-after-load 'cc-mode
+(use-package cc-mode
+  :defer t
+  :config
   (define-key c-mode-base-map (kbd "TAB")
     '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter)))
 
 ;; Rainbow delimiters
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
 
-(if (eq system-type 'darwin)
-    (setq mac-command-modifier 'meta
-          mac-option-modifier 'none))
+;; (if (eq system-type 'darwin)
+;;     (setq mac-command-modifier 'meta
+;;           mac-option-modifier 'none))
+
+;; nerd-svg-icons
+(use-package nerd-svg-icons-dired
+  :load-path "packages/nerd-svg-icons"
+  :hook (dired-mode . nerd-svg-icons-dired-mode))
+
+(use-package nerd-svg-icons-ibuffer
+  :load-path "packages/nerd-svg-icons"
+  :hook (ibuffer . nerd-svg-icons-ibuffer-mode))
 
 ;; Ibuffer
-(add-hook 'ibuffer-hook #'nerd-svg-icons-ibuffer-mode)
-(add-hook 'ibuffer-hook
-          (lambda ()
-            (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-            (unless (eq ibuffer-sorting-mode 'project-file-relative)
-              (ibuffer-do-sort-by-project-file-relative))))
-(with-eval-after-load 'ibuffer-project
+(use-package ibuffer-project
+  :ensure t
+  :defer t
+  :hook (ibuffer . (lambda ()
+                     (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+                     (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                       (ibuffer-do-sort-by-project-file-relative))))
+  :config
+  (require 'nerd-svg-icons)
   (setq ibuffer-project-root-functions
         `((ibuffer-project-project-root . ,(nerd-svg-icons-icon-str "oct-repo" :face 'nerd-svg-icons-lorange))
           (file-remote-p . ,(nerd-svg-icons-icon-str "cod-terminal" :face 'nerd-svg-icons-lorange)))))
+
+;; Deadgrep
+(use-package deadgrep
+  :ensure t
+  :bind ("C-c s" . deadgrep))
+
+(use-package wgrep
+  :ensure t
+  :defer t
+  :config
+  (setq wgrep-auto-save-buffer t)
+  (advice-add #'wgrep-change-to-wgrep-mode :after #'evil-normal-state)
+  (advice-add #'wgrep-finish-edit :after #'evil-motion-state)
+  (advice-add #'wgrep-abort-changes :after #'evil-motion-state))
+
+(use-package wgrep-deadgrep
+  :ensure t
+  :hook (deadgrep-finished . wgrep-deadgrep-setup))
+
+;; Yasnippet
+(use-package yasnippet
+  :ensure t
+  :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
+  :config
+  (defun yas-try-key-from-dot (_start-point)
+    "As `yas-key-syntaxes' element, look for dot key.
+It enables expanding `foo.' to `foo->'."
+    (skip-chars-backward "\."))
+  (add-to-list 'yas-key-syntaxes 'yas-try-key-from-dot)
+
+  (setq yas-triggers-in-field t)
+  (yas-reload-all))
+
+;; Diff-hl
+(use-package diff-hl
+  :ensure t
+  :init
+  (global-diff-hl-mode)
+  (unless (display-graphic-p) (diff-hl-margin-mode))
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (add-hook 'vc-dir-mode-hook 'diff-hl-dir-mode)
+  :config
+  (setq diff-hl-command-prefix (kbd "C-c v"))
+  (set-face-background 'diff-hl-change (face-background 'default))
+  (set-face-background 'diff-hl-insert (face-background 'default))
+  (set-face-background 'diff-hl-delete (face-background 'default))
+  (defun my/diff-hl-define-bitmaps (&rest _)
+    (define-fringe-bitmap 'diff-hl-bmp-middle [#b00011000] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-delete [#b11110000
+                                               #b11100000
+                                               #b11000000
+                                               #b10000000] nil nil 'top))
+
+  (advice-add #'diff-hl-define-bitmaps :override #'my/diff-hl-define-bitmaps)
+  (defun my/diff-hl-type-face-fn (type _pos)
+    (intern (format "diff-hl-%s" type)))
+  (defun my/diff-hl-type-at-pos-fn (type _pos)
+    (if (eq type 'delete)
+        'diff-hl-bmp-delete
+      'diff-hl-bmp-middle))
+  (advice-add #'diff-hl-fringe-bmp-from-pos  :override #'my/diff-hl-type-at-pos-fn)
+  (advice-add #'diff-hl-fringe-bmp-from-type :override #'my/diff-hl-type-at-pos-fn)
+  (setq diff-hl-draw-borders nil)
+  (with-eval-after-load 'flycheck
+    (setq flycheck-indication-mode 'right-fringe)
+    ;; Let the arrow point left
+    (when (fboundp 'define-fringe-bitmap) ;; #ifdef HAVE_WINDOW_SYSTEM
+      (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+        flycheck-fringe-bitmap-double-left-arrow)
+      (define-fringe-bitmap
+        'flycheck-fringe-bitmap-double-arrow-hi-res
+        flycheck-fringe-bitmap-double-left-arrow-hi-res
+        nil 16)))
+
+  (def-transient-commands diff-hl-mode-map diff-hl-command-prefix
+                          ("n" . diff-hl-next-hunk)
+                          ("p" . diff-hl-previous-hunk)
+                          ("r" . diff-hl-revert-hunk)))
 
 (provide 'init-misc)
 

@@ -14,7 +14,9 @@
     (call-interactively 'compile)))
 (global-set-key (kbd "C-c m") 'my/compile-project)
 
-(with-eval-after-load 'compile
+(use-package compile
+  :defer t
+  :config
   (setq compilation-save-buffers-predicate
         '(lambda nil
            (string-prefix-p
@@ -30,8 +32,6 @@
     (ansi-color-apply-on-region compilation-filter-start (point-max)))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
   (add-hook 'compilation-mode-hook (lambda () (pop-to-buffer (buffer-name)))))
-
-
 
 (provide 'init-compile)
 

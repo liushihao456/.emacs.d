@@ -7,7 +7,10 @@
 
 ;;; Code:
 
-(with-eval-after-load 'latex
+(use-package latex
+  :ensure auctex
+  :defer t
+  :config
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
   (setq-default TeX-master nil)
@@ -21,7 +24,10 @@
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   (setq font-latex-fontify-sectioning 'color))
 
-(with-eval-after-load 'font-latex
+(use-package font-latex
+  :ensure auctex
+  :defer t
+  :config
   (set-face-attribute 'font-latex-slide-title-face
                       nil
                       :height 'unspecified

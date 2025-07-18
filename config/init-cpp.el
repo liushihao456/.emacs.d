@@ -10,8 +10,13 @@
 ;; Use c++-mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-(add-hook 'c-mode-common-hook 'lsp)
-(with-eval-after-load 'cc-mode
+(use-package lsp-mode
+  :ensure t
+  :hook (c-mode-common . lsp))
+
+(use-package cc-mode
+  :defer t
+  :config
   (defun my/cmake-project-generate-compile-commands ()
     "Generate the compile_commands.json file containing build flags in a cmake
 project in order for clangd to understand the project code."
@@ -27,25 +32,26 @@ project in order for clangd to understand the project code."
 
 ;; Cmake
 (when (executable-find "cmake")
-  (require 'dash)
-  (setq cmake-load-path (--> "cmake"
-                             (executable-find it)
-                             (file-truename it)
-                             (file-name-concat it ".." ".." "share" "emacs" "site-lisp")
-                             ;; cmake-mode.el either resides in cmake/share/emacs/site-lisp/
-                             ;; or cmake/share/emacs/site-lisp/cmake/
-                             (if (file-exists-p (file-name-concat it "cmake-mode.el"))
-                                 it
-                               (file-name-concat it "cmake"))
-                             (file-truename it)))
-  (add-to-list 'load-path cmake-load-path)
-  (autoload 'cmake-mode (file-name-concat cmake-load-path "cmake-mode.el") "Major mode for editing CMake listfiles." t)
-  (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-  (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-  (when (executable-find "cmake-language-server")
-    (add-hook 'cmake-mode-hook 'lsp)))
+  (use-package dash
+    :ensure t)
+  (eval-and-compile
+    (setq cmake-load-path (--> "cmake"
+                               (executable-find it)
+                               (file-truename it)
+                               (file-name-concat it ".." ".." "share" "emacs" "site-lisp")
+                               ;; cmake-mode.el either resides in cmake/share/emacs/site-lisp/
+                               ;; or cmake/share/emacs/site-lisp/cmake/
+                               (if (file-exists-p (file-name-concat it "cmake-mode.el"))
+                                   it
+                                 (file-name-concat it "cmake"))
+                               (file-truename it))))
+  (use-package cmake-mode
+    :load-path cmake-load-path
+    :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")))
 
-(with-eval-after-load 'cc-mode
+(use-package cc-mode
+  :defer t
+  :config
   (defun cpp-compile-vs-sln ()
     "Compile visual studio projects."
     (interactive)

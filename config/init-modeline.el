@@ -8,28 +8,31 @@
 ;;; Code:
 
 ;; Delight modeline lighters
-(delight '((eldoc-mode nil "eldoc")
-           (emacs-lisp-mode "Elisp" :major)
-           (which-key-mode nil "which-key")
-           (abbrev-mode nil "abbrev")
-           (visual-line-mode nil "simple")
-           (lsp-mode nil "lsp-mode")
-           (company-mode nil "company")
-           (company-box-mode nil "company-box")
-           (yas-minor-mode nil "yasnippet")
-           (auto-revert-mode nil "autorevert")
-           (hi-lock-mode nil "hi-lock")
-           (auto-fill-function nil "simple")
-           (emmet-mode nil "emmet-mode")
-           (anzu-mode nil "anzu")
-           (isearch-mode nil "isearch")
-           (tree-sitter-mode nil "tree-sitter")
-           (flycheck-mode nil "flycheck")
-           (mini-modeline-mode nil "mini-modeline")
-           (hs-minor-mode nil "hideshow")
-           (lsp-lens-mode nil "lsp-lens")
-           (evil-commentary-mode nil "evil-commentary")
-           (copilot-mode nil "copilot")))
+(use-package delight
+  :ensure t
+  :init
+  (delight '((eldoc-mode nil "eldoc")
+             (emacs-lisp-mode "Elisp" :major)
+             (which-key-mode nil "which-key")
+             (abbrev-mode nil "abbrev")
+             (visual-line-mode nil "simple")
+             (lsp-mode nil "lsp-mode")
+             (company-mode nil "company")
+             (company-box-mode nil "company-box")
+             (yas-minor-mode nil "yasnippet")
+             (auto-revert-mode nil "autorevert")
+             (hi-lock-mode nil "hi-lock")
+             (auto-fill-function nil "simple")
+             (emmet-mode nil "emmet-mode")
+             (anzu-mode nil "anzu")
+             (isearch-mode nil "isearch")
+             (tree-sitter-mode nil "tree-sitter")
+             (flycheck-mode nil "flycheck")
+             (mini-modeline-mode nil "mini-modeline")
+             (hs-minor-mode nil "hideshow")
+             (lsp-lens-mode nil "lsp-lens")
+             (evil-commentary-mode nil "evil-commentary")
+             (copilot-mode nil "copilot"))))
 
 ;; cc-mode.el assumes that `mode-name’ is always a string (which was true in
 ;; Emacs 22 and earlier), while delight.el makes use of the fact that
@@ -50,7 +53,7 @@
 (defun my/buffer-file-icon-mode-line ()
   "Render icon for current buffer file in the mode line."
   (if-let* ((buffer-file buffer-file-name)
-           (file (file-name-nondirectory buffer-file-name)))
+            (file (file-name-nondirectory buffer-file-name)))
       (cond ((string-match-p "\\/$" file)
              (nerd-svg-icons-icon-for-dir file))
             (t
@@ -167,7 +170,17 @@
 
 ;; Combine mode line and minibuffer ------------------------------------------ ;
 
-(with-eval-after-load 'mini-modeline
+;; The emacs-mini-modeline package requires dash
+(use-package dash
+  :ensure t
+  :defer t)
+
+(use-package mini-modeline
+  :load-path "packages/emacs-mini-modeline"
+  :commands mini-modeline-mode
+  :init
+  (mini-modeline-mode)
+  :config
   (setq mini-modeline-l-format
         (list "%e"
               " "
@@ -192,10 +205,7 @@
               '(:eval (my/flycheck-mode-line))
               '(:eval (my/row-col-mode-line))
               " "))
-  (setq mini-modeline-right-padding 1)
-  )
-
-(mini-modeline-mode)
+  (setq mini-modeline-right-padding 1))
 
 (provide 'init-modeline)
 

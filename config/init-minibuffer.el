@@ -7,41 +7,45 @@
 
 ;;; Code:
 
-;; Vertico ------------------------------------------------------------------- ;
-
-(vertico-mode)
 (savehist-mode)
 
-;; Copied from vertico github example configurations:
-;; 
-;; Add prompt indicator to `completing-read-multiple'.
-;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-(defun crm-indicator (args)
-  (cons (format "[CRM%s] %s"
-                (replace-regexp-in-string
-                 "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                 crm-separator)
-                (car args))
-        (cdr args)))
-(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+;; Vertico ------------------------------------------------------------------- ;
 
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode)
+  :config
+  ;; Copied from vertico github example configurations:
+  ;; 
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-;; Enable recursive minibuffers
-(setq enable-recursive-minibuffers t)
-(minibuffer-depth-indicate-mode)
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t)
+  (minibuffer-depth-indicate-mode)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 
 ;; Orderless ----------------------------------------------------------------- ;
 
-;; Only activate orderless in minibuffer completion
-(add-hook 'minibuffer-setup-hook (lambda ()
-                                   (setq-local completion-styles '(orderless basic))))
-(setq completion-category-defaults nil
-      completion-category-overrides '((file (styles orderless partial-completion))))
-(with-eval-after-load 'orderless
+(use-package orderless
+  :ensure t
+  :config
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic partial-completion))))
   (setq orderless-matching-styles '(orderless-literal
                                     orderless-regexp
                                     orderless-initialism
@@ -54,7 +58,11 @@
 
 ;; Marginalia ---------------------------------------------------------------- ;
 
-(with-eval-after-load 'marginalia
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode)
+  :config
   (setq marginalia-separator "  ")
 
   (defun marginalia-annotate-buffer-a (cand)
@@ -84,8 +92,8 @@
   (advice-add #'marginalia-annotate-bookmark :override #'marginalia-annotate-bookmark-a)
 
   ;; Hack: when candidates are truncated for example by advicing
-  ;; `vertico--format-candidate', we can't access the truncation candidates
-  ;; here. Therefor use my custom 'truncate-to property of candidates if
+  ;; `vertico--format-candidate', we can't access the truncated candidates
+  ;; here. Therefore use my custom 'truncate-to property of candidates if
   ;; present. (The ctags candidates are marked with this property, as can be
   ;; seen below.)
   (defun marginalia--align-a (cands)
@@ -110,21 +118,24 @@
                                                 (string-width ann)))))))
                   ann))
                (list cand "" ann))))
-  (advice-add #'marginalia--align :override #'marginalia--align-a)
-  )
-(marginalia-mode)
+  (advice-add #'marginalia--align :override #'marginalia--align-a))
 
 ;; Icons --------------------------------------------------------------------- ;
 
-(nerd-svg-icons-completion-mode)
+(use-package nerd-svg-icons-completion
+  :load-path "packages/nerd-svg-icons"
+  :commands nerd-svg-icons-completion-mode
+  :init (nerd-svg-icons-completion-mode))
 
 ;; Embark -------------------------------------------------------------------- ;
 
-(define-key minibuffer-mode-map (kbd "C-j") 'embark-act)
-
-(global-set-key (kbd "C-j") 'embark-act)
-(global-set-key (kbd "C-q") 'embark-export)
-(with-eval-after-load 'embark
+(use-package embark
+  :ensure t
+  :bind (("C-j" . embark-act)
+         ("C-q" . embark-export)
+         :map minibuffer-mode-map
+         ("C-j" . embark-act))
+  :config
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -147,14 +158,12 @@
 
   (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
   (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
-  (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
-  )
+  (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right)))
 
-(global-set-key (kbd "C-c p s") 'consult-ripgrep)
-(with-eval-after-load 'consult
-  (with-eval-after-load 'embark
-    (require 'embark-consult))
-
+(use-package consult
+  :ensure t
+  :bind ("C-c p s" . consult-ripgrep)
+  :config
   ;; Start consult-ripgrep search with active region or symbol at point
   (defun my/consult-ripgrep-initial-input-advice (consult-fn &optional dir given-initial)
     "Advising function around CONSULT-FN.
@@ -168,6 +177,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (apply consult-fn dir initial)))
   (advice-add #'consult-ripgrep :around #'my/consult-ripgrep-initial-input-advice)
   (setq consult-preview-key "C-o"))
+
+(use-package embark-consult
+  :ensure t
+  :after (consult embark))
 
 ;; Recentf files completion -------------------------------------------------- ;
 
@@ -186,8 +199,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                             'full x)
                                 (propertize (number-to-string (setq count (1+ count)))
                                             'invisible t))
-                         x))
-                 recentf-list))
+                        x))
+                     recentf-list))
          (fname (completing-read "File name: "
                                  (lambda (str pred action)
                                    (if (eq action 'metadata)
@@ -200,45 +213,41 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (when fname (find-file (cdr (assoc fname file-list))))))
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
-(defun nerd-svg-icons-completion-get-recentf-file-icon (cand)
-  "Return the icon for the candidate CAND of completion category recentf-file."
-  (let ((real-cand (substring cand 0 (next-single-property-change 0 'invisible cand))))
-    (nerd-svg-icons-completion-get-file-icon real-cand)))
+(use-package nerd-svg-icons
+  :defer t
+  :config
+  (defun nerd-svg-icons-completion-get-recentf-file-icon (cand)
+    "Return the icon for the candidate CAND of completion category recentf-file."
+    (let ((real-cand (substring cand 0 (next-single-property-change 0 'invisible cand))))
+      (nerd-svg-icons-completion-get-file-icon real-cand)))
 
-(add-to-list 'nerd-svg-icons-completion-category-icon-alist
-             '(recentf-file . nerd-svg-icons-completion-get-recentf-file-icon))
+  (add-to-list 'nerd-svg-icons-completion-category-icon-alist
+               '(recentf-file . nerd-svg-icons-completion-get-recentf-file-icon)))
 
-(defun marginalia--recentf-file-annotator (cand)
-  "Annotate recentf file CAND."
-  (when-let* ((file (get-text-property 0 'full cand))
-              (attrs (ignore-errors
-                       ;; may throw permission denied errors
-                       (file-attributes (substitute-in-file-name
-                                         (marginalia--full-candidate file))
-                                        'integer))))
-    (marginalia--fields
-     ((file-size-human-readable (file-attribute-size attrs))
-      :face 'marginalia-size :width -7)
-     ((marginalia--time (file-attribute-modification-time attrs))
-      :face 'marginalia-date :width -12)
-     ((file-name-directory (abbreviate-file-name file))
-      :face 'marginalia-file-name))))
+(use-package marginalia
+  :defer t
+  :config
+  (defun marginalia--recentf-file-annotator (cand)
+    "Annotate recentf file CAND."
+    (when-let* ((file (get-text-property 0 'full cand))
+                (attrs (ignore-errors
+                         ;; may throw permission denied errors
+                         (file-attributes (substitute-in-file-name
+                                           (marginalia--full-candidate file))
+                                          'integer))))
+      (marginalia--fields
+       ((file-size-human-readable (file-attribute-size attrs))
+        :face 'marginalia-size :width -7)
+       ((marginalia--time (file-attribute-modification-time attrs))
+        :face 'marginalia-date :width -12)
+       ((file-name-directory (abbreviate-file-name file))
+        :face 'marginalia-file-name))))
 
-(add-to-list 'marginalia-annotator-registry
-             '(recentf-file marginalia--recentf-file-annotator builtin none))
+  (add-to-list 'marginalia-annotator-registry
+               '(recentf-file marginalia--recentf-file-annotator builtin none)))
 
 ;; Switch to buffer in the current project ----------------------------------- ;
 
-(defun project-switch-to-buffer ()
-  "Switch to buffers of current buffers."
-  (interactive)
-  (read-buffer
-   (format "Switch to buffer in current project (%s):" (project-root (project-current)))
-   nil nil
-   (lambda (buf)
-     (let ((root (expand-file-name (file-name-as-directory (project-root (project-current))))))
-       (string-prefix-p
-        root (expand-file-name (buffer-local-value 'default-directory (cdr buf))))))))
 (global-set-key (kbd "C-c p b") 'project-switch-to-buffer)
 
 ;; Insert symbol at point into minibuffer ------------------------------------ ;

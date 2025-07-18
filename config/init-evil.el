@@ -7,7 +7,17 @@
 
 ;;; Code:
 
-(with-eval-after-load 'evil
+(use-package evil
+  :ensure t
+  :defer t
+  :custom
+  (evil-disable-insert-state-bindings t)
+  (evil-kill-on-visual-paste nil)
+  (evil-symbol-word-search t)
+  (evil-want-C-u-scroll t)
+  :init
+  (evil-mode)
+  :config
   (setq evil-insert-state-cursor 'box)
   (define-key evil-normal-state-map (kbd "gr") 'xref-find-references)
   (define-key evil-normal-state-map (kbd "[f") 'beginning-of-defun)
@@ -20,6 +30,7 @@
   (add-to-list 'evil-motion-state-modes 'symbols-outline-mode)
   (add-to-list 'evil-motion-state-modes 'deadgrep-mode)
   (add-to-list 'evil-motion-state-modes 'dired-mode)
+  (with-current-buffer (messages-buffer) (evil-motion-state))
   (with-eval-after-load 'treemacs
     (evil-make-overriding-map treemacs-mode-map 'motion))
   (with-eval-after-load 'dashboard
@@ -62,55 +73,71 @@
         (minibuffer-with-setup-hook
             (lambda () (backward-char 3))
           (evil-ex (concat "%s/" symbol "/" symbol "/gc"))))))
-  (global-set-key (kbd "C-c r") 'evil-replace-symbol-at-point)
-  )
+  (global-set-key (kbd "C-c r") 'evil-replace-symbol-at-point))
 
-(require 'evil)
-(evil-mode)
-(require 'evil-anzu)
-(global-evil-surround-mode)
-(evil-commentary-mode)
+(use-package evil-anzu
+  :ensure t
+  :after evil)
 
-(require 'evil-keypad)
-(evil--setup-which-key t)
-(setq evil-keypad-leader-dispatch "C-c")
-(evil-define-key 'normal global-map (kbd "SPC") 'evil-keypad-state)
-(evil-define-key 'motion global-map (kbd "SPC") 'evil-keypad-state)
-(define-key evil-normal-state-map (kbd "SPC") 'evil-keypad-state)
-(define-key evil-motion-state-map (kbd "SPC") 'evil-keypad-state)
-(global-set-key (kbd "C-h C-f") nil)
-(global-set-key (kbd "C-h C-t") nil)
-(global-set-key (kbd "C-h C-p") nil)
-(global-set-key (kbd "C-h C-d") nil)
-(global-set-key (kbd "C-h C-a") nil)
-(global-set-key (kbd "C-h C-c") nil)
-(global-set-key (kbd "C-h C-e") nil)
-(global-set-key (kbd "C-h C-n") nil)
-(global-set-key (kbd "C-h C-o") nil)
-(global-set-key (kbd "C-h C-s") nil)
-(global-set-key (kbd "C-h C-w") nil)
-(global-set-key (kbd "C-h C-m") nil)
-(global-set-key (kbd "C-x C-r") nil)
-(global-set-key (kbd "C-c b") 'switch-to-buffer)
-(global-set-key (kbd "C-c B") 'ibuffer)
-(global-set-key (kbd "C-c ;") 'comment-line)
-(global-set-key (kbd "C-c /") 'evil-keypad-describe-key)
+(use-package evil-surround
+  :ensure t
+  :after evil
+  :config
+  (global-evil-surround-mode))
+
+(use-package evil-commentary
+  :ensure t
+  :after evil
+  :config
+  (evil-commentary-mode))
+
+(use-package evil-keypad
+  :load-path "packages/evil-keypad"
+  :after evil
+  :config
+  (evil--setup-which-key t)
+  (setq evil-keypad-leader-dispatch "C-c")
+  (evil-define-key 'normal global-map (kbd "SPC") 'evil-keypad-state)
+  (evil-define-key 'motion global-map (kbd "SPC") 'evil-keypad-state)
+  (define-key evil-normal-state-map (kbd "SPC") 'evil-keypad-state)
+  (define-key evil-motion-state-map (kbd "SPC") 'evil-keypad-state)
+  (global-set-key (kbd "C-h C-f") nil)
+  (global-set-key (kbd "C-h C-t") nil)
+  (global-set-key (kbd "C-h C-p") nil)
+  (global-set-key (kbd "C-h C-d") nil)
+  (global-set-key (kbd "C-h C-a") nil)
+  (global-set-key (kbd "C-h C-c") nil)
+  (global-set-key (kbd "C-h C-e") nil)
+  (global-set-key (kbd "C-h C-n") nil)
+  (global-set-key (kbd "C-h C-o") nil)
+  (global-set-key (kbd "C-h C-s") nil)
+  (global-set-key (kbd "C-h C-w") nil)
+  (global-set-key (kbd "C-h C-m") nil)
+  (global-set-key (kbd "C-x C-r") nil)
+  (global-set-key (kbd "C-c b") 'switch-to-buffer)
+  (global-set-key (kbd "C-c B") 'ibuffer)
+  (global-set-key (kbd "C-c ;") 'comment-line)
+  (global-set-key (kbd "C-c /") 'evil-keypad-describe-key))
 
 ;; Tree-sitter text objects
-(define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
-(define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
-(define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
-(define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
-(define-key evil-outer-text-objects-map "F" (evil-textobj-tree-sitter-get-textobj "call.outer"))
-(define-key evil-inner-text-objects-map "F" (evil-textobj-tree-sitter-get-textobj "call.inner"))
-(define-key evil-outer-text-objects-map "C" (evil-textobj-tree-sitter-get-textobj "class.outer"))
-(define-key evil-inner-text-objects-map "C" (evil-textobj-tree-sitter-get-textobj "class.inner"))
-(define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "comment.outer"))
-(define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "comment.inner"))
-(define-key evil-outer-text-objects-map "v" (evil-textobj-tree-sitter-get-textobj "conditional.outer"))
-(define-key evil-inner-text-objects-map "v" (evil-textobj-tree-sitter-get-textobj "conditional.inner"))
-(define-key evil-outer-text-objects-map "l" (evil-textobj-tree-sitter-get-textobj "loop.outer"))
-(define-key evil-inner-text-objects-map "l" (evil-textobj-tree-sitter-get-textobj "loop.inner"))
+(use-package evil-textobj-tree-sitter
+  :ensure t
+  :after evil
+  :config
+  (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+  (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+  (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
+  (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+  (define-key evil-outer-text-objects-map "F" (evil-textobj-tree-sitter-get-textobj "call.outer"))
+  (define-key evil-inner-text-objects-map "F" (evil-textobj-tree-sitter-get-textobj "call.inner"))
+  (define-key evil-outer-text-objects-map "C" (evil-textobj-tree-sitter-get-textobj "class.outer"))
+  (define-key evil-inner-text-objects-map "C" (evil-textobj-tree-sitter-get-textobj "class.inner"))
+  (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "comment.outer"))
+  (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "comment.inner"))
+  (define-key evil-outer-text-objects-map "v" (evil-textobj-tree-sitter-get-textobj "conditional.outer"))
+  (define-key evil-inner-text-objects-map "v" (evil-textobj-tree-sitter-get-textobj "conditional.inner"))
+  (define-key evil-outer-text-objects-map "l" (evil-textobj-tree-sitter-get-textobj "loop.outer"))
+  (define-key evil-inner-text-objects-map "l" (evil-textobj-tree-sitter-get-textobj "loop.inner")))
 
 (provide 'init-evil)
 

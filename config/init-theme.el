@@ -7,10 +7,16 @@
 
 ;;; Code:
 
-(with-eval-after-load 'base16-theme
+(use-package base16-theme
+  :ensure t
+  :defer t
+  :config
   (setq base16-theme-256-color-source 'base16-shell))
 
-(with-eval-after-load 'solarized
+(use-package solarized-theme
+  :ensure t
+  :defer t
+  :config
   ;; Don't change the font for some headings and titles
   (setq solarized-use-variable-pitch nil)
   ;; Use less bolding
@@ -22,7 +28,10 @@
   ;; Don't change size of org-mode headlines (but keep other size-changes)
   (setq solarized-scale-org-headlines nil))
 
-(with-eval-after-load 'modus-themes
+(use-package modus-themes
+  :ensure t
+  :defer t
+  :config
   (setq modus-themes-italic-constructs t)
   (setq modus-themes-region '(bg-only))
   (setq modus-themes-org-blocks 'gray-background))

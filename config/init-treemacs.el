@@ -7,9 +7,11 @@
 
 ;;; Code:
 
-(global-set-key (kbd "C-c e") 'treemacs-select-window)
-(add-hook 'treemacs-mode-hook (lambda () (setq-local scroll-margin 0)))
-(with-eval-after-load 'treemacs
+(use-package treemacs
+  :ensure t
+  :bind ("C-c e" . treemacs-select-window)
+  :config
+  (add-hook 'treemacs-mode-hook (lambda () (setq-local scroll-margin 0)))
   (treemacs-follow-mode)
   (treemacs-project-follow-mode)
   (treemacs-hide-gitignored-files-mode)
@@ -62,7 +64,10 @@ double prefix argument."
   (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
 
   ;; nerd-svg-icons-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
-  (nerd-svg-icons-treemacs-icons-config))
+  (use-package nerd-svg-icons-treemacs-icons
+    :load-path "packages/nerd-svg-icons"
+    :config
+    (nerd-svg-icons-treemacs-icons-config)))
 
 (provide 'init-treemacs)
 

@@ -7,8 +7,14 @@
 
 ;;; Code:
 
-(with-eval-after-load 'jsts-mode
-  (require 'prettier-js)
+(use-package prettier-js
+  :ensure t
+  :defer t)
+
+(use-package jsts-mode
+  :load-path "packages/jsts-mode"
+  :mode ("\\.jsx\\'" "\\.js\\'" "\\.tsx\\'" "\\.ts\\'")
+  :config
   (defun prettier-buffer ()
     "Organize imports and call prettier to format buffer."
     (interactive)
@@ -16,19 +22,23 @@
     (when (fboundp 'prettier-js) (prettier-js)))
   (define-key jsts-mode-map (kbd "<f5>") 'prettier-buffer))
 
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsts-mode))
-(add-to-list 'auto-mode-alist '("\\.js\\'" . jsts-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . jsts-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . jsts-mode))
+(use-package lsp-mode
+  :ensure t
+  :hook (jsts-mode . lsp))
 
-(add-hook 'jsts-mode-hook 'lsp)
-(add-hook 'jsts-mode-hook 'emmet-mode)
-(add-hook 'jsts-mode-hook (lambda () (when yas-minor-mode
+(use-package emmet-mode
+  :ensure t
+  :hook ((jsts-mode mhtml-mode) . emmet-mode))
+
+(use-package yasnippet
+  :ensure t
+  :hook (jsts-mode . (lambda () (when yas-minor-mode
                                   (yas-activate-extra-mode 'js-mode)
-                                  (yas-activate-extra-mode 'typescript-mode))))
+                                  (yas-activate-extra-mode 'typescript-mode)))))
 
-(add-hook 'mhtml-mode-hook 'emmet-mode)
-(with-eval-after-load 'sgml-mode
+(use-package sgml-mode
+  :defer t
+  :config
   (setq sgml-basic-offset 4))
 
 (provide 'init-js)

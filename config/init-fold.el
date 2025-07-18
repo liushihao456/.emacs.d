@@ -9,21 +9,24 @@
 
 (require 'init-macros)
 
-(with-eval-after-load 'origami
+(use-package origami
+  :ensure t
+  :hook (prog-mode . origami-mode)
+  :config
   (define-key origami-mode-map (kbd "M-RET") 'origami-recursively-toggle-node)
 
   (def-transient-commands origami-mode-map "C-c o"
-    ("n" . origami-next-fold)
-    ("p" . origami-previous-fold)
-    ("o" . origami-forward-toggle-node)
-    ("a" . origami-open-all-nodes)
-    ("c" . origami-close-all-nodes)
-    ("t" . origami-toggle-all-nodes)
-    ("u" . origami-undo)
-    ("r" . origami-redo)
-    ("R" . origami-reset)
-    ("s" . origami-show-only-node)
-    ("TAB" . origami-recursively-toggle-node))
+                          ("n" . origami-next-fold)
+                          ("p" . origami-previous-fold)
+                          ("o" . origami-forward-toggle-node)
+                          ("a" . origami-open-all-nodes)
+                          ("c" . origami-close-all-nodes)
+                          ("t" . origami-toggle-all-nodes)
+                          ("u" . origami-undo)
+                          ("r" . origami-redo)
+                          ("R" . origami-reset)
+                          ("s" . origami-show-only-node)
+                          ("TAB" . origami-recursively-toggle-node))
 
   (defun my/origami-recenter-a (&rest _)
     "Recenter point to the middle of screen."
@@ -36,8 +39,6 @@
       (apply orig-fn args)))
   (advice-add #'origami-recursively-toggle-node
               :around #'origami-recursively-toggle-node-a))
-
-(add-hook 'prog-mode-hook 'origami-mode)
 
 (provide 'init-fold)
 

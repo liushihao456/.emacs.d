@@ -46,7 +46,6 @@
 
 (require 'init-local-config)
 (require 'init-custom)
-(require 'init-custom-packages)
 (require 'init-minibuffer)
 (require 'init-font)
 (require 'init-theme)
@@ -54,9 +53,7 @@
 (require 'init-evil)
 (require 'init-misc)
 (require 'init-compile)
-(require 'init-wgrep)
 (require 'init-flycheck)
-(require 'init-yasnippet)
 (require 'init-company)
 (require 'init-imenu)
 (require 'init-latex)
@@ -70,7 +67,6 @@
 (require 'init-js)
 (require 'init-treesitter)
 (require 'init-fold)
-(require 'init-diffhl)
 (require 'init-treemacs)
 
 ;; (setq gc-cons-threshold (* 800 1000))
