@@ -10,20 +10,16 @@
 (require 'init-macros)
 
 ;; Kill currnet line and copy current line
-(defadvice kill-region (before slick-cut activate compile)
-  "When called interactively with no active region, kill a single line instead."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (list (line-beginning-position) (line-beginning-position 2)))))
+(define-advice kill-region (:around (fn &rest _) slick-cut)
+  (if mark-active
+      (funcall fn (region-beginning) (region-end))
+    (funcall fn (line-beginning-position) (line-beginning-position 2))))
 
-(defadvice kill-ring-save (before slick-copy activate compile)
-  "When called interactively with no active region, copy a single line instead."
-  (interactive
-   (if mark-active
-       (list (region-beginning) (region-end))
-     (message "Copied line")
-     (list (line-beginning-position) (line-beginning-position 2)))))
+(define-advice kill-ring-save (:around (fn &rest _) slick-copy)
+  (if mark-active
+      (funcall fn (region-beginning) (region-end))
+    (message "Copied line")
+    (funcall fn (line-beginning-position) (line-beginning-position 2))))
 
 (defun my/delete-word (arg)
   "Delete characters forward until encountering the end of a word.

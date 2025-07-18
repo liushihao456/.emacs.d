@@ -11,11 +11,11 @@
   :ensure t
   :defer t
   :custom
-  (evil-disable-insert-state-bindings t)
   (evil-kill-on-visual-paste nil)
   (evil-symbol-word-search t)
   (evil-want-C-u-scroll t)
   :init
+  (setq evil-disable-insert-state-bindings t) ; has to be set before loading Evil
   (evil-mode)
   :config
   (setq evil-insert-state-cursor 'box)
