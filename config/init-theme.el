@@ -13,6 +13,11 @@
   :config
   (setq base16-theme-256-color-source 'base16-shell))
 
+(use-package zenburn-theme
+  :ensure t
+  :if window-system
+  :defer t)
+
 (use-package solarized-theme
   :ensure t
   :defer t

@@ -357,12 +357,9 @@ It enables expanding `foo.' to `foo->'."
 ;; Diff-hl
 (use-package diff-hl
   :ensure t
-  :init
-  (global-diff-hl-mode)
-  (unless (display-graphic-p) (diff-hl-margin-mode))
-  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  (add-hook 'vc-dir-mode-hook 'diff-hl-dir-mode)
+  :hook ((prog-mode gfm-mode org-mode dired-mode vc-dir-mode) . diff-hl-mode)
   :config
+  (unless (display-graphic-p) (diff-hl-margin-mode))
   (setq diff-hl-command-prefix (kbd "C-c v"))
   (set-face-background 'diff-hl-change (face-background 'default))
   (set-face-background 'diff-hl-insert (face-background 'default))

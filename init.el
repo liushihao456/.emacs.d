@@ -15,24 +15,15 @@
   (interactive)
   (find-file user-init-file))
 (global-set-key (kbd "C-c f i") 'find-init-file)
-(global-set-key (kbd "<f5>") 'profiler-start)
-(global-set-key (kbd "<f6>") 'profiler-stop)
-(global-set-key (kbd "<f7>") 'profiler-report)
+(setq use-package-compute-statistics t)
 
 (setq gc-cons-threshold 100000000)
-(require 'package)
-(setq package-enable-at-startup nil)
+
 (setq package-archives '(("gnu" . "http://mirrors.ustc.edu.cn/elpa/gnu/")
                          ("melpa" . "http://mirrors.ustc.edu.cn/elpa/melpa/")
                          ("nongnu" . "http://mirrors.ustc.edu.cn/elpa/nongnu/")))
-(package-initialize)
-(when (not package-archive-contents)
-  (package-refresh-contents))
-
-(setq package-check-signature nil)
 
 (add-to-list 'load-path (file-name-concat user-emacs-directory "config"))
-(setq custom-file (file-name-concat user-emacs-directory "config" "init-custom.el"))
 
 ;; (define-advice define-obsolete-function-alias (:filter-args (ll) fix-obsolete)
 ;;   (let ((obsolete-name (pop ll))
@@ -40,12 +31,12 @@
 ;;         (when (if ll (pop ll) "1"))
 ;;         (docstring (if ll (pop ll) nil)))
 ;;     (list obsolete-name current-name when docstring)))
-;; (require 'benchmark-init)
-;; ;; (benchmark-init/activate)
+;; (use-package benchmark-init
+;;   :ensure t)
+;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 (require 'init-local-config)
-(require 'init-custom)
 (require 'init-minibuffer)
 (require 'init-font)
 (require 'init-theme)

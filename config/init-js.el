@@ -20,6 +20,9 @@
     (interactive)
     (when (fboundp 'lsp-organize-imports) (lsp-organize-imports))
     (when (fboundp 'prettier-js) (prettier-js)))
+  (add-hook 'jsts-mode-hook (lambda () (when yas-minor-mode
+                                        (yas-activate-extra-mode 'js-mode)
+                                        (yas-activate-extra-mode 'typescript-mode))))
   (define-key jsts-mode-map (kbd "<f5>") 'prettier-buffer))
 
 (use-package lsp-mode
@@ -29,12 +32,6 @@
 (use-package emmet-mode
   :ensure t
   :hook ((jsts-mode mhtml-mode) . emmet-mode))
-
-(use-package yasnippet
-  :ensure t
-  :hook (jsts-mode . (lambda () (when yas-minor-mode
-                                  (yas-activate-extra-mode 'js-mode)
-                                  (yas-activate-extra-mode 'typescript-mode)))))
 
 (use-package sgml-mode
   :defer t
