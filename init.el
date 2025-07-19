@@ -15,7 +15,6 @@
   (interactive)
   (find-file user-init-file))
 (global-set-key (kbd "C-c f i") 'find-init-file)
-(setq use-package-compute-statistics t)
 
 (setq gc-cons-threshold 100000000)
 
@@ -35,6 +34,8 @@
 ;;   :ensure t)
 ;; (benchmark-init/activate)
 ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
+
+;; (setq use-package-compute-statistics t)
 
 (require 'init-local-config)
 (require 'init-minibuffer)

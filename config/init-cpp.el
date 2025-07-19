@@ -32,9 +32,9 @@ project in order for clangd to understand the project code."
 
 ;; Cmake
 (when (executable-find "cmake")
-  (use-package dash
-    :ensure t)
   (eval-and-compile
+    (use-package dash
+      :ensure t)
     (setq cmake-load-path (--> "cmake"
                                (executable-find it)
                                (file-truename it)
