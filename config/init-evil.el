@@ -23,6 +23,14 @@
   (define-key evil-normal-state-map (kbd "[f") 'beginning-of-defun)
   (define-key evil-normal-state-map (kbd "]f") 'end-of-defun)
 
+  (evil-define-text-object evil-defun-textobj (count &optional _beg _end type)
+    "Text object to select the top-level Lisp form or function definition at point."
+    (cl-destructuring-bind (beg . end)
+        (bounds-of-thing-at-point 'defun)
+      (evil-range beg end type)))
+  (define-key evil-outer-text-objects-map "f" 'evil-defun-textobj)
+  (define-key evil-inner-text-objects-map "f" 'evil-defun-textobj)
+
   ;; Mode specific keymaps
   (add-to-list 'evil-emacs-state-modes 'diff-mode)
   (add-to-list 'evil-motion-state-modes 'special-mode)
@@ -118,26 +126,6 @@
   (global-set-key (kbd "C-c B") 'ibuffer)
   (global-set-key (kbd "C-c ;") 'comment-line)
   (global-set-key (kbd "C-c /") 'evil-keypad-describe-key))
-
-;; ;; Tree-sitter text objects
-;; (use-package evil-textobj-tree-sitter
-;;   :ensure t
-;;   :after evil
-;;   :config
-;;   (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
-;;   (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
-;;   (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
-;;   (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
-;;   (define-key evil-outer-text-objects-map "F" (evil-textobj-tree-sitter-get-textobj "call.outer"))
-;;   (define-key evil-inner-text-objects-map "F" (evil-textobj-tree-sitter-get-textobj "call.inner"))
-;;   (define-key evil-outer-text-objects-map "C" (evil-textobj-tree-sitter-get-textobj "class.outer"))
-;;   (define-key evil-inner-text-objects-map "C" (evil-textobj-tree-sitter-get-textobj "class.inner"))
-;;   (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "comment.outer"))
-;;   (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "comment.inner"))
-;;   (define-key evil-outer-text-objects-map "v" (evil-textobj-tree-sitter-get-textobj "conditional.outer"))
-;;   (define-key evil-inner-text-objects-map "v" (evil-textobj-tree-sitter-get-textobj "conditional.inner"))
-;;   (define-key evil-outer-text-objects-map "l" (evil-textobj-tree-sitter-get-textobj "loop.outer"))
-;;   (define-key evil-inner-text-objects-map "l" (evil-textobj-tree-sitter-get-textobj "loop.inner")))
 
 (provide 'init-evil)
 
