@@ -11,7 +11,6 @@
 
 (use-package lsp-mode
   :ensure t
-  :defer t
   :config
   (define-key lsp-mode-map (kbd "C-c l k") 'lsp-describe-thing-at-point)
   (define-key lsp-mode-map (kbd "C-c l t") 'lsp-find-type-definition)

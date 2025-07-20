@@ -8,10 +8,7 @@
 ;;; Code:
 
 (use-package cc-mode
-  :defer t
   :config
-  (require 'lsp-java)
-
   (defun java-compile-run-current-main-class ()
     "If the current java file contains main method, compile project and run it."
     (interactive)
@@ -34,21 +31,17 @@
                 "mvn compile"))))
       (call-interactively 'compile)))
 
-  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class))
+  (define-key java-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class)
+  (use-package java-ts-mode
+    :config
+    (define-key java-ts-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class)))
 
 (use-package lsp-mode
   :ensure t
-  :hook (java-mode . lsp))
-
-(use-package kotlin-mode
-  :ensure t
-  :defer t
-  :config
-  (add-hook 'kotlin-mode-hook (lambda () (lsp))))
+  :hook ((java-mode java-ts-mode) . lsp))
 
 (use-package lsp-java
   :ensure t
-  :defer t
   :config
   (setq lsp-java-autobuild-enabled nil)
   (setq lsp-java-code-generation-generate-comments t)

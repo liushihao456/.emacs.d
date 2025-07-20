@@ -9,18 +9,15 @@
 
 (use-package base16-theme
   :ensure t
-  :defer t
   :config
   (setq base16-theme-256-color-source 'base16-shell))
 
 (use-package zenburn-theme
   :ensure t
-  :if window-system
-  :defer t)
+  :if window-system)
 
 (use-package solarized-theme
   :ensure t
-  :defer t
   :config
   ;; Don't change the font for some headings and titles
   (setq solarized-use-variable-pitch nil)
@@ -35,7 +32,6 @@
 
 (use-package modus-themes
   :ensure t
-  :defer t
   :config
   (setq modus-themes-italic-constructs t)
   (setq modus-themes-region '(bg-only))

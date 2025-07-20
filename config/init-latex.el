@@ -9,7 +9,6 @@
 
 (use-package latex
   :ensure auctex
-  :defer t
   :config
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
@@ -26,7 +25,6 @@
 
 (use-package font-latex
   :ensure auctex
-  :defer t
   :config
   (set-face-attribute 'font-latex-slide-title-face
                       nil

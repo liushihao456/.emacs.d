@@ -15,7 +15,6 @@
 (global-set-key (kbd "C-c m") 'my/compile-project)
 
 (use-package compile
-  :defer t
   :config
   (setq compilation-save-buffers-predicate
         '(lambda nil

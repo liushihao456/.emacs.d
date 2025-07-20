@@ -31,7 +31,6 @@
 
   ;; Yasnippet integration
   (use-package yasnippet
-    :defer t
     :config
     (global-set-key (kbd "C-]") 'company-yasnippet)
 
@@ -54,7 +53,6 @@
 
     ;; Enable in `lsp-mode'
     (use-package lsp-mode
-      :defer t
       :config
       (advice-add #'lsp--auto-configure :after #'my/company-enable-yas))))
 

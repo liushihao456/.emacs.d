@@ -160,6 +160,7 @@ split; vice versa."
 ;; be displayed.
 (use-package dashboard
   :ensure t
+  :demand t
   :config
   (setq dashboard-items '((recents . 5) (bookmarks . 5)))
   (setq dashboard-center-content t)
@@ -228,7 +229,6 @@ split; vice versa."
 
 ;; ;; Xref
 ;; (use-package xref
-;;   :defer t
 ;;   (setq xref-prompt-for-identifier '(not xref-find-definitions
 ;;                                          xref-find-definitions-other-window
 ;;                                          xref-find-definitions-other-frame
@@ -239,11 +239,6 @@ split; vice versa."
   :ensure t
   :init
   (which-key-mode))
-
-;; C indentation style
-(setq c-basic-offset 4)
-(c-set-offset 'arglist-intro '+)
-(c-set-offset 'arglist-close '0)
 
 ;; Markdown mode
 (use-package markdown-mode
@@ -285,7 +280,6 @@ definition."
 (define-key prog-mode-map [tab]
   '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter))
 (use-package cc-mode
-  :defer t
   :config
   (define-key c-mode-base-map (kbd "TAB")
     '(menu-item "" my/tab-jump-over-pair :filter my/tab-jump-over-pair-key-filter)))
@@ -311,7 +305,6 @@ definition."
 ;; Ibuffer
 (use-package ibuffer-project
   :ensure t
-  :defer t
   :hook (ibuffer . (lambda ()
                      (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
                      (unless (eq ibuffer-sorting-mode 'project-file-relative)
@@ -329,7 +322,6 @@ definition."
 
 (use-package wgrep
   :ensure t
-  :defer t
   :config
   (setq wgrep-auto-save-buffer t)
   (advice-add #'wgrep-change-to-wgrep-mode :after #'evil-normal-state)

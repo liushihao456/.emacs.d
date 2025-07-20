@@ -172,8 +172,7 @@
 
 ;; The emacs-mini-modeline package requires dash
 (use-package dash
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package mini-modeline
   :load-path "packages/emacs-mini-modeline"

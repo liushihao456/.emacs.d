@@ -9,14 +9,12 @@
 
 (use-package lsp-mode
   :ensure t
-  :hook (python-mode . lsp))
+  :hook (python-base-mode . lsp))
 
 (use-package lsp-pyright
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package python
-  :defer t
   :config
   (require 'lsp-pyright)
   (setq python-shell-interpreter "python3")
@@ -27,8 +25,8 @@
       (erase-buffer)
       (insert (shell-command-to-string (concat "yapf " (buffer-name))))
       (goto-char old-point)))
-  (define-key python-mode-map (kbd "C-c C-l") nil)
-  (define-key python-mode-map (kbd "<f5>") 'my/format-buffer))
+  (define-key python-base-mode-map (kbd "C-c C-l") nil)
+  (define-key python-base-mode-map (kbd "<f5>") 'my/format-buffer))
 
 (provide 'init-python)
 

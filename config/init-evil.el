@@ -9,7 +9,6 @@
 
 (use-package evil
   :ensure t
-  :defer t
   :custom
   (evil-kill-on-visual-paste nil)
   (evil-symbol-word-search t)
@@ -85,22 +84,26 @@
 
 (use-package evil-anzu
   :ensure t
+  :demand t
   :after evil)
 
 (use-package evil-surround
   :ensure t
+  :demand t
   :after evil
   :config
   (global-evil-surround-mode))
 
 (use-package evil-commentary
   :ensure t
+  :demand t
   :after evil
   :config
   (evil-commentary-mode))
 
 (use-package evil-keypad
   :load-path "packages/evil-keypad"
+  :demand t
   :after evil
   :config
   (evil--setup-which-key t)

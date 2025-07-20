@@ -37,6 +37,8 @@
 
 ;; (setq use-package-compute-statistics t)
 
+(setq use-package-always-defer t)
+
 (require 'init-local-config)
 (require 'init-minibuffer)
 (require 'init-font)
@@ -57,7 +59,7 @@
 (require 'init-java)
 (require 'init-lsp)
 (require 'init-js)
-(require 'init-treesitter)
+(require 'init-treesit)
 (require 'init-fold)
 (require 'init-treemacs)
 

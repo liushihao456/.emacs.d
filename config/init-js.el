@@ -8,33 +8,41 @@
 ;;; Code:
 
 (use-package prettier-js
-  :ensure t
-  :defer t)
+  :ensure t)
 
-(use-package jsts-mode
-  :load-path "packages/jsts-mode"
-  :mode ("\\.jsx\\'" "\\.js\\'" "\\.tsx\\'" "\\.ts\\'")
+(use-package js
   :config
   (defun prettier-buffer ()
     "Organize imports and call prettier to format buffer."
     (interactive)
     (when (fboundp 'lsp-organize-imports) (lsp-organize-imports))
     (when (fboundp 'prettier-js) (prettier-js)))
-  (add-hook 'jsts-mode-hook (lambda () (when yas-minor-mode
-                                        (yas-activate-extra-mode 'js-mode)
-                                        (yas-activate-extra-mode 'typescript-mode))))
-  (define-key jsts-mode-map (kbd "<f5>") 'prettier-buffer))
+  (add-hook 'js-base-mode-hook (lambda () (when yas-minor-mode
+                                            (yas-activate-extra-mode 'js-mode)
+                                            (yas-activate-extra-mode 'typescript-mode))))
+  (define-key js-base-mode-map (kbd "<f5>") 'prettier-buffer))
+
+(use-package typescript-ts-mode
+  :config
+  (defun prettier-buffer ()
+    "Organize imports and call prettier to format buffer."
+    (interactive)
+    (when (fboundp 'lsp-organize-imports) (lsp-organize-imports))
+    (when (fboundp 'prettier-js) (prettier-js)))
+  (add-hook 'typescript-ts-base-mode-hook (lambda () (when yas-minor-mode
+                                            (yas-activate-extra-mode 'js-mode)
+                                            (yas-activate-extra-mode 'typescript-mode))))
+  (define-key typescript-ts-base-mode-map (kbd "<f5>") 'prettier-buffer))
 
 (use-package lsp-mode
   :ensure t
-  :hook (jsts-mode . lsp))
+  :hook ((js-base-mode typescript-ts-base-mode) . lsp))
 
 (use-package emmet-mode
   :ensure t
-  :hook ((jsts-mode mhtml-mode) . emmet-mode))
+  :hook ((js-base-mode typescript-ts-base-mode mhtml-mode) . emmet-mode))
 
 (use-package sgml-mode
-  :defer t
   :config
   (setq sgml-basic-offset 4))
 

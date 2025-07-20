@@ -42,7 +42,7 @@
 
 (use-package orderless
   :ensure t
-  :config
+  :init
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles basic partial-completion))))
@@ -179,8 +179,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (setq consult-preview-key "C-o"))
 
 (use-package embark-consult
-  :ensure t
-  :after (consult embark))
+  :ensure t)
 
 ;; Recentf files completion -------------------------------------------------- ;
 
@@ -214,7 +213,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (global-set-key (kbd "C-c f r") 'recentf-open-files-compl)
 
 (use-package nerd-svg-icons
-  :defer t
   :config
   (defun nerd-svg-icons-completion-get-recentf-file-icon (cand)
     "Return the icon for the candidate CAND of completion category recentf-file."
@@ -225,7 +223,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                '(recentf-file . nerd-svg-icons-completion-get-recentf-file-icon)))
 
 (use-package marginalia
-  :defer t
   :config
   (defun marginalia--recentf-file-annotator (cand)
     "Annotate recentf file CAND."

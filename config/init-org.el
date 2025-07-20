@@ -7,7 +7,6 @@
 
 ;;; Code:
 (use-package org
-  :defer t
   :config
   (add-hook 'org-mode-hook 'auto-fill-mode)
   ;; (setq org-startup-with-inline-images t) ; Display inline images by default
@@ -137,13 +136,11 @@ Entered on %T")
   (setq org-log-done 'time))
 
 (use-package ox
-  :defer t
   :config
   (require 'ox-md)
   (require 'ox-beamer))
 
 (use-package ox-latex
-  :defer t
   :config
   (add-to-list 'org-latex-packages-alist '("UTF8" "ctex"))
   (add-to-list 'org-latex-packages-alist '("" "minted")) ; use minted for code blocks
@@ -189,7 +186,6 @@ Entered on %T")
   :hook (org-mode . org-bullets-mode))
 
 (use-package org
-  :defer t
   :config
   (set-face-background 'org-block-begin-line 'unspecified)
   (set-face-background 'org-block-end-line 'unspecified)

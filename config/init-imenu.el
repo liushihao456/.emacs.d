@@ -19,12 +19,6 @@
   (require 'symbols-outline-follow-mode)
   (symbols-outline-follow-mode))
 
-;; (use-package symbols-outline-follow-mode
-;;   :load-path "packages/symbols-outline"
-;;   :after symbols-outline
-;;   :config
-;;   (symbols-outline-follow-mode))
-
 (when (executable-find "ctags")
 
   (defun ctags-parse-json (buf)
@@ -154,13 +148,11 @@
   (global-set-key (kbd "C-c p i") 'ctags-jump-to-symbol-in-project)
 
   (use-package nerd-svg-icons-completion
-    :defer t
     :config
     (add-to-list 'nerd-svg-icons-completion-category-icon-alist
                  '(ctags . nerd-svg-icons-completion-get-imenu-icon)))
 
   (use-package marginalia
-    :defer t
     :config
     (defun project-ctags-tag-annotator (cand)
       (when-let* ((full-json (get-text-property 0 'full-json cand)))
@@ -186,7 +178,6 @@
                  '(ctags project-ctags-tag-annotator builtin none)))
 
   (use-package vertico
-    :defer t
     :config
     (defun my/vertico-truncate-ctags-candidates (args)
       (when-let* (((eq (vertico--metadata-get 'category) 'ctags))
