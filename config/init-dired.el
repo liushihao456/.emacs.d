@@ -66,7 +66,8 @@
         '(vc-state nerd-icons subtree-state-custom))
 
   ;; Disable modeline
-  (define-advice dirvish--setup-mode-line (:override (&rest _)) nil)
+  (setq dirvish-use-header-line nil)
+  (setq dirvish-use-mode-line nil)
 
   (dirvish-peek-mode)             ; Preview files in minibuffer
   (setq dirvish-side-width 25)
