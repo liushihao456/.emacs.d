@@ -65,10 +65,11 @@ project in order for clangd to understand the project code."
       (define-key c-ts-base-mode-map (kbd "<f1>") 'cpp-compile-vs-sln))))
 
 ;; Cmake
-(when (executable-find "cmake")
-  (eval-and-compile
+(eval-and-compile
+  (when (executable-find "cmake")
     (use-package dash
-      :ensure t)
+      :ensure t
+      :demand t)
     (setq cmake-load-path (--> "cmake"
                                (executable-find it)
                                (file-truename it)
@@ -78,10 +79,10 @@ project in order for clangd to understand the project code."
                                (if (file-exists-p (file-name-concat it "cmake-mode.el"))
                                    it
                                  (file-name-concat it "cmake"))
-                               (file-truename it))))
-  (use-package cmake-mode
-    :load-path cmake-load-path
-    :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")))
+                               (file-truename it)))
+    (use-package cmake-mode
+      :load-path cmake-load-path
+      :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))))
 
 
 (provide 'init-cpp)
