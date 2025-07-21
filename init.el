@@ -62,6 +62,7 @@
 (require 'init-treesit)
 (require 'init-fold)
 (require 'init-treemacs)
+(require 'init-vc)
 
 ;; (setq gc-cons-threshold (* 800 1000))
 

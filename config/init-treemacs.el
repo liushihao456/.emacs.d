@@ -66,6 +66,7 @@ double prefix argument."
   ;; nerd-svg-icons-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
   (use-package nerd-svg-icons-treemacs-icons
     :load-path "packages/nerd-svg-icons"
+    :demand t
     :config
     (nerd-svg-icons-treemacs-icons-config)))
 
