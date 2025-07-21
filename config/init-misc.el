@@ -287,16 +287,11 @@ definition."
 ;;     (setq mac-command-modifier 'meta
 ;;           mac-option-modifier 'none))
 
-;; nerd-svg-icons
-(use-package nerd-svg-icons-dired
-  :load-path "packages/nerd-svg-icons"
-  :hook (dired-mode . nerd-svg-icons-dired-mode))
-
+;; Ibuffer
 (use-package nerd-svg-icons-ibuffer
   :load-path "packages/nerd-svg-icons"
   :hook (ibuffer . nerd-svg-icons-ibuffer-mode))
 
-;; Ibuffer
 (use-package ibuffer-project
   :ensure t
   :hook (ibuffer . (lambda ()

@@ -1,75 +1,102 @@
-;;; init-treemacs.el --- Treemacs configuration	-*- lexical-binding: t -*-
+;;; init-dired.el --- Dired configuration	-*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;
-;; Treemacs configuration.
+;; Dired configuration.
 ;; --------------------------------------
 
 ;;; Code:
 
-(use-package treemacs
-  :ensure t
-  :bind ("C-c e" . treemacs-select-window)
+;; ;; nerd-svg-icons-dired
+;; (use-package nerd-svg-icons-dired
+;;   :load-path "packages/nerd-svg-icons"
+;;   :hook (dired-mode . nerd-svg-icons-dired-mode))
+
+(use-package dired
   :config
-  (add-hook 'treemacs-mode-hook (lambda () (setq-local scroll-margin 0)))
-  (treemacs-follow-mode)
-  (treemacs-project-follow-mode)
-  (treemacs-hide-gitignored-files-mode)
-  (setq treemacs--project-follow-delay 0.1)
-  (setq treemacs-file-follow-delay 0.1)
-  (setq treemacs-project-follow-cleanup t)
-  (setq treemacs-follow-after-init t)
-  (setq treemacs-width 30)
-  (setq treemacs-indentation 1)
-  (setq treemacs-is-never-other-window t)
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+  ;; this command is useful when you want to close the window of `dirvish-side'
+  ;; automatically when opening a file
+  (put 'dired-find-alternate-file 'disabled nil))
 
-  (defun treemacs--propagate-new-icons (_theme)
-    "The original function propagates icons from the Default theme to
-_THEME, hence override it with empty function body.")
+(use-package dirvish
+  :ensure t
+  :config
+  (dirvish-override-dired-mode)
 
-  (define-advice treemacs-visit-node-default (:after (&rest _args))
-    "Restore Treemacs buffer if it's in extr-wide state."
-    (if (get 'treemacs-extra-wide-toggle :toggle-on)
-        (with-selected-window (treemacs-get-local-window)
-          (treemacs--set-width treemacs-width)
-          (put 'treemacs-extra-wide-toggle :toggle-on nil)
-          (treemacs-log "Switched to normal width display"))))
-  (define-advice treemacs-quit (:after (&rest _args))
-    (put 'treemacs-extra-wide-toggle :toggle-on nil)
-    (treemacs-log "Switched to normal width display"))
-
-  (defun treemacs-visit-node-other-window (&optional arg)
-    "Open current node in other window.
-If the node is already opened in some other window then that
-window will be selected instead.  Stay in the current window with
-a single prefix argument ARG, or close the treemacs window with a
-double prefix argument."
-    (interactive "P")
-    (treemacs--execute-button-action
-     :file-action (find-file (treemacs-safe-button-get btn :path))
-     :dir-action (dired (treemacs-safe-button-get btn :path))
-     :tag-section-action (treemacs--visit-or-expand/collapse-tag-node btn arg nil)
-     :tag-action (treemacs--goto-tag btn)
-     :window-arg arg
-     :ensure-window-split t
-     :window  (progn (other-window 1) (get-buffer-window))
-     :no-match-explanation "Node is neither a file, a directory or a tag - nothing to do here."))
-  (setq treemacs-default-visit-action #'treemacs-visit-node-other-window)
-
-  (defun my/treemacs-ignore-file-predicate (file _)
-    (or (string= file ".gitignore")
-        (string-suffix-p ".pyc" file)
-        (string= file "__pycache__")
-        (string-prefix-p ".cache" file)))
-  (push #'my/treemacs-ignore-file-predicate treemacs-ignored-file-predicates)
-
-  ;; nerd-svg-icons-treemacs-icons displays svg icons in GUI and nerd font icons in TUI.
-  (use-package nerd-svg-icons-treemacs-icons
+  ;; Override nerd-icons attribute using nerd-svg-icons
+  (use-package nerd-svg-icons
     :load-path "packages/nerd-svg-icons"
-    :demand t
-    :config
-    (nerd-svg-icons-treemacs-icons-config)))
+    :demand t)
+  (require 'dirvish-icons)
+  (dirvish-define-attribute nerd-icons
+    "File icons provided by `nerd-svg-icons.el'."
+    :width (+ (length dirvish-icon-delimiter) 2)
+    (let* ((face (when hl-face hl-face `(:face ,hl-face)))
+           (icon (if (eq (car f-type) 'dir)
+                     (apply #'nerd-svg-icons-icon-for-dir f-name face)
+                   (apply #'nerd-svg-icons-icon-for-file f-str face)))
+           (icon-str (concat icon (propertize dirvish-icon-delimiter 'face hl-face)))
+           (ov (make-overlay (1- f-beg) f-beg)))
+      (overlay-put ov 'after-string icon-str)
+      `(ov . ,ov)))
 
-(provide 'init-treemacs)
+  ;; Substree state chevrons using nerd-svg-icons
+  (dirvish-define-attribute subtree-state-custom
+    "A indicator for directory expanding state."
+    :when (or dirvish-subtree-always-show-state dirvish-subtree--overlays)
+    :width 1
+    (let* ((nerd-svg-icons-icon-width 1)
+           (state-str
+            (propertize (if (eq (car f-type) 'dir)
+                            (if (dirvish-subtree--expanded-p)
+                                (nerd-svg-icons-icon-str "md-chevron_down" :face 'dirvish-subtree-state)
+                              (nerd-svg-icons-icon-str "md-chevron_right" :face 'dirvish-subtree-state))
+                          " ")))
+           (ov (make-overlay (1+ l-beg) (1+ l-beg))))
+      (when hl-face
+        (add-face-text-property 0 1 hl-face t state-str))
+      (overlay-put ov 'after-string state-str)
+      `(ov . ,ov)))
 
-;;; init-treemacs.el ends here
+  (setq dirvish-attributes           ; The order *MATTERS* for some attributes
+        '(vc-state nerd-icons subtree-state-custom file-size)
+        dirvish-side-attributes
+        '(vc-state nerd-icons subtree-state-custom))
+
+  ;; Disable modeline
+  (define-advice dirvish--setup-mode-line (:override (&rest _)) nil)
+
+  (dirvish-peek-mode)             ; Preview files in minibuffer
+  (setq dirvish-side-width 25)
+  (dirvish-side-follow-mode)      ; similar to `dired-follow-mode'
+
+  ;; open large directory (over 20000 files) asynchronously with `fd' command
+  (setq dirvish-large-directory-threshold 20000)
+
+  :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c e" . dirvish-side)
+   ("C-c d" . dirvish)
+   :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
+   (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
+   ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
+   ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
+   ("f"   . dirvish-file-info-menu)    ; [f]ile info
+   ("o"   . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
+   ("s"   . dirvish-quicksort)         ; [s]ort flie list
+   ("r"   . dirvish-history-jump)      ; [r]ecent visited
+   ("l"   . dirvish-ls-switches-menu)  ; [l]s command flags
+   ("v"   . dirvish-vc-menu)           ; [v]ersion control commands
+   ("*"   . dirvish-mark-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("TAB" . dirvish-subtree-toggle)
+   ("M-f" . dirvish-history-go-forward)
+   ("M-b" . dirvish-history-go-backward)
+   ("M-e" . dirvish-emerge-menu)))
+
+(provide 'init-dired)
+
+;;; init-dired.el ends here

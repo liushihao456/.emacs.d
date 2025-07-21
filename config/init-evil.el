@@ -32,11 +32,11 @@
 
   ;; Mode specific keymaps
   (add-to-list 'evil-emacs-state-modes 'diff-mode)
+  (add-to-list 'evil-emacs-state-modes 'dired-mode)
   (add-to-list 'evil-motion-state-modes 'special-mode)
   (add-to-list 'evil-motion-state-modes 'dashboard-mode)
   (add-to-list 'evil-motion-state-modes 'symbols-outline-mode)
   (add-to-list 'evil-motion-state-modes 'deadgrep-mode)
-  (add-to-list 'evil-motion-state-modes 'dired-mode)
   (with-current-buffer (messages-buffer) (evil-motion-state))
   (with-eval-after-load 'treemacs
     (evil-make-overriding-map treemacs-mode-map 'motion))

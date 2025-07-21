@@ -17,7 +17,7 @@
 ;; Diff-hl
 (use-package diff-hl
   :ensure t
-  :hook ((prog-mode gfm-mode org-mode dired-mode vc-dir-mode) . diff-hl-mode)
+  :hook ((prog-mode gfm-mode org-mode) . diff-hl-mode)
   :config
   (unless (display-graphic-p) (diff-hl-margin-mode))
   (setq diff-hl-command-prefix (kbd "C-c v"))
