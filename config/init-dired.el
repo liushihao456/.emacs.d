@@ -69,7 +69,7 @@
   (setq dirvish-use-header-line nil)
   (setq dirvish-use-mode-line nil)
 
-  (dirvish-peek-mode)             ; Preview files in minibuffer
+  ;; (dirvish-peek-mode)             ; Preview files in minibuffer
   (setq dirvish-side-width 25)
   (dirvish-side-follow-mode)      ; similar to `dired-follow-mode'
 

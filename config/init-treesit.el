@@ -7,6 +7,7 @@
 
 ;;; Code:
 
+;; Prebuilt grammars are available at https://github.com/casouri/tree-sitter-module
 (use-package treesit-auto
   :ensure t
   :demand t
