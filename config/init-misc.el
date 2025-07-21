@@ -9,6 +9,12 @@
 
 (require 'init-macros)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns x))
+  :init
+  (exec-path-from-shell-initialize))
+
 ;; Kill currnet line and copy current line
 (define-advice kill-region (:around (fn &rest _) slick-cut)
   (if mark-active
