@@ -32,6 +32,7 @@
              (hs-minor-mode nil "hideshow")
              (lsp-lens-mode nil "lsp-lens")
              (evil-commentary-mode nil "evil-commentary")
+             (org-indent-mode nil "org-indent")
              (copilot-mode nil "copilot"))))
 
 ;; cc-mode.el assumes that `mode-name’ is always a string (which was true in

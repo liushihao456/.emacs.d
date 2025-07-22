@@ -61,9 +61,9 @@
       `(ov . ,ov)))
 
   (setq dirvish-attributes           ; The order *MATTERS* for some attributes
-        '(vc-state nerd-icons subtree-state-custom file-size)
+        '(vc-state subtree-state-custom nerd-icons collapse file-size)
         dirvish-side-attributes
-        '(vc-state nerd-icons subtree-state-custom))
+        '(vc-state subtree-state-custom nerd-icons collapse))
 
   ;; Disable modeline
   (setq dirvish-use-header-line nil)
