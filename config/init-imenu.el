@@ -16,6 +16,8 @@
               (setq-local symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)))
   :config
   (setq symbols-outline-window-position 'left)
+  (setq symbols-outline-ignore-variable-symbols nil)
+  (setq symbols-outline-window-width 25)
   (require 'symbols-outline-follow-mode)
   (symbols-outline-follow-mode))
 
