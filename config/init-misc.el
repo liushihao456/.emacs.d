@@ -156,6 +156,9 @@ split; vice versa."
 (when (display-graphic-p)
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode)))
+(setq scroll-preserve-screen-position t)
+(global-set-key (kbd "M-[") 'previous-buffer)
+(global-set-key (kbd "M-]") 'next-buffer)
 
 ;; Exclude files for recentf
 (recentf-mode)
