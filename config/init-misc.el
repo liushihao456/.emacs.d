@@ -157,8 +157,9 @@ split; vice versa."
   (when (fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode)))
 (setq scroll-preserve-screen-position t)
-(global-set-key (kbd "M-[") 'previous-buffer)
-(global-set-key (kbd "M-]") 'next-buffer)
+(when (display-graphic-p)
+  (global-set-key (kbd "M-[") 'previous-buffer)
+  (global-set-key (kbd "M-]") 'next-buffer))
 
 ;; Exclude files for recentf
 (recentf-mode)
@@ -292,9 +293,9 @@ definition."
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-;; (if (eq system-type 'darwin)
-;;     (setq mac-command-modifier 'meta
-;;           mac-option-modifier 'none))
+(if (eq system-type 'darwin)
+    (setq mac-command-modifier 'meta
+          mac-option-modifier 'none))
 
 ;; Ibuffer
 (use-package nerd-svg-icons-ibuffer

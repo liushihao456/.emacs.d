@@ -15,15 +15,43 @@
   :config
   (define-key origami-mode-map (kbd "M-RET") 'origami-recursively-toggle-node)
 
+  ;; `->' and `-last-item' below requires dash
+  (use-package dash
+    :ensure t
+    :demand t)
+  (defun origami-parent-fold (buffer point)
+    "Move point to the beginning of the parent fold of the fold the point is
+currently in."
+    (interactive (list (current-buffer) (point)))
+    (-when-let (tree (origami-get-fold-tree buffer))
+      (-when-let (path (origami-fold-find-path-containing tree point))
+        (push-mark)
+        (-when-let (c (-> (origami-fold-parent path)
+                          origami-fold-beg))
+          (goto-char c)))))
+
+  (defun origami-child-fold (buffer point)
+    "Move point to the beginning of the first child fold of the fold the point is
+currently in."
+    (interactive (list (current-buffer) (point)))
+    (-when-let (tree (origami-get-fold-tree buffer))
+      (-when-let (path (origami-fold-find-path-containing tree point))
+        (push-mark)
+        (-when-let (c (-> (-last-item path)
+                          (origami-fold-children)
+                          (-first-item)
+                          origami-fold-beg))
+          (goto-char c)))))
+
   (def-transient-commands origami-mode-map "C-c o"
-                          ("n" . origami-next-fold)
-                          ("p" . origami-previous-fold)
+                          ("n" . origami-forward-fold-same-level)
+                          ("p" . origami-backward-fold-same-level)
                           ("o" . origami-forward-toggle-node)
                           ("a" . origami-open-all-nodes)
                           ("c" . origami-close-all-nodes)
                           ("t" . origami-toggle-all-nodes)
-                          ("u" . origami-undo)
-                          ("r" . origami-redo)
+                          ("u" . origami-parent-fold)
+                          ("d" . origami-child-fold)
                           ("R" . origami-reset)
                           ("s" . origami-show-only-node)
                           ("TAB" . origami-recursively-toggle-node))

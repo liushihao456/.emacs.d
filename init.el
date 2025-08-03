@@ -59,6 +59,7 @@
 (require 'init-java)
 (require 'init-lsp)
 (require 'init-js)
+(require 'init-rust)
 (require 'init-treesit)
 (require 'init-fold)
 (require 'init-dired)
