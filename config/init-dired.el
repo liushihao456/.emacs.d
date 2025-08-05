@@ -76,6 +76,15 @@
   ;; open large directory (over 20000 files) asynchronously with `fd' command
   (setq dirvish-large-directory-threshold 20000)
 
+  ;; Preview image with full width and height. Using advice because
+  ;; `dirvish-media--img-scale-h' and `dirvish-media--img-scale-w' are defconst 
+  (define-advice dirvish-media--img-size (:override (window &optional height))
+    "Get corresponding image width or HEIGHT in WINDOW."
+    (let ((size (if height (* 1 (window-pixel-height window))
+                  (min (* 1 (window-pixel-width window))
+                       dirvish-media--img-max-width))))
+      (floor size)))
+
   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
   (("C-c e" . dirvish-side)
    ("C-c d" . dirvish)
