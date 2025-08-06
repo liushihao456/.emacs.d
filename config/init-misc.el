@@ -345,6 +345,24 @@ It enables expanding `foo.' to `foo->'."
   (setq yas-triggers-in-field t)
   (yas-reload-all))
 
+;; Csv mode
+(use-package csv-mode
+  :ensure t)
+
+;; Nov - epub reader
+(use-package nov
+  :ensure t
+  :mode ("\\.epub\\'" . nov-mode)
+  :config
+  (setq nov-text-width t)
+  (add-hook 'nov-mode-hook 'visual-line-mode)
+
+  (add-to-list 'evil-emacs-state-modes 'nov-mode)
+  (defun my-nov-font-setup ()
+    (text-scale-set 2)
+    (face-remap-add-relative 'variable-pitch :family "Friz Quadrata" :height 1.0))
+  (add-hook 'nov-mode-hook 'my-nov-font-setup))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
