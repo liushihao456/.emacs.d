@@ -55,11 +55,13 @@
   "Render icon for current buffer file in the mode line."
   (if-let* ((buffer-file buffer-file-name)
             (file (file-name-nondirectory buffer-file-name)))
-      (cond ((string-match-p "\\/$" file)
-             (nerd-svg-icons-icon-for-dir file))
-            (t
-             (nerd-svg-icons-icon-for-file file)))
-    (nerd-svg-icons-icon-for-mode major-mode)))
+      (with-selected-window (minibuffer-window)
+        (cond ((string-match-p "\\/$" file)
+               (nerd-svg-icons-icon-for-dir file))
+              (t
+               (nerd-svg-icons-icon-for-file file))))
+    (with-selected-window (minibuffer-window)
+      (nerd-svg-icons-icon-for-mode major-mode))))
 
 (defun my/vc-mode-line ()
   "Render version control information in the mode line."

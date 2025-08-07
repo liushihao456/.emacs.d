@@ -354,12 +354,14 @@ It enables expanding `foo.' to `foo->'."
   :ensure t
   :mode ("\\.epub\\'" . nov-mode)
   :config
+  (setq nov-header-line-format nil)
   (setq nov-text-width t)
   (add-hook 'nov-mode-hook 'visual-line-mode)
 
   (add-to-list 'evil-emacs-state-modes 'nov-mode)
   (defun my-nov-font-setup ()
     (text-scale-set 2)
+    (setq line-spacing 10)
     (face-remap-add-relative 'variable-pitch :family "Friz Quadrata" :height 1.0))
   (add-hook 'nov-mode-hook 'my-nov-font-setup))
 
