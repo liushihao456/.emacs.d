@@ -362,6 +362,8 @@ It enables expanding `foo.' to `foo->'."
   (defun my-nov-font-setup ()
     (text-scale-set 2)
     (setq line-spacing 10)
+    (setq-local left-margin-width 10)
+    (setq-local right-margin-width 10)
     (face-remap-add-relative 'variable-pitch :family "Friz Quadrata" :height 1.0))
   (add-hook 'nov-mode-hook 'my-nov-font-setup))
 
