@@ -60,8 +60,9 @@
                (nerd-svg-icons-icon-for-dir file))
               (t
                (nerd-svg-icons-icon-for-file file))))
-    (with-selected-window (minibuffer-window)
-      (nerd-svg-icons-icon-for-mode major-mode))))
+    (let ((mode major-mode))
+      (with-selected-window (minibuffer-window)
+        (nerd-svg-icons-icon-for-mode mode)))))
 
 (defun my/vc-mode-line ()
   "Render version control information in the mode line."
