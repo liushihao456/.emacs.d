@@ -16,7 +16,8 @@
     (set-face-attribute 'fixed-pitch nil :family local-config-font)
     (set-face-attribute 'fixed-pitch-serif nil :family local-config-font)
     (when (boundp 'local-config-chinese-font)
-      (set-fontset-font t 'han local-config-chinese-font))
+      (set-fontset-font t 'han (font-spec :family local-config-chinese-font
+                                          :size (string-to-number local-config-font-size))))
     ;; Fix unicode font height bug on macOS
     (when (memq window-system '(mac ns))
       (set-fontset-font t 'unicode
