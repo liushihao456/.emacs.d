@@ -41,16 +41,6 @@
   (advice-add #'diff-hl-fringe-bmp-from-pos  :override #'my/diff-hl-type-at-pos-fn)
   (advice-add #'diff-hl-fringe-bmp-from-type :override #'my/diff-hl-type-at-pos-fn)
   (setq diff-hl-draw-borders nil)
-  (with-eval-after-load 'flycheck
-    (setq flycheck-indication-mode 'right-fringe)
-    ;; Let the arrow point left
-    (when (fboundp 'define-fringe-bitmap) ;; #ifdef HAVE_WINDOW_SYSTEM
-      (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-        flycheck-fringe-bitmap-double-left-arrow)
-      (define-fringe-bitmap
-        'flycheck-fringe-bitmap-double-arrow-hi-res
-        flycheck-fringe-bitmap-double-left-arrow-hi-res
-        nil 16)))
 
   (def-transient-commands diff-hl-mode-map diff-hl-command-prefix
                           ("n" . diff-hl-next-hunk)

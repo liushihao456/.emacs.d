@@ -1,8 +1,8 @@
-;;; init-flycheck.el --- Configurations for flycheck	-*- lexical-binding: t -*-
+;;; init-flymake.el --- Configurations for flymake	-*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;
-;; Configurations for flycheck
+;; Configurations for flymake
 ;; --------------------------------------
 
 ;;; Code:
@@ -43,6 +43,14 @@
                                              (warning "«" compilation-warning)
                                              (note "«" compilation-info)))))
 
-(provide 'init-flycheck)
+(use-package sideline-flymake
+  :vc (:url "https://github.com/emacs-sideline/sideline-flymake")
+  :ensure t
+  :hook (flymake-mode . sideline-mode)
+  :init
+  (setq sideline-flymake-display-mode 'line)
+  (setq sideline-backends-right '(sideline-flymake)))
 
-;;; init-flycheck.el ends here
+(provide 'init-flymake)
+
+;;; init-flymake.el ends here

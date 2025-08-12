@@ -42,7 +42,6 @@
   (add-to-list 'evil-emacs-state-modes 'embark-collect-mode)
   (add-to-list 'evil-emacs-state-modes 'grep-mode)
   (add-to-list 'evil-emacs-state-modes 'deadgrep-mode)
-  (add-to-list 'evil-emacs-state-modes 'flycheck-error-list-mode)
   (add-to-list 'evil-emacs-state-modes 'flymake-diagnostics-buffer-mode)
   (add-to-list 'evil-emacs-state-modes 'xref--xref-buffer-mode)
   (add-to-list 'evil-emacs-state-modes 'symbols-outline-mode)

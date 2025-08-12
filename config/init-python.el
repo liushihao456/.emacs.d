@@ -7,6 +7,7 @@
 
 ;;; Code:
 
+;; Install pyright with `pip install pyright'
 (use-package eglot
   :ensure t
   :hook (python-base-mode . eglot-ensure))

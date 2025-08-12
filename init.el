@@ -47,7 +47,7 @@
 (require 'init-evil)
 (require 'init-misc)
 (require 'init-compile)
-(require 'init-flycheck)
+(require 'init-flymake)
 (require 'init-company)
 (require 'init-imenu)
 (require 'init-latex)
@@ -69,3 +69,18 @@
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages '(sideline sideline-flymake))
+ '(package-vc-selected-packages
+   '((sideline-flymake :url "https://github.com/emacs-sideline/sideline-flymake")
+     (sideline :url "https://github.com/emacs-sideline/sideline"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

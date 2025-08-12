@@ -31,7 +31,8 @@
              (lsp-lens-mode nil "lsp-lens")
              (evil-commentary-mode nil "evil-commentary")
              (org-indent-mode nil "org-indent")
-             (copilot-mode nil "copilot"))))
+             (copilot-mode nil "copilot")
+             (sideline-mode nil "sideline"))))
 
 ;; cc-mode.el assumes that `mode-name’ is always a string (which was true in
 ;; Emacs 22 and earlier), while delight.el makes use of the fact that
