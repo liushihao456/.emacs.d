@@ -12,7 +12,11 @@
 
 (use-package eglot
   :ensure t
-  :hook ((c-mode-common c-ts-base-mode) . eglot-ensure))
+  :hook ((c-mode-common c-ts-base-mode) . eglot-ensure)
+  :config
+  ;; Download clangd from https://github.com/clangd/clangd/releases/latest
+  ;; Then put it in .emacs.d/.cache/clangd
+  (add-to-list 'exec-path (file-name-concat user-emacs-directory ".cache/clangd/bin")))
 
 (use-package c-ts-mode
   :config

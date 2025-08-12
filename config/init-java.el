@@ -41,12 +41,8 @@
   :hook ((java-mode java-ts-mode) . eglot-ensure)
   :config
   ;; Download jdtls from http://download.eclipse.org/jdtls/milestones/
-  ;; Then put it in .emacs.d/.cache/eglot/jdtls
-  (add-to-list 'eglot-server-programs
-               `((java-mode java-ts-mode) ,(file-name-concat
-                                            user-emacs-directory
-                                            ".cache/eglot/jdtls/bin/jdtls")))
-  )
+  ;; Then put it in .emacs.d/.cache/jdtls
+  (add-to-list 'exec-path (file-name-concat user-emacs-directory ".cache/jdtls/bin")))
 
 (provide 'init-java)
 

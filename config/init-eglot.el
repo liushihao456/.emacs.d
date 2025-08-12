@@ -1,4 +1,4 @@
-;;; init-lsp.el --- Configurations of LSP	-*- lexical-binding: t -*-
+;;; init-eglot.el --- Configurations of eglot	-*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;
@@ -19,6 +19,6 @@
   (define-key eglot-mode-map (kbd "C-c l e") 'eglot-find-declaration)
   (define-key eglot-mode-map (kbd "C-c l t") 'eglot-find-typeDefinition))
 
-(provide 'init-lsp)
+(provide 'init-eglot)
 
-;;; init-lsp.el ends here
+;;; init-eglot.el ends here
