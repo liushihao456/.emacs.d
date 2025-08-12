@@ -37,9 +37,13 @@
   (delete 'compilation-mode evil-motion-state-modes)
   (add-to-list 'evil-emacs-state-modes 'Info-mode)
   (delete 'Info-mode evil-motion-state-modes)
+  (add-to-list 'evil-emacs-state-modes 'help-mode)
+  (delete 'help-mode evil-motion-state-modes)
+  (add-to-list 'evil-emacs-state-modes 'embark-collect-mode)
   (add-to-list 'evil-emacs-state-modes 'grep-mode)
   (add-to-list 'evil-emacs-state-modes 'deadgrep-mode)
   (add-to-list 'evil-emacs-state-modes 'flycheck-error-list-mode)
+  (add-to-list 'evil-emacs-state-modes 'flymake-diagnostics-buffer-mode)
   (add-to-list 'evil-emacs-state-modes 'xref--xref-buffer-mode)
   (add-to-list 'evil-emacs-state-modes 'symbols-outline-mode)
   (add-to-list 'evil-motion-state-modes 'special-mode)
@@ -47,8 +51,6 @@
   (with-current-buffer (messages-buffer) (evil-motion-state))
   (with-eval-after-load 'dashboard
     (evil-make-overriding-map dashboard-mode-map 'motion))
-  (with-eval-after-load 'help-mode
-    (evil-make-overriding-map help-mode-map 'motion))
   (with-eval-after-load 'org
     (evil-make-overriding-map org-mode-map 'normal))
 

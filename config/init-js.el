@@ -15,7 +15,7 @@
   (defun prettier-buffer ()
     "Organize imports and call prettier to format buffer."
     (interactive)
-    (when (fboundp 'lsp-organize-imports) (lsp-organize-imports))
+    (when (fboundp 'eglot-code-action-organize-imports) (eglot-code-action-organize-imports))
     (when (fboundp 'prettier-js) (prettier-js)))
   (add-hook 'js-base-mode-hook (lambda () (when yas-minor-mode
                                             (yas-activate-extra-mode 'js-mode)
@@ -27,16 +27,16 @@
   (defun prettier-buffer ()
     "Organize imports and call prettier to format buffer."
     (interactive)
-    (when (fboundp 'lsp-organize-imports) (lsp-organize-imports))
+    (when (fboundp 'eglot-code-action-organize-imports) (eglot-code-action-organize-imports))
     (when (fboundp 'prettier-js) (prettier-js)))
   (add-hook 'typescript-ts-base-mode-hook (lambda () (when yas-minor-mode
                                             (yas-activate-extra-mode 'js-mode)
                                             (yas-activate-extra-mode 'typescript-mode))))
   (define-key typescript-ts-base-mode-map (kbd "<f5>") 'prettier-buffer))
 
-(use-package lsp-mode
+(use-package eglot
   :ensure t
-  :hook ((js-base-mode typescript-ts-base-mode) . lsp))
+  :hook ((js-base-mode typescript-ts-base-mode) . eglot-ensure))
 
 (use-package emmet-mode
   :ensure t

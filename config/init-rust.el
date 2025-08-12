@@ -7,9 +7,9 @@
 
 ;;; Code:
 
-(use-package lsp-mode
+(use-package eglot
   :ensure t
-  :hook (rust-ts-mode . lsp))
+  :hook (rust-ts-mode . eglot-ensure))
 
 (provide 'init-rust)
 

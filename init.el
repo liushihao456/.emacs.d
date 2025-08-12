@@ -57,7 +57,7 @@
 (require 'init-python)
 (require 'init-cpp)
 (require 'init-java)
-(require 'init-lsp)
+(require 'init-eglot)
 (require 'init-js)
 (require 'init-rust)
 (require 'init-treesit)

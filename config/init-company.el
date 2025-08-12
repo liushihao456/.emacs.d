@@ -35,26 +35,7 @@
     (global-set-key (kbd "C-]") 'company-yasnippet)
 
     (define-key company-active-map [tab] nil)
-    (define-key company-active-map (kbd "TAB") nil)
-
-    (defun company-backend-with-yas (backend)
-      "Add `yasnippet' to company backend."
-      (if (and (listp backend) (member 'company-yasnippet backend))
-          backend
-        (append (if (consp backend) backend (list backend))
-                '(:with company-yasnippet))))
-
-    (defun my/company-enable-yas (&rest _)
-      "Enable `yasnippet' in `company'."
-      (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
-
-    ;; Enable in current backends
-    (my/company-enable-yas)
-
-    ;; Enable in `lsp-mode'
-    (use-package lsp-mode
-      :config
-      (advice-add #'lsp--auto-configure :after #'my/company-enable-yas))))
+    (define-key company-active-map (kbd "TAB") nil)))
 
 (use-package company-box
   :ensure t

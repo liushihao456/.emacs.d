@@ -36,18 +36,17 @@
     :config
     (define-key java-ts-mode-map (kbd "C-c C-m") 'java-compile-run-current-main-class)))
 
-(use-package lsp-mode
+(use-package eglot
   :ensure t
-  :hook ((java-mode java-ts-mode) . lsp))
-
-(use-package lsp-java
-  :ensure t
+  :hook ((java-mode java-ts-mode) . eglot-ensure)
   :config
-  (setq lsp-java-autobuild-enabled nil)
-  (setq lsp-java-code-generation-generate-comments t)
-  (setq lsp-java-completion-overwrite nil)
-  (setq lsp-java-format-on-type-enabled nil)
-  (setq lsp-java-save-action-organize-imports nil))
+  ;; Download jdtls from http://download.eclipse.org/jdtls/milestones/
+  ;; Then put it in .emacs.d/.cache/eglot/jdtls
+  (add-to-list 'eglot-server-programs
+               `((java-mode java-ts-mode) ,(file-name-concat
+                                            user-emacs-directory
+                                            ".cache/eglot/jdtls/bin/jdtls")))
+  )
 
 (provide 'init-java)
 

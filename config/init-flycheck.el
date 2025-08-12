@@ -9,43 +9,39 @@
 
 (require 'init-macros)
 
-(use-package flycheck
+(use-package flymake
   :ensure t
-  :hook (prog-mode . flycheck-mode)
+  :hook (prog-mode . flymake-mode)
   :config
-  (def-transient-commands flycheck-mode-map "C-c f"
-    ("n" . flycheck-next-error)
-    ("p" . flycheck-previous-error))
+  (setq flymake-mode-line-lighter "")
+  (def-transient-commands flymake-mode-map "C-c f"
+    ("n" . flymake-goto-next-error)
+    ("p" . flymake-goto-prev-error))
 
-  (define-key flycheck-mode-map (kbd "C-c f l") 'flycheck-list-errors)
+  (define-key flymake-mode-map (kbd "C-c f l") 'flymake-show-buffer-diagnostics)
+  (define-advice flymake-show-buffer-diagnostics (:after ())
+    (select-window (get-buffer-window (flymake--diagnostics-buffer-name))))
+  (define-advice flymake-goto-diagnostic (:after (pos))
+    (quit-window nil (get-buffer-window (flymake--diagnostics-buffer-name))))
 
-  (setq-default flycheck-emacs-lisp-load-path 'inherit)
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
-
-  (add-to-list 'display-buffer-alist
-               `(,flycheck-error-list-buffer
-                 (display-buffer-reuse-window display-buffer-at-bottom)
-                 (window-height . 0.33)))
-  (defun flycheck-list-errors-a ()
-    "Switch to flycheck error list buffer after creating it."
-    (select-window (get-buffer-window flycheck-error-list-buffer)))
-  (advice-add #'flycheck-list-errors :after #'flycheck-list-errors-a)
-  (defun flycheck-goto-error-a ()
-    "Close flycheck error list window after going to error."
-    (when (eq this-command 'flycheck-error-list-goto-error)
-      (quit-window nil (get-buffer-window flycheck-error-list-buffer))))
-  (advice-add #'flycheck-error-list-goto-error :after #'flycheck-goto-error-a)
-  (add-hook 'window-configuration-change-hook
-            (lambda ()
-              (when-let* ((w (get-buffer-window flycheck-error-list-buffer)))
-                (set-window-parameter w 'no-other-window t))))
-
-  (set-face-background 'flycheck-warning (face-background 'default))
-  (set-face-background 'flycheck-error (face-background 'default))
-  (set-face-background 'flycheck-info (face-background 'default))
-  (set-face-background 'flycheck-fringe-warning (face-background 'default))
-  (set-face-background 'flycheck-fringe-error (face-background 'default))
-  (set-face-background 'flycheck-fringe-info (face-background 'default)))
+  (if (display-graphic-p)
+      (progn
+        (setq flymake-fringe-indicator-position 'right-fringe)
+        (define-fringe-bitmap 'flymake-double-left-arrow
+          [#b00011011
+           #b00110110
+           #b01101100
+           #b11011000
+           #b01101100
+           #b00110110
+           #b00011011])
+        (setq flymake-error-bitmap '(flymake-double-left-arrow compilation-error))
+        (setq flymake-warning-bitmap '(flymake-double-left-arrow compilation-warning))
+        (setq flymake-note-bitmap '(flymake-double-left-arrow compilation-info)))
+    (setq flymake-margin-indicator-position 'right-margin)
+    (setq flymake-margin-indicators-string '((error "«" compilation-error)
+                                             (warning "«" compilation-warning)
+                                             (note "«" compilation-info)))))
 
 (provide 'init-flycheck)
 

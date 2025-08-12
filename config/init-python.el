@@ -7,16 +7,12 @@
 
 ;;; Code:
 
-(use-package lsp-mode
+(use-package eglot
   :ensure t
-  :hook (python-base-mode . lsp))
-
-(use-package lsp-pyright
-  :ensure t)
+  :hook (python-base-mode . eglot-ensure))
 
 (use-package python
   :config
-  (require 'lsp-pyright)
   (setq python-shell-interpreter "python3")
   (defun my/format-buffer ()
     "Format buffer using yapf."

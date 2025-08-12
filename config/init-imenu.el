@@ -11,7 +11,7 @@
   :load-path "packages/symbols-outline"
   :bind ("C-c i" . symbols-outline-show)
   :init
-  (add-hook 'lsp-mode-hook
+  (add-hook 'eglot-managed-mode-hook
             (lambda ()
               (setq-local symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)))
   :config

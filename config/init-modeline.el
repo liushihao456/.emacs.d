@@ -16,7 +16,6 @@
              (which-key-mode nil "which-key")
              (abbrev-mode nil "abbrev")
              (visual-line-mode nil "simple")
-             (lsp-mode nil "lsp-mode")
              (company-mode nil "company")
              (company-box-mode nil "company-box")
              (yas-minor-mode nil "yasnippet")
@@ -27,7 +26,6 @@
              (anzu-mode nil "anzu")
              (isearch-mode nil "isearch")
              (tree-sitter-mode nil "tree-sitter")
-             (flycheck-mode nil "flycheck")
              (mini-modeline-mode nil "mini-modeline")
              (hs-minor-mode nil "hideshow")
              (lsp-lens-mode nil "lsp-lens")
@@ -73,34 +71,6 @@
   "Render version control information in the mode line."
   (cond (evil-mode (evil-generate-mode-line-tag evil-state))
         (t nil)))
-
-(defun my/flycheck-mode-line ()
-  "Render flycheck information in the mode line."
-  (if (boundp 'flycheck-last-status-change)
-      (pcase flycheck-last-status-change
-        (`not-checked nil)
-        (`no-checker (propertize "   -    " 'face 'warning))
-        (`running (propertize "   ?    " 'face 'success))
-        (`errored (propertize "   !    " 'face 'error))
-        (`finished
-         (when-let* ((error-counts (flycheck-count-errors flycheck-current-errors)))
-           (let ((no-errors (cdr (assq 'error error-counts)))
-                 (no-warnings (cdr (assq 'warning error-counts))))
-             (format "[%s/%s] "
-                     (propertize (format "%2d" (or no-errors 0)) 'face 'error)
-                     (propertize (format "%2d" (or no-warnings 0)) 'face 'warning)))))
-        ;; (concat
-        ;;    (when no-errors
-        ;;      (propertize
-        ;;       (format "%s%s " (nerd-svg-icons-icon-str :face "ban") no-errors)
-        ;;       'face 'error))
-        ;;    (when no-warnings
-        ;;      (propertize
-        ;;       (format "%s%s" (nerd-svg-icons-icon-str :face "warning") no-warnings)
-        ;;       'face 'warning))))))
-        (`interrupted "   -    ")
-        (`suspicious '(propertize "   ?    " 'face 'warning)))
-    nil))
 
 (defun my/row-col-mode-line ()
   "Render row and col information in the mode line."
@@ -160,7 +130,6 @@
 
 ;; (defvar my/mode-line-right-segment
 ;;   (list " "
-;;         '(:eval (my/flycheck-mode-line))
 ;;         '(:eval (my/row-col-mode-line))))
 
 ;; (setq-default mode-line-format
@@ -205,7 +174,6 @@
               '(:eval (list (-remove #'(lambda (x) (or (equal x "(") (equal x ")"))) mode-line-modes)))
               '(:eval (my/evil-mode-line))
               " "
-              '(:eval (my/flycheck-mode-line))
               '(:eval (my/row-col-mode-line))
               " "))
   (setq mini-modeline-right-padding 1))

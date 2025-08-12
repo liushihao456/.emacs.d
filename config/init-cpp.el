@@ -10,9 +10,9 @@
 ;; Use c++-mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-(use-package lsp-mode
+(use-package eglot
   :ensure t
-  :hook ((c-mode-common c-ts-base-mode) . lsp))
+  :hook ((c-mode-common c-ts-base-mode) . eglot-ensure))
 
 (use-package c-ts-mode
   :config
