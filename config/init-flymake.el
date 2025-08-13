@@ -12,11 +12,15 @@
 (use-package flymake
   :ensure t
   :hook (prog-mode . flymake-mode)
+  :custom
+  (flymake-margin-indicators-string '((error "«" compilation-error)
+                                      (warning "«" compilation-warning)
+                                      (note "«" compilation-info)))
   :config
   (setq flymake-mode-line-lighter "")
   (def-transient-commands flymake-mode-map "C-c f"
-    ("n" . flymake-goto-next-error)
-    ("p" . flymake-goto-prev-error))
+                          ("n" . flymake-goto-next-error)
+                          ("p" . flymake-goto-prev-error))
 
   (define-key flymake-mode-map (kbd "C-c f l") 'flymake-show-buffer-diagnostics)
   (define-advice flymake-show-buffer-diagnostics (:after ())
@@ -38,10 +42,7 @@
         (setq flymake-error-bitmap '(flymake-double-left-arrow compilation-error))
         (setq flymake-warning-bitmap '(flymake-double-left-arrow compilation-warning))
         (setq flymake-note-bitmap '(flymake-double-left-arrow compilation-info)))
-    (setq flymake-margin-indicator-position 'right-margin)
-    (setq flymake-margin-indicators-string '((error "«" compilation-error)
-                                             (warning "«" compilation-warning)
-                                             (note "«" compilation-info)))))
+    (setq flymake-margin-indicator-position 'right-margin)))
 
 (use-package sideline-flymake
   :vc (:url "https://github.com/emacs-sideline/sideline-flymake")
