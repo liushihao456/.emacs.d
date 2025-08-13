@@ -39,7 +39,7 @@
 
 (setq use-package-always-defer t)
 
-(defun package--save-selected-packages (&rest opt) nil)
+(defun package--update-selected-packages (&rest opt) nil)
 
 (require 'init-local-config)
 (require 'init-minibuffer)
