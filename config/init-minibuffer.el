@@ -162,7 +162,8 @@
 
 (use-package consult
   :ensure t
-  :bind ("C-c p s" . consult-ripgrep)
+  :bind (("C-c p s" . consult-ripgrep)
+         ([remap switch-to-buffer] . consult-buffer))
   :config
   ;; Start consult-ripgrep search with active region or symbol at point
   (defun my/consult-ripgrep-initial-input-advice (consult-fn &optional dir given-initial)
