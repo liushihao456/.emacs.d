@@ -30,7 +30,8 @@
     "Apply ansi color rendering in compilation buffer."
     (ansi-color-apply-on-region compilation-filter-start (point-max)))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-  (add-hook 'compilation-finish-functions 'switch-to-buffer-other-window))
+  (define-advice compile (:after (&rest _))
+    (switch-to-buffer-other-window next-error-last-buffer)))
 
 (provide 'init-compile)
 
