@@ -241,7 +241,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
        ((file-name-directory (abbreviate-file-name file))
         :face 'marginalia-file-name))))
 
-  (add-to-list 'marginalia-annotator-registry
+  (add-to-list 'marginalia-annotators
                '(recentf-file marginalia--recentf-file-annotator builtin none)))
 
 ;; Switch to buffer in the current project ----------------------------------- ;

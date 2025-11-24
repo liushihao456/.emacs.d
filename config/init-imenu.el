@@ -176,7 +176,7 @@
            ((string-trim (or (gethash "pattern" full-json) ""))
             :face 'marginalia-function)))))
 
-    (add-to-list 'marginalia-annotator-registry
+    (add-to-list 'marginalia-annotators
                  '(ctags project-ctags-tag-annotator builtin none)))
 
   (use-package vertico
