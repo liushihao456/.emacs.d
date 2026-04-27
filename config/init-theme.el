@@ -46,6 +46,9 @@
 (when (display-graphic-p)
   (set-face-background 'fringe "unspecified"))
 
+(unless (display-graphic-p)
+  (set-face-background 'default "unspecified"))
+
 (provide 'init-theme)
 
 ;;; init-theme.el ends here
