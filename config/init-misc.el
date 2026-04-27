@@ -200,7 +200,7 @@ split; vice versa."
 (global-set-key (kbd "C-c p p") 'project-switch-project)
 (global-set-key (kbd "C-c p r") 'project-find-regexp)
 (global-set-key (kbd "C-c p q") 'project-query-replace-regexp)
-(global-set-key (kbd "C-c `") 'fileloop-continue)
+(global-set-key (kbd "C-c `") 'revert-buffer)
 (global-set-key (kbd "C-x v") nil)
 (global-set-key (kbd "C-x B") 'ibuffer)
 (global-set-key (kbd "C-x p") 'list-processes)
