@@ -41,6 +41,28 @@
 
 (defun package--update-selected-packages (&rest opt) nil)
 
+(defun my/ensure-git-submodules (&optional dir)
+  "Ensure git submodules in DIR are initialized and updated."
+  (let* ((dir (file-name-as-directory (or dir user-emacs-directory)))
+         (default-directory dir)
+         (buf (get-buffer-create "*emacs git submodules*")))
+    (when (and (executable-find "git")
+               (file-exists-p (expand-file-name ".gitmodules" dir)))
+      (with-current-buffer buf
+        (erase-buffer))
+      (let ((exit-code
+             (call-process
+              "git" nil buf t
+              "submodule" "update" "--init" "--recursive")))
+        (unless (zerop exit-code)
+          (display-warning
+           'emacs-init
+           (format "Git submodule update failed in %s. See buffer %s"
+                   dir
+                   (buffer-name buf))))))))
+
+(my/ensure-git-submodules user-emacs-directory)
+
 (require 'init-local-config)
 (require 'init-minibuffer)
 (require 'init-font)
