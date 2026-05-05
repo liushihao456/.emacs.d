@@ -62,7 +62,6 @@
 (require 'init-eglot)
 (require 'init-js)
 (require 'init-rust)
-(require 'init-treesit)
 (require 'init-fold)
 (require 'init-dired)
 (require 'init-vc)
