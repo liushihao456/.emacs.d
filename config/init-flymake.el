@@ -45,7 +45,6 @@
     (setq flymake-margin-indicator-position 'right-margin)))
 
 (use-package sideline-flymake
-  :vc (:url "https://github.com/emacs-sideline/sideline-flymake")
   :ensure t
   :hook (flymake-mode . sideline-mode)
   :init
