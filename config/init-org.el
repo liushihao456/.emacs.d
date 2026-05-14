@@ -151,34 +151,6 @@ Entered on %T")
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
 
-(use-package org-roam
-  :ensure t
-  :bind (("C-c n f" . org-roam-node-find)
-         ("C-c n r" . org-roam-node-random)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n c" . org-roam-capture)
-         ("C-c n j" . org-roam-dailies-capture-today))
-  :config
-  (define-key org-mode-map (kbd "C-c n t") 'org-roam-tag-add)
-  (define-key org-mode-map (kbd "C-c n o") 'org-id-get-create)
-  (define-key org-mode-map (kbd "C-c n a") 'org-roam-alias-add)
-  (define-key org-mode-map (kbd "C-c n i") 'org-roam-node-insert)
-  (define-key org-mode-map (kbd "C-c n l") 'org-roam-buffer-toggle)
-  (org-roam-db-autosync-mode)
-  (setq org-roam-node-display-template
-        (concat "${title:*} "
-                (propertize "${tags:20}" 'face 'org-tag)))
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?" :target
-           (file+head "${slug}.org" "#+title: ${title}\n")
-           :unnarrowed)))
-  (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
-                 (display-buffer-in-direction)
-                 (direction . right)
-                 (window-width . 0.33)
-                 (window-height . fit-window-to-buffer))))
-
 ;; Beautify org -------------------------------------------------------------- ;
 
 (use-package org-bullets
