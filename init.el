@@ -54,7 +54,8 @@
              (call-process
               "git" nil buf t
               "submodule" "update" "--init" "--recursive")))
-        (unless (zerop exit-code)
+        (if (zerop exit-code)
+            (kill-buffer buf)
           (display-warning
            'emacs-init
            (format "Git submodule update failed in %s. See buffer %s"
