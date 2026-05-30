@@ -12,10 +12,13 @@
 (use-package eglot
   :ensure t
   :config
+  (setq eglot-ignored-server-capabilities '(:inlayHintProvider))
   (define-key eglot-mode-map (kbd "C-c l r") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c l R") 'eglot-reconnect)
   (define-key eglot-mode-map (kbd "C-c l f") 'eglot-format)
   (define-key eglot-mode-map (kbd "C-c l x") 'eglot-code-actions)
   (define-key eglot-mode-map (kbd "C-c l m") 'eglot-code-action-organize-imports)
+  (define-key eglot-mode-map (kbd "C-c l h") 'eglot-inlay-hints-mode)
   (define-key eglot-mode-map (kbd "C-c l e") 'eglot-find-declaration)
   (define-key eglot-mode-map (kbd "C-c l t") 'eglot-find-typeDefinition))
 
