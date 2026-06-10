@@ -7,9 +7,13 @@
 
 ;;; Code:
 
+(use-package rust-mode
+  :ensure t
+  )
+
 (use-package eglot
   :ensure t
-  :hook (rust-ts-mode . eglot-ensure))
+  :hook (rust-mode . eglot-ensure))
 
 (provide 'init-rust)
 
