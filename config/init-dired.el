@@ -22,9 +22,12 @@
 
 (use-package dirvish
   :ensure t
-  :config
-  (dirvish-override-dired-mode)
+  :init
+  (use-package dired
+    :config
+    (dirvish-override-dired-mode))
 
+  :config
   ;; Override nerd-icons attribute using nerd-svg-icons
   (use-package nerd-svg-icons
     :load-path "packages/nerd-svg-icons"
