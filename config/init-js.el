@@ -23,6 +23,7 @@
   (define-key js-base-mode-map (kbd "<f5>") 'prettier-buffer))
 
 (use-package typescript-ts-mode
+  :mode ("\\.ts\\'" "\\.tsx\\'")
   :config
   (defun prettier-buffer ()
     "Organize imports and call prettier to format buffer."
